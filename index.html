@@ -1,12 +1,29 @@
 <!DOCTYPE html>
+<!--
+  サーキットマネージャー  v1.0.0
+
+  更新内容（v1.0.0・2026-10-15）
+  ・チーム選択／マイチームのスタート条件：強さをS〜Gのランクで表示
+  ・日本語フォントを M PLUS 1p に変更
+  ・市街地サーキット：大通り・旧市街・海沿いの地区で構成し、長い直線を追加。1シーズン1戦まで
+  ・ダブルスタック（同じチームの2台が続けてピットイン）と、AIの判断
+  ・選手の名前・国籍・能力をキャリアごとにランダム生成（国籍は均等）
+  ・マシン開発：失敗・成功・大成功と開発方針、開発枠の追加購入、開発結果を行に表示
+  ・リザーブ：シミュレーター作業の効果と、リザーブ特殊能力
+  ・スポンサー：企業を22社に、契約タイプに予選型・露出型・若手育成型を追加
+  ・スターティンググリッドの間隔を拡大、トラブル車はグラベルに停車（SCが出にくい）
+  ・スマホ：レース結果・移籍市場・資金表示・タワー型順位表・レース画面の整理（観戦モードなど）
+-->
+
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>サーキットマネージャー</title>
+<meta name="version" content="1.0.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=M+PLUS+1p:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#eceeea;--panel:#fbfbf9;--text:#1f2328;--muted:#646b73;--line:#d9ddd6;
@@ -18,7 +35,7 @@
 }}
 :root[data-theme="dark"]{--bg:#15181c;--panel:#1d2126;--text:#e9ebee;--muted:#9aa2ab;--line:#30353c;--btn:#262b31;--btnh:#30363d;--tower:#0f1114;}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:"Zen Kaku Gothic New",system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;font-size:14px;line-height:1.5}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"M PLUS 1p",system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;font-size:14px;line-height:1.5}
 .num{font-family:"Chakra Petch","Segoe UI",system-ui,sans-serif;font-variant-numeric:tabular-nums}
 header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;background:var(--panel);border-bottom:3px solid var(--signal);position:sticky;top:0;z-index:10;flex-wrap:wrap}
 h1{font-size:18px;margin:0;font-weight:700}
@@ -134,6 +151,7 @@ input[type=text]{min-width:0;flex:1}
 .wrapx{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
 main>*,.panel,.panel>*,.sec,.stage{min-width:0}
 html,body{max-width:100%;overflow-x:hidden}
+@supports (overflow-x:clip){html,body{overflow-x:clip}}   /* hidden だと画面下の固定バー（position:sticky）が効かなくなるので、使えるブラウザでは clip にする */
 @media (max-width:520px){
   main{padding:6px;gap:6px}
   .sec{padding:10px}
@@ -162,6 +180,8 @@ html,body{max-width:100%;overflow-x:hidden}
 .rec.f-red .rec-lab{color:#ff5a6e}
 .rec.f-mech .rec-ico{background:#ff7f11;color:#15171a}
 .rec.f-mech .rec-lab{color:#ffa24d}
+.rec.f-stack .rec-ico{background:#ff7f11;color:#15171a}   /* ダブルスタックの速報 */
+.rec.f-stack .rec-lab{color:#ffa24d}
 .rec .rec-name:last-child{padding-right:14px}
 .rec>span{display:flex;align-items:center;white-space:nowrap}
 .rec-ico{background:#c026d3;color:#fff;padding:0 7px}
@@ -197,6 +217,20 @@ html,body{max-width:100%;overflow-x:hidden}
 .res th{font-size:12px;color:var(--muted);font-weight:500}
 .res tr+tr td{border-top:1px solid var(--line)}
 .res .p1 td{font-weight:700}
+.res .gchg.up{color:#1a9a55}.res .gchg.dn{color:#d7263d}.res .gchg{color:var(--muted)}
+.res .rPts{font-weight:700}
+/* スマホ：結果の表を横スクロールなしで収める（文字と余白を詰め、ピット回数はタイヤの並びで分かるので省く） */
+@media (max-width:560px){
+  #resultModal{padding:6px}
+  #resultModal .box{padding:12px 10px}
+  #resultModal h3{font-size:16px;margin-bottom:6px}
+  .res td,.res th{padding:3px 3px;font-size:11.5px}
+  .res th{font-size:10.5px}
+  .res .rPit{display:none}
+  .res .dot{width:8px;height:8px;margin-right:3px}
+  .res .sw{width:11px;margin-left:2px}
+  #resultModal .myRes{font-size:12px;padding:6px 8px;margin-bottom:6px}
+}
 textarea{width:100%;height:160px;font-size:12px;font-family:ui-monospace,Menlo,monospace}
 /* カメラ操作（コース画面の左下） */
 .stage.wxTop .wxlab{display:none}   /* 狭い画面：路面表示を小さくし（見出しを省く）、速報バナーはその左側の幅で中央に出す */
@@ -277,7 +311,7 @@ textarea{width:100%;height:160px;font-size:12px;font-family:ui-monospace,Menlo,m
 .lead-txt{flex-wrap:wrap;row-gap:2px}
 .camctl{position:absolute;left:8px;bottom:8px;display:flex;flex-wrap:nowrap;max-width:calc(100% - 16px);align-items:center;gap:4px;z-index:7;
   background:rgba(20,22,26,.8);padding:4px;border-radius:9px;font-family:"Chakra Petch","Segoe UI",system-ui,sans-serif}
-.camctl button{border:0;background:transparent;color:#dfe4ea;font:700 12px "Chakra Petch","Zen Kaku Gothic New",system-ui,sans-serif;
+.camctl button{border:0;background:transparent;color:#dfe4ea;font:700 12px "Chakra Petch","M PLUS 1p",system-ui,sans-serif;
   min-width:30px;height:28px;padding:0 8px;border-radius:6px;cursor:pointer;letter-spacing:.03em}
 .camctl button:hover{background:rgba(255,255,255,.12)}
 .camctl button.on{background:#ffc400;color:#15171a}
@@ -384,7 +418,7 @@ button.ghost{background:transparent}
 .typeSeg button.on{background:var(--tower);color:var(--towerText)}
 .typeSeg button:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
 .stats .typeSt{grid-column:1/-1;display:flex;flex-direction:column;gap:2px}
-.stats .typeSt b{font:700 13.5px "Zen Kaku Gothic New",system-ui,sans-serif}
+.stats .typeSt b{font:700 13.5px "M PLUS 1p",system-ui,sans-serif}
 .stats .typeSt span{white-space:normal;line-height:1.5}
 .stats .typeSt .need{color:var(--text);font-size:11.5px}
 .edtools{position:absolute;right:8px;bottom:8px;display:flex;gap:3px;z-index:7;background:rgba(20,22,26,.8);padding:4px;border-radius:10px}
@@ -550,6 +584,7 @@ main.bcast #raceCtl{flex:none}
 .rec.f-radio .rec-lab{color:#5fd6ff}
 .myRes{background:rgba(0,200,255,.1);border:1px solid rgba(0,200,255,.35);border-radius:10px;padding:8px 10px;margin:0 0 10px;font-size:13px;line-height:1.6}
 .myRes b{font-family:"Chakra Petch",sans-serif}
+.myRes .mrLine + .mrLine{border-top:1px solid rgba(0,200,255,.3);margin-top:5px;padding-top:5px}   /* 同じチームの2台を区切る */
 .res tr.my td{background:rgba(0,200,255,.1)}
 main.bcast #pitWall{flex:none}
 
@@ -584,6 +619,23 @@ main.bcast #pitWall{flex:none}
 .raceBar .b.go{min-height:44px;min-width:9em;font-size:15px}
 @media (min-width:761px){.raceBar.onOv{display:none}}
 @media (max-width:440px){.raceBar .rbInfo small{display:none}}
+/* 画面下のバーの資金。確定待ちのときは「確定すると $13.8M → $9.5M」 */
+.raceBar .rbMoney{flex:none;display:flex;align-items:baseline;gap:5px;padding:4px 10px;border-radius:8px;background:rgba(255,255,255,.08);white-space:nowrap}
+.raceBar .rbMoney small{font-size:10.5px;color:#aab0b8;letter-spacing:.02em}
+.raceBar .rbMoney b{font-size:16px;font-weight:700}
+.raceBar .rbMoney i{font-style:normal;color:#aab0b8;font-size:12px}
+.raceBar .rbMoney.pend{background:rgba(255,196,0,.18);box-shadow:inset 0 0 0 1px rgba(255,196,0,.6)}
+.raceBar .rbMoney .aft{color:var(--signal)}
+.raceBar .rbMoney .neg,.raceBar .rbMoney.neg b{color:#ff5a6e}
+@media (max-width:440px){
+  .raceBar .rbIn{gap:6px;padding-left:10px}
+  .raceBar .b.go{min-width:6.5em;font-size:14px;padding-left:10px;padding-right:10px}
+  .raceBar .rbMoney{padding:4px 7px;gap:4px}
+  .raceBar .rbMoney.pend small{display:none}   /* 狭い画面：確定待ちは「$13.8M → $9.5M」だけ */
+}
+/* 確定待ちのボタンの「残り」 */
+button .left{display:block;font-size:10.5px;font-weight:500;opacity:.85;line-height:1.2;margin-top:1px}
+@media (max-width:640px){ #hq .fa .acts .b{white-space:normal;line-height:1.2} }   /* 確定待ちの長い文言は折り返す */
 @media (max-width:760px){.hq .nextRace~.goRace,.hq #goRace{display:none}}
 /* ===== 遊び方ガイド ===== */
 .guideBtn{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 12px 0 8px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--text);font:700 13px inherit;font-family:inherit;cursor:pointer;margin-left:auto}
@@ -726,7 +778,7 @@ body.guideOpen{overflow:hidden}
 .nw{display:grid;grid-template-columns:4.8em minmax(0,1fr);gap:4px 10px;padding:9px 0;border-top:1px solid var(--line)}
 .nw h4{margin:0 0 2px;font-size:14px;line-height:1.45;text-wrap:balance}
 .nw p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.65}
-.nwTag{align-self:start;text-align:center;font:700 10.5px "Chakra Petch","Zen Kaku Gothic New",system-ui,sans-serif;letter-spacing:.06em;padding:3px 0;border-radius:4px;background:var(--tower);color:var(--towerText);white-space:nowrap}
+.nwTag{align-self:start;text-align:center;font:700 10.5px "Chakra Petch","M PLUS 1p",system-ui,sans-serif;letter-spacing:.06em;padding:3px 0;border-radius:4px;background:var(--tower);color:var(--towerText);white-space:nowrap}
 .nwTag.win{background:var(--signal);color:#1f2328}
 .nwTag.mine{background:#00c8ff;color:#06222e}
 .nwTag.bad{background:#d7263d;color:#fff}
@@ -794,6 +846,18 @@ body.guideOpen{overflow:hidden}
 .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:var(--tower)}
 .bar em{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--red);border-radius:1px}
 .devRow .v{font:700 13px "Chakra Petch",sans-serif;text-align:right;font-variant-numeric:tabular-nums}
+/* 開発の結果（押した行のすぐ下に出す。失敗＝赤・成功＝緑・大成功＝紫） */
+.devRes{grid-column:1/-1;display:flex;align-items:baseline;gap:8px;margin:2px 0 1px;padding:4px 10px;border-radius:7px;font-size:12.5px;border:1px solid}
+.devRes b{font-weight:700;font-size:13.5px}
+.devRes.t0{background:rgba(215,38,61,.08);border-color:rgba(215,38,61,.45);color:#c11f35}
+.devRes.t1{background:rgba(26,154,85,.08);border-color:rgba(26,154,85,.45);color:#13814a}
+.devRes.t2{background:rgba(192,38,211,.09);border-color:rgba(192,38,211,.5);color:#a21cb3}
+.devFlash{animation:devFlash 1.2s ease-out}
+.devFlash.t2{animation-name:devFlashG}
+@keyframes devFlash{0%{background:rgba(255,196,0,.35)}100%{background:transparent}}
+@keyframes devFlashG{0%{background:rgba(192,38,211,.3)}100%{background:transparent}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .devRes.t0{color:#ff6b7d}:root:not([data-theme="light"]) .devRes.t1{color:#3ce08c}:root:not([data-theme="light"]) .devRes.t2{color:#e879f9}}
+:root[data-theme="dark"] .devRes.t0{color:#ff6b7d}:root[data-theme="dark"] .devRes.t1{color:#3ce08c}:root[data-theme="dark"] .devRes.t2{color:#e879f9}
 .devRow button{min-width:6.6em;white-space:nowrap}
 .legend{display:flex;gap:14px;font-size:11.5px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
 .legend span{display:inline-flex;align-items:center;gap:5px}
@@ -822,6 +886,13 @@ body.guideOpen{overflow:hidden}
 .fa{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:8px 0}
 .fa+.fa{border-top:1px solid var(--line)}
 .fa .acts{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+/* スマホ：ボタンを名前の下の段に回し、名前や年俸の欄を広く使う（1文字ずつの折り返しを防ぐ） */
+@media (max-width:640px){
+  .fa{grid-template-columns:2.8em minmax(0,1fr);gap:4px 8px}
+  .fa .acts{grid-column:1/-1;grid-row:3;display:grid;margin-top:2px;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .fa .acts .b{min-height:34px;padding:5px 4px;font-size:12.5px;white-space:nowrap}
+  .fa .abRow{margin-top:3px}
+}
 .note{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.55}
 .lastRes{font-size:13px;line-height:1.6}
 .lastRes .big{font:700 15px "Chakra Petch",sans-serif}
@@ -833,6 +904,19 @@ body.guideOpen{overflow:hidden}
 .pick .livery{grid-row:span 2;width:30px;height:30px}
 .pick b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pick small{font-size:11.5px;color:var(--muted)}
+/* チームの強さ（マシン・ドライバー・スポンサー）をS〜Gのランクで並べる */
+.pick small.pkSt{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+.pick small.pkSt .tier{margin-right:0}
+.pick small.pkSt .gd{margin-left:2px}
+/* スマホ：ランクの行を折り返さず1行に収める（文字と間隔を少し詰める） */
+@media (max-width:520px){
+  .pick small.pkSt{flex-wrap:nowrap;gap:0 7px;font-size:11px;white-space:nowrap}
+  .pick small.pkSt .tier{font-size:10px;padding:1px 4px}
+  .pick small.pkSt .gd{font-size:11px;min-width:1.35em;height:1.35em;margin-left:1px}
+}
+@media (max-width:360px){
+  .pick small.pkSt{gap:0 5px;font-size:10.5px}
+}
 .tier{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:4px;margin-right:4px;background:var(--btn)}
 .tier.t1{background:var(--signal);color:var(--signalText)}
 .hqIntro{max-width:62ch;margin:0 0 10px;color:var(--muted);line-height:1.6}
@@ -853,6 +937,10 @@ body.career #againBtn{display:none}
 .abList{grid-column:1/-1;list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:5px}
 .abList li{display:flex;align-items:baseline;gap:8px;font-size:12px;color:var(--muted);line-height:1.45}
 .abList .ab{flex:none}
+.ab.rabC{outline:1px dashed currentColor;outline-offset:1px}   /* リザーブ特殊能力（点線の枠で区別） */
+.abList.rabOff{opacity:.6}
+.resDemand{grid-column:1/-1;display:flex;flex-direction:column;gap:4px;margin-top:8px;padding:8px 10px;border-radius:9px;background:#fff4cc;color:#5a4500;font-size:12.5px;line-height:1.5}
+.resDemand .row{margin-top:2px}
 .abRow{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
 .ab{display:inline-block;padding:1px 7px;border-radius:5px;font-size:11.5px;font-weight:700;line-height:1.6;white-space:nowrap;border:1px solid}
 .ab.blue{color:var(--abBlue);background:var(--abBlueBg);border-color:var(--abBlue)}
@@ -884,9 +972,9 @@ body.phoneRace #raceCtl{display:none}                         /* スタート・
 body.phoneRace #camctl{top:44px;bottom:auto}                  /* カメラ操作は上側（LAP表示の下）へ */
 body.phoneRace .dock{display:flex;flex-direction:column;gap:6px;position:absolute;left:8px;right:8px;bottom:8px;z-index:8;
   padding:6px;border-radius:12px;background:rgba(20,22,26,.78);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
-  font-family:"Chakra Petch","Zen Kaku Gothic New",system-ui,sans-serif}
+  font-family:"Chakra Petch","M PLUS 1p",system-ui,sans-serif}
 .dkRow{display:flex;gap:6px;align-items:stretch;min-width:0}
-.dock button{min-height:42px;border:0;border-radius:8px;background:rgba(255,255,255,.08);color:#e9ebee;font:700 13px "Chakra Petch","Zen Kaku Gothic New",system-ui,sans-serif;cursor:pointer;
+.dock button{min-height:42px;border:0;border-radius:8px;background:rgba(255,255,255,.08);color:#e9ebee;font:700 13px "Chakra Petch","M PLUS 1p",system-ui,sans-serif;cursor:pointer;
   display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:0 8px;min-width:0;touch-action:manipulation}
 .dock button:disabled{opacity:.4;cursor:not-allowed}
 .dock button.on{background:#ffc400;color:#15171a}
@@ -923,12 +1011,13 @@ body.phoneRace .toasts{left:8px!important;right:8px!important}
 .teamTel{position:absolute;right:8px;bottom:8px;z-index:7;display:flex;flex-direction:column;gap:5px;pointer-events:none;width:min(230px,calc(100% - 16px))}
 .teamTel[hidden]{display:none}
 body.phoneRace .teamTel{left:8px;right:8px;width:auto;flex-direction:row;bottom:calc(var(--dockH,150px) + 14px)}
-.tc{flex:1 1 0;min-width:0;background:rgba(20,22,26,.84);color:#fff;border-radius:9px;padding:5px 8px 6px;font-family:"Chakra Petch","Zen Kaku Gothic New",system-ui,sans-serif;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+.tc{flex:1 1 0;min-width:0;background:rgba(20,22,26,.84);color:#fff;border-radius:9px;padding:5px 8px 6px;font-family:"Chakra Petch","M PLUS 1p",system-ui,sans-serif;box-shadow:0 3px 10px rgba(0,0,0,.3)}
 .tc.mine{box-shadow:inset 0 0 0 1.5px #00c8ff,0 3px 10px rgba(0,0,0,.3)}
 .tcHead{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;line-height:1.2;white-space:nowrap}
 .tcHead .dot{margin:0}
 .tcHead .pp{margin-left:auto;color:#aab0b8;font-size:11px}
 .tcHead .pit{background:#ffc400;color:#15171a;border-radius:3px;padding:0 4px;font-size:10px}
+.tcHead .pit.stk{background:#ff7f11}   /* ダブルスタックの作業待ち */
 .tcRow{display:grid;grid-template-columns:auto minmax(0,1fr) 2.6em;gap:5px;align-items:center;margin-top:3px;font-size:11px}
 .tcRow .k{display:inline-flex;align-items:center;gap:3px;min-width:2.6em;color:#dfe4ea;white-space:nowrap}
 .tcRow .k svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -948,7 +1037,7 @@ body.phoneRace .radioBox{top:auto;bottom:calc(var(--dockH,150px) + var(--telH,0p
 .radio .rh b{color:#fff;letter-spacing:.04em}
 .radio .rt{font-size:12.5px;line-height:1.45;margin-top:2px}
 .radio .rh .tdot{width:8px;height:8px;border-radius:50%;margin-left:4px;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.5)}
-.radio .rh .mt{font:600 9.5px "Zen Kaku Gothic New",sans-serif;color:#aab0b8;letter-spacing:0;margin-left:2px}
+.radio .rh .mt{font:600 9.5px "M PLUS 1p",sans-serif;color:#aab0b8;letter-spacing:0;margin-left:2px}
 .radio .rb{display:flex;flex-direction:column;gap:3px;margin-top:4px}
 .radio .rl{display:flex;gap:6px;align-items:baseline;font-size:12.5px;line-height:1.45}
 .radio .rw{flex:none;font:700 9.5px/1.3 "Chakra Petch",sans-serif;letter-spacing:.06em;padding:1px 4px;border-radius:3px}
@@ -967,7 +1056,7 @@ body.phoneRace .radioBox{top:auto;bottom:calc(var(--dockH,150px) + var(--telH,0p
 body.career #pitWall,body.career #raceCtl{display:none!important}
 /* PC：操作ボタンはコース画面の下に帯として並べる（コースに重ねない） */
 body.career .dock{display:flex;flex-direction:column;gap:6px;position:relative;padding:8px;background:#1b1f25;
-  font-family:"Chakra Petch","Zen Kaku Gothic New",system-ui,sans-serif}
+  font-family:"Chakra Petch","M PLUS 1p",system-ui,sans-serif}
 body.career:not(.phoneRace) #stage #camctl{bottom:calc(var(--dockH,0px) + 8px)}
 body.career:not(.phoneRace) .teamTel{bottom:calc(var(--dockH,0px) + 8px)}
 body.career:not(.phoneRace) .stage .tele{bottom:calc(var(--dockH,0px) + var(--telH,0px) + 16px)}
@@ -1020,7 +1109,7 @@ body.phoneRace .lead-txt{min-width:0;flex-wrap:wrap;row-gap:2px}
 .awkFx .awkBox{position:relative;width:min(440px,100%);max-height:calc(100vh - 32px);overflow:auto;border-radius:16px;padding:3px;
   background:linear-gradient(100deg,#ff3b5c,#ff9f1a,#ffe11a,#2bd96b,#1ab8ff,#7a5cff,#ff3bd1,#ff3b5c);background-size:300% 100%;animation:awkFlow 3s linear infinite,awkPop .5s cubic-bezier(.2,1.6,.4,1)}
 .awkFx .awkIn{background:#11131c;color:#f2f4f8;border-radius:13px;padding:18px 18px 16px;text-align:center}
-.awkFx .awkTitle{font:900 44px/1 "Zen Kaku Gothic New","Chakra Petch",system-ui,sans-serif;letter-spacing:.12em;margin:2px 0 4px;
+.awkFx .awkTitle{font:900 44px/1 "M PLUS 1p","Chakra Petch",system-ui,sans-serif;letter-spacing:.12em;margin:2px 0 4px;
   background:linear-gradient(100deg,#ff3b5c,#ff9f1a,#ffe11a,#2bd96b,#1ab8ff,#7a5cff,#ff3bd1,#ff3b5c);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:awkFlow 3s linear infinite;filter:drop-shadow(0 0 10px rgba(255,255,255,.25))}
 .awkFx .awkKick{font:700 11px "Chakra Petch",sans-serif;letter-spacing:.3em;color:#9aa3b5}
 .awkFx .awkOne{margin-top:14px;padding-top:12px;border-top:1px solid #2a2f3d}
@@ -1056,6 +1145,27 @@ body.phoneRace .stage:has(#flag:not(:empty)) #camctl{top:80px}
 .abp{font-size:10px}
 /* オーナー目標とスポンサー契約 */
 .ownerBar,.spLine{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:13px}
+.regBar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;border-radius:12px;padding:9px 14px;font-size:13px;border:1px solid #c98a00;background:linear-gradient(90deg,rgba(255,196,0,.16),rgba(255,196,0,.05))}
+.regBar .kick{color:#b07800}
+.regBar.now{border-color:#1f9d5a;background:linear-gradient(90deg,rgba(31,157,90,.16),rgba(31,157,90,.04))}
+.regBar.now .kick{color:#1f9d5a}
+.regCard{border:1px solid #c98a00;border-radius:12px;padding:12px 14px;margin:0 0 12px;background:linear-gradient(180deg,rgba(255,196,0,.10),transparent)}
+.regCard h3{margin:0 0 4px;font-size:15px}
+.regCard .rcRow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:8px}
+.regCard .rcMeter{flex:1 1 160px;height:8px;border-radius:5px;background:var(--line);overflow:hidden;min-width:120px}
+.regCard .rcMeter i{display:block;height:100%;background:linear-gradient(90deg,#ffc400,#ff8a00)}
+.regCard .rum{font-size:12px;color:var(--muted);margin-top:6px}
+.slotPips{display:inline-flex;gap:3px;vertical-align:-1px;margin-left:6px}
+.slotPips i{width:9px;height:9px;border-radius:50%;background:var(--signal);display:inline-block}
+.slotPips i.used{background:var(--line)}
+.buySlot{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:-2px 0 10px}   /* 開発枠の追加購入 */
+.buySlot .muted{font-size:12px}
+/* 開発方針（慎重・標準・攻め）と、結果の確率 */
+.devPol{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0 0 10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px}
+.devPol .dpLab{font-size:12.5px;font-weight:700}
+.devPol .dpOdds{display:flex;flex-direction:column;gap:2px;flex:1 1 100%;font-size:12px}
+.devPol .dpRow{display:flex;flex-wrap:wrap;gap:2px 10px}.devPol .dpRow b{min-width:7.5em;font-weight:700}.devPol .dpRow i{font-style:normal;font-weight:700}
+.devPol .dpNote{color:var(--muted);font-size:11.5px}
 .ownerBar .trust{display:inline-flex;align-items:center;gap:6px;margin-left:auto;white-space:nowrap}
 .tmeter{display:inline-block;width:90px;height:8px;border-radius:4px;background:var(--btn);overflow:hidden}
 .tmeter i{display:block;height:100%}
@@ -1220,6 +1330,35 @@ body.career.phoneRace #camctl .who{font-size:9.5px;padding:1px 0}
 body.career.phoneRace #camctl .who .dot{width:6px;height:6px}
 body.career.phoneRace #camctl .sep{margin:1px 2px}
 body.phoneRace .radioBox{max-width:calc(100% - 70px)}
+/* スマホ：カメラ操作は右端の列へ（路面表示の下）。先頭にビデオカメラのマーク */
+.camIco{display:none}
+body.phoneRace .camIco{display:flex;justify-content:center;align-items:center;height:18px;color:var(--signal)}
+body.phoneRace .camIco svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+body.career.phoneRace #camctl,body.career.phoneRace .stage:has(#flag:not(:empty)) #camctl{top:44px!important;left:auto!important;right:8px!important}
+/* スマホ：ミニマップの下に、中継のタイミングタワー風の順位表 */
+.miniTower{position:absolute;left:8px;z-index:7;pointer-events:none;display:flex;flex-direction:column;background:rgba(14,16,20,.82);border-radius:8px;padding:3px 3px 3px 2px;box-shadow:0 3px 10px rgba(0,0,0,.3);
+  font-family:"Chakra Petch","Segoe UI",system-ui,sans-serif;font-weight:700;color:#f2f3f5;font-variant-numeric:tabular-nums;top:calc(52px + var(--mmH,90px))}
+.stage:has(#flag:not(:empty)) .miniTower{top:calc(88px + var(--mmH,90px))}
+.miniTower .mtR{display:grid;grid-template-columns:1.55em 3px 2.3em 3.4em 0.9em;align-items:center;column-gap:3px;height:var(--mtH,12px);font-size:var(--mtF,9px);line-height:1;white-space:nowrap}
+.miniTower .mtR+.mtR{border-top:1px solid rgba(255,255,255,.06)}
+.miniTower .mtP{justify-self:stretch;text-align:center;border-radius:2px;padding:1px 0;color:#d8dbe0}
+.miniTower .mtR.mtP1 .mtP{background:#e4092a;color:#fff}
+.miniTower .mtC{height:70%;border-radius:1px}
+.miniTower .mtG{text-align:right;color:#cfd3d8;font-weight:500}
+.miniTower .mtT{text-align:center}
+.miniTower .mtR.mine{background:rgba(0,200,255,.18);border-radius:3px}
+.miniTower .mtR.out{color:#7d838b}.miniTower .mtR.out .mtG{color:#7d838b}
+.miniTower .mtR.pit .mtG{color:#ffc400}
+/* 畳むボタン（押すと順位の行を隠す。もう一度押すと出す） */
+.miniTower .mtHead{pointer-events:auto;display:flex;align-items:center;justify-content:space-between;gap:4px;min-height:22px;padding:2px 4px 2px 5px;margin:0 0 2px;border:0;border-radius:5px;
+  background:rgba(255,255,255,.08);color:#f2f3f5;font:700 10px "M PLUS 1p",system-ui,sans-serif;letter-spacing:.06em;cursor:pointer}
+.miniTower .mtHead svg{width:12px;height:12px;fill:none;stroke:var(--signal);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.miniTower.fold{padding:3px}
+.miniTower.fold .mtHead{margin:0}
+.miniTower.fold .mtHead svg{transform:rotate(180deg)}
+.miniTower.fold .mtRows{display:none}
+.miniTower .mtR.mtP1 .mtG{color:#8b929b}
+body.career.phoneRace .radioBox{left:calc(var(--mtW,0px) + 14px);max-width:calc(100% - var(--mtW,0px) - 22px)}   /* チームラジオは順位表の右に */
 /* 畳んだ状態でスタート前：タイヤ交換のボタンの代わりにスタートボタンを出す */
 .dock .dkStart2{display:none}
 .dock.fold.pre .dkStart2{display:inline-flex;flex:1 1 auto}
@@ -1264,13 +1403,70 @@ body.phoneRace .radioBox{max-width:calc(100% - 70px)}
 .owStart{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px}
 .owStart button{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;padding:8px 10px;border:1.5px solid var(--line);border-radius:9px;background:transparent;color:var(--text);font:inherit;cursor:pointer}
 .owStart button.on{border-color:var(--tower);box-shadow:inset 0 -3px 0 var(--signal)}
-.owStart b{font-size:13.5px}.owStart small{font-size:11px;color:var(--muted);font-weight:700}.owStart span{font-size:11.5px;color:var(--muted);line-height:1.45}
+.owStart b{font-size:13.5px}.owStart small{font-size:11px;color:var(--muted);font-weight:700}
+.owStart small.owRk{display:flex;flex-wrap:wrap;align-items:center;gap:3px 9px}   /* マシン・ドライバー・スポンサーをS〜Gのランクで */
+.owStart small.owRk .gd{margin-left:2px}
+.owStart small.owRk > span{line-height:1.5}.owStart button > span{font-size:11.5px;color:var(--muted);line-height:1.45}   /* 説明文だけ（ランクの札には効かせない） */
 .owSw button:focus-visible,.owSyms button:focus-visible,.owStart button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 
 /* スポンサー契約の選択画面 */
 .spGate .spOpt{cursor:pointer}
 .spGate .spOpt.on{border-color:var(--tower);box-shadow:inset 0 -4px 0 var(--signal)}
 .spGate #spConfirm:disabled{opacity:.45;cursor:not-allowed}
+
+/* ===== スマホのレース画面（キャリア）：見やすさの整理 =====
+   1. 自チームのカードを2段に縮め、ペースのボタンは担当マシンのカードを押したときだけ開く
+   2. 操作パネル：速度は押すたびに切り替わる1つのボタン、ピットの判断は小さな切り替え、「？」は省く（2段にまとめる）
+   3. 重ねて出すパネルの背景・角の丸み・影をそろえる
+   4. コースの何もないところをタップすると、重ねた表示を隠す「観戦モード」（もう一度タップで戻る） */
+body.career.phoneRace{--ovBg:rgba(14,16,20,.8);--ovR:10px;--ovSh:0 3px 10px rgba(0,0,0,.28)}
+body.career.phoneRace .hud .hint,body.career.phoneRace .wxbox,body.career.phoneRace .miniMap,body.career.phoneRace .miniTower,
+body.career.phoneRace #camctl,body.career.phoneRace .radio,body.career.phoneRace .tc,body.career.phoneRace .dock{background:var(--ovBg)!important;border-radius:var(--ovR)!important;box-shadow:var(--ovSh)!important}
+/* 1. カード */
+body.career.phoneRace .tc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:8px;row-gap:1px;align-items:center;padding:3px 7px 5px;overflow:hidden}
+body.career.phoneRace .tc .secBar{grid-column:1/-1;margin:-3px -7px 2px;gap:1px;border-radius:0}
+body.career.phoneRace .tc .secBar i{height:3px}
+body.career.phoneRace .tc .secBar i b{display:none}
+body.career.phoneRace .tc .tcHead{grid-column:1/-1;font-size:11.5px}
+body.career.phoneRace .tc .tcRow{margin-top:1px;font-size:10.5px;grid-template-columns:auto minmax(0,1fr) 2.2em;gap:4px}
+body.career.phoneRace .tc .tcRow .k{min-width:0}
+body.career.phoneRace .tc .tcRow.t1 .k small{display:none}
+body.career.phoneRace .tc .tcRow.t2 .k{font-size:0}
+body.career.phoneRace .tc .tcRow .v small{font-size:8px}
+body.career.phoneRace .tc .tcBar{height:5px}
+body.career.phoneRace .tc .tcPace{display:none;grid-column:1/-1;margin-top:4px}
+body.career.phoneRace .tc.open .tcPace{display:grid}
+body.career.phoneRace .tc.mine .tcHead::after{content:"";width:0;height:0;margin-left:2px;border:4px solid transparent;border-top-color:#aab0b8;transform:translateY(2px)}
+body.career.phoneRace .tc.mine.open .tcHead::after{transform:translateY(-2px) rotate(180deg)}
+/* 2. 操作パネル */
+body.career.phoneRace .dock{display:grid!important;grid-template-columns:auto auto minmax(0,1fr) auto;gap:5px;align-items:stretch;padding:5px}
+body.career.phoneRace .dock>.dkRow.dkFoldable{display:contents}
+body.career.phoneRace .dock.fold>.dkRow.dkFoldable{display:none}
+body.career.phoneRace .dock .dkHelp{display:none}
+body.career.phoneRace .dock button{min-height:38px}
+body.career.phoneRace .dock .dkMain{padding:0 10px;font-size:13px}
+body.career.phoneRace #dkSpeed button:not(.on){display:none}
+body.career.phoneRace #dkSpeed button.on{min-width:46px;background:rgba(255,255,255,.14);color:#fff;font-size:14px}
+body.career.phoneRace #dkSpeed button.on::after{content:"";width:0;height:0;margin-left:3px;border:4px solid transparent;border-left-color:#ffc400;border-right-width:0}
+body.career.phoneRace .dock .dkMode{display:flex;gap:2px;padding:2px;border-radius:9px;background:rgba(255,255,255,.06);min-width:0}
+body.career.phoneRace .dock .dkMode .lab{display:none}
+body.career.phoneRace .dock .dkMode button{flex:1 1 0;min-height:34px;font-size:12px;border-radius:7px;background:transparent}
+body.career.phoneRace .dock .dkMode button.on{background:#ffc400;color:#15171a}
+body.career.phoneRace .dock .dkTy{grid-column:1/-1}
+body.career.phoneRace .dock #dkStart{grid-area:1/1}
+body.career.phoneRace .dock #dkSpeed{grid-area:1/2}
+body.career.phoneRace .dock .dkMode{grid-area:1/3}
+body.career.phoneRace .dock .dkFold{grid-area:1/4}
+body.career.phoneRace .dock .dkTy button{min-height:40px}
+/* 4. 観戦モード */
+body.career.phoneRace.watch .miniMap,body.career.phoneRace.watch .miniTower,body.career.phoneRace.watch #camctl,
+body.career.phoneRace.watch .radioBox,body.career.phoneRace.watch .teamTel,body.career.phoneRace.watch .dock{opacity:0;pointer-events:none!important}
+body.career.phoneRace .miniMap,body.career.phoneRace .miniTower,body.career.phoneRace #camctl,body.career.phoneRace .radioBox,body.career.phoneRace .teamTel,body.career.phoneRace .dock{transition:opacity .25s}
+.watchHint{display:none}
+body.career.phoneRace.watch .watchHint{display:block;position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:9;pointer-events:none;
+  background:rgba(14,16,20,.7);color:#dfe4ea;font:700 11px "M PLUS 1p",system-ui,sans-serif;padding:5px 10px;border-radius:999px;white-space:nowrap}
+/* バージョン表記（ページの一番下） */
+.appVer{max-width:1440px;margin:0 auto;padding:6px 16px 18px;text-align:right;font:500 11px "Chakra Petch","M PLUS 1p",system-ui,sans-serif;color:var(--muted);letter-spacing:.04em}
 </style>
 </head>
 <body>
@@ -1312,6 +1508,7 @@ body.phoneRace .radioBox{max-width:calc(100% - 70px)}
     <div class="spdbox" id="spd" hidden><span class="sn" id="spdName"></span><span class="sv"><b id="spdV">0</b><small>km/h</small></span><span class="sg"><b id="spdG">1</b><small>GEAR</small></span><i class="sbar" id="spdBar"></i></div>
     </div>
     <div class="camctl" id="camctl" hidden role="group" aria-label="カメラ">
+      <span class="camIco" aria-hidden="true" title="カメラ"><svg viewBox="0 0 24 24"><rect x="2.5" y="6.5" width="13" height="11" rx="2.5"/><path d="M15.5 10.6 21.5 7v10l-6-3.6z"/></svg></span>
       <button id="camAll" class="on" title="コース全体を映す">全体</button>
       <button id="camAuto" title="バトルやクラッシュなど、見どころへ自動でカメラを切り替えます（テレビ中継風）">自動中継</button>
       <button id="camMy" hidden title="担当マシンを追いかける">担当</button>
@@ -1336,8 +1533,10 @@ body.phoneRace .radioBox{max-width:calc(100% - 70px)}
       <div class="dkRow dkTy dkPitRow" id="dkTy" role="group" aria-label="次のタイヤ"><button type="button" data-c="S"><span class="tring" style="border-color:#e63946"></span>S</button><button type="button" data-c="M"><span class="tring" style="border-color:#f4b400"></span>M</button><button type="button" data-c="H"><span class="tring" style="border-color:#e8e8e8"></span>H</button><button type="button" data-c="I"><span class="tring" style="border-color:#3ce08c"></span>I</button><button type="button" data-c="W"><span class="tring" style="border-color:#2f8fff"></span>W</button><button type="button" class="dkBox" id="dkBox2">BOX</button><button type="button" class="dkMain dkStart2" id="dkStart2"></button><button type="button" class="dkIco dkFoldOnly" id="dkUnfold" aria-label="操作ボタンをすべて表示" title="操作ボタンをすべて表示"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button></div>
     </div>
     <canvas class="miniMap" id="miniMap" hidden aria-label="ミニマップ"></canvas>
+    <div class="miniTower" id="miniTower" hidden aria-label="順位表"><button type="button" class="mtHead" id="mtHead" aria-expanded="true" aria-controls="mtRows"><span>順位</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button><div class="mtRows" id="mtRows"></div></div>
     <div class="teamTel" id="teamTel" hidden aria-label="自チームのタイヤとバッテリー"></div>
     <div class="radioBox" id="radioBox" aria-live="polite"></div>
+    <div class="watchHint" aria-hidden="true">観戦モード　画面をタップすると表示が戻ります</div>
     <div class="wxbox" id="wxbox" hidden><span class="wxlab">TRACK</span><span id="weather"></span></div>
     <div class="countdown" id="cd" role="status" aria-label="スタートシグナル"></div>
     <div class="replayTag" id="replayTag" hidden><span class="rt"><i></i>REPLAY<small id="replayWho"></small></span><span class="bar"><b id="replayBar"></b></span></div>
@@ -1525,17 +1724,27 @@ body.phoneRace .radioBox{max-width:calc(100% - 70px)}
   </div>
 </main>
 
+<div class="modal" id="devModal" role="dialog" aria-modal="true" aria-labelledby="devModalT">
+  <div class="box" style="width:min(440px,100%)">
+    <h3 id="devModalT">開発枠が残っています</h3>
+    <p id="devModalMsg" style="margin:0;line-height:1.7"></p>
+    <div class="row" style="margin-top:14px;justify-content:flex-end">
+      <button class="b" id="devModalGo" type="button">このまま予選へ</button>
+      <button class="b go" id="devModalDev" type="button">マシン開発へ</button>
+    </div>
+  </div>
+</div>
 <div class="modal" id="resultModal">
   <div class="box">
     <h3>RACE FINISHED</h3>
     <div class="myRes" id="myRes" hidden></div>
     <div class="wrapx"><table class="res" id="resultTable" style="width:100%;border-collapse:collapse"></table></div>
-    <div id="raceNewsBox"></div>
     <div class="row" style="margin-top:12px;justify-content:flex-end">
       <button class="b" id="closeResult">閉じる</button>
       <button class="b go" id="againBtn">もう一度走る</button>
       <button class="b go" id="hqBtn" type="button" hidden>チーム本部へ</button>
     </div>
+    <div id="raceNewsBox"></div>   <!-- ニュースはボタンの下（結果とボタンをスクロールなしで見られるように） -->
   </div>
 </div>
 
@@ -1552,9 +1761,11 @@ body.phoneRace .radioBox{max-width:calc(100% - 70px)}
   </div>
 </div>
 
+<footer class="appVer">サーキットマネージャー v1.0.0</footer>
 <script>
 (function(){
 'use strict';
+const APP_VERSION = '1.0.0';   // バージョン（GitHubに載せるときに更新する）
 const $ = s => document.querySelector(s);
 /* 画面の基準の広さ（ズーム1倍で映る範囲）と、マップ（コースを描ける範囲）の広さ。
    マップは S＝基準と同じ／M＝縦横1.5倍／L＝縦横2倍。道幅や車の大きさはどのサイズでも同じなので、
@@ -2059,6 +2270,14 @@ function clampView(x, y, z){
   const hw = VW/(2*z), hh = viewH()/(2*z);
   return [hw*2 >= W ? W/2 : clamp(x, hw, W - hw), hh*2 >= H ? H/2 : clamp(y, hh, H - hh)];
 }
+/* 車を追うカメラは、車を画面の中央より少し上に映す。
+   画面の下にかぶさる操作パネル（キャリアのボタン・自チームのカード）が開いているときは、そのぶん上げる */
+let camCover = 0;                                         // 画面の下にかぶさっているパネルの高さ（CSSピクセル）
+function camLiftY(z){
+  const h = Math.max(cv.clientHeight, cv2.clientHeight); if(!h) return 0;   // 中継レイアウトでは追従カメラは下の画面（同じ大きさ）
+  const px = Math.min(Math.max(h*0.1, camCover*0.5), h*0.3);   // 最低でも画面の高さの1割、最大3割まで
+  return px / (scale*z);                                  // 画面のピクセル → ワールドの長さ
+}
 function camClamp(x, y, z){
   // レース中に車を追っているときは画面の端で止めない（車を常に中央に。外側は芝生を描き足す）
   if(mode === 'race' && cam.mode !== 'all' && z > 1.01) return [clamp(x, -W*0.3, W*1.3), clamp(y, -H*0.3, H*1.3)];
@@ -2099,7 +2318,7 @@ function camTarget(){
     if(s && s.x != null){ const z = Math.min(CAM_ZMAX, CAM_ZOOMS[cam.zi]*(s.zk || 1)); const [x, y] = camClamp(s.x, s.y, z); return { x, y, z }; }
     if(s && s.sc && race.scCar){                           // セーフティカーを追う（すぐ後ろの隊列も入るよう少し引く）
       const S = race.scCar, z = Math.min(CAM_ZMAX, CAM_ZOOMS[cam.zi]*(s.zk || 1)), back = 30;
-      const [x, y] = camClamp(S.x - Math.cos(S.h)*back, S.y - Math.sin(S.h)*back, z); return { x, y, z };
+      const [x, y] = camClamp(S.x - Math.cos(S.h)*back, S.y - Math.sin(S.h)*back + camLiftY(z), z); return { x, y, z };
     }
     c = s && s.car && !s.car.gone ? s.car : ranking().find(o => !o.out);
     zk = (s && s.zk) || 1;
@@ -2109,7 +2328,7 @@ function camTarget(){
   else c = race.cars.find(o => o.m === cam.follow && !o.gone);
   if(!c){ return allCam; }
   const z = Math.min(CAM_ZMAX, CAM_ZOOMS[cam.zi]*zk), lead = Math.min(c.v, 400) * 0.22 * ahead;    // 進行方向を少し先まで見せる
-  const [x, y] = camClamp(c.x + Math.cos(c.h)*lead, c.y + Math.sin(c.h)*lead, z);
+  const [x, y] = camClamp(c.x + Math.cos(c.h)*lead, c.y + Math.sin(c.h)*lead + camLiftY(z), z);   // カメラの中心を下にずらす＝車は中央より上に映る
   return { x, y, z };
 }
 /* ---------- 自動中継（ディレクター） ----------
@@ -2182,7 +2401,7 @@ function dirCandidates(now){
   // ピット作業中の車
   for(const c of race.cars){
     if(!c.out && c.inPit && c.stopUntil > race.t && c.stopUntil !== Infinity)
-      out.push({ key: 'pit:' + race.cars.indexOf(c), car: c, score: 42, label: 'PIT STOP' });
+      out.push({ key: 'pit:' + race.cars.indexOf(c), car: c, score: c.stackStart > race.t ? 48 : 42, label: c.stackStart > race.t ? 'DOUBLE STACK' : 'PIT STOP' });
   }
   return out;
 }
@@ -2466,6 +2685,19 @@ function drawGravel(T){
        縁石が角を切ったり、ジグザグに折れたりしていた）
    ・内側の角では、ずらした線どうしが交わって輪になるので、交点で切って輪の部分を取り除く
    ・スタートラインの位置（点の番号の0）をまたぐコーナーも1本につなげる */
+/* 国旗の色の縁石（6か国のGPだけ。ほかのGPと自作コースは紅白のまま）
+   路面で見えにくい黒は濃いグレー、濃い青は少し明るい青に置き換えてある */
+const CURB_SEG = 10;
+const CURB_FLAG = {
+  IT: ['#009246', '#f4f4f4', '#ce2b37'],     // イタリア：緑・白・赤
+  FR: ['#2456c8', '#f4f4f4', '#ed2939'],     // フランス：青・白・赤
+  DE: ['#4a4a4a', '#dd0000', '#ffce00'],     // ドイツ：黒（濃いグレー）・赤・黄
+  ES: ['#c8141b', '#f1bf00'],                // スペイン：赤・黄
+  CO: ['#fcd116', '#2456c8', '#ce1126'],     // コロンビア：黄・青・赤
+  FI: ['#f4f4f4', '#1f62c8']                 // フィンランド：白・青
+};
+function curbFlag(){ try{ return curbFlag0(); }catch(e){ return null; } }   // 読み込みの途中（国の表がまだ無いとき）に呼ばれても落ちないように
+function curbFlag0(){ const n = String((course && course.name) || '').replace(/\s*GP$/, ''); const cc = GP_COUNTRY[n]; return (cc && CURB_FLAG[cc]) || null; }
 function curbRuns(T, band){
   const K = T.pts, N = T.N, out = [];
   let s0 = 0; while(s0 < N && K[s0].r < CURB_R) s0++;
@@ -2591,8 +2823,15 @@ function drawStatic(){
     ctx.lineWidth = 5.5; ctx.lineCap = 'butt'; ctx.lineJoin = 'round';
     for(const run of curbRuns(track, band)){
       ctx.beginPath(); run.forEach(([x,y],k)=> k ? ctx.lineTo(x,y) : ctx.moveTo(x,y));
-      ctx.setLineDash([]); ctx.strokeStyle = '#f4f4f4'; ctx.stroke();
-      ctx.setLineDash([9,9]); ctx.strokeStyle = '#d7263d'; ctx.stroke(); ctx.setLineDash([]);
+      const fc = curbFlag();
+      if(fc){                                                // 国旗の色の縞：1色目で塗ってから、2色目以降を順にずらして重ねる
+        ctx.setLineDash([]); ctx.strokeStyle = fc[0]; ctx.stroke();
+        for(let i = 1; i < fc.length; i++){ ctx.setLineDash([CURB_SEG, CURB_SEG*(fc.length - 1)]); ctx.lineDashOffset = -CURB_SEG*i; ctx.strokeStyle = fc[i]; ctx.stroke(); }
+        ctx.setLineDash([]); ctx.lineDashOffset = 0;
+      } else {
+        ctx.setLineDash([]); ctx.strokeStyle = '#f4f4f4'; ctx.stroke();
+        ctx.setLineDash([9,9]); ctx.strokeStyle = '#d7263d'; ctx.stroke(); ctx.setLineDash([]);
+      }
     }
     ctx.lineCap = 'round';
     if(career && track.type === 'street') drawStreetMarks(track);   // 市街地：路面に残る公道の標示（縁石の内側）
@@ -3439,13 +3678,7 @@ function drawViewInner(cm){
     const order = ranking(); const rankOf = new Map(order.map((c,i)=>[c,i+1]));
     const camCar = cam.mode === 'lead' ? order.find(o => !o.out) : race.cars.find(o => o.m === cam.follow);
     const drawCar = c => {
-      if(cam.mode !== 'all' && camCar === c){                    // カメラが追っている車の足元に輪を出す
-        ctx.save();
-        ctx.beginPath(); ctx.arc(c.x, c.y, 13, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(255,196,0,.18)'; ctx.fill();
-        ctx.lineWidth = 1.6; ctx.strokeStyle = 'rgba(255,196,0,.95)'; ctx.stroke();
-        ctx.restore();
-      }
+      /* カメラが追っている車の足元の黄色い輪は廃止（担当マシンは頭上の水色の三角で分かる） */
       ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.h + (c.bodyOff || 0)); ctx.scale(0.5, 0.37);   // bodyOff：スライド中は車体の向きが進む向きとずれる   // 横幅だけ細めに（実車の細長い形に近づける）
       drawF1Car(ctx, c.m.color, col2Of(c.m));   // リタイアしても元のマシンカラーのまま
       ctx.restore();
@@ -3768,7 +4001,9 @@ function pickCar(e, canvas, cm){
   const p = screenToWorld(e, canvas, cm), rWorld = (e.pointerType === 'touch' ? 28 : 18) / (scale*cm.z);
   let best = null, bd = rWorld*rWorld;
   for(const c of race.cars){ if(c.gone) continue; const d = (c.x-p.x)**2 + (c.y-p.y)**2; if(d < bd){ bd = d; best = c; } }
-  if(best) setCam('car', best.m);
+  if(best){ setCam('car', best.m); return; }
+  // スマホのキャリアのレース：車のないところをタップしたら、重ねた表示を隠す／戻す（観戦モード）
+  if(careerRace && document.body.classList.contains('phoneRace') && (!e.isPrimary || e.isPrimary)) document.body.classList.toggle('watch');
 }
 cv2.addEventListener('pointerdown', e=> pickCar(e, cv2, cam));
 /* ズームとスクロール（コース作成中）
@@ -4018,7 +4253,7 @@ function typeOk(type, pf, g){
   if(type === 'power')  return pf.n >= Math.round(6*g) && pf.n <= Math.round(12*g) && pf.slow <= 5 && pf.straight >= 0.40;
   if(type === 'flow')   return pf.n >= Math.round(9.4*g) && pf.n <= Math.round(21*g) && pf.slow <= 3 && pf.fast >= 3 && pf.straight < 0.38;
   if(type === 'stopgo') return pf.n >= Math.round(8*g) && pf.n <= Math.round(20*g) && pf.slow >= Math.max(5, Math.round(pf.n*0.55));
-  if(type === 'street') return pf.n >= Math.round(8*g) && pf.n <= Math.round(19*g) && pf.slow >= Math.max(2, pf.n*0.3) && pf.slow <= pf.n*0.7 && pf.mid + pf.fast >= 3;
+  if(type === 'street') return pf.n >= Math.round(8*g) && pf.n <= Math.round(19*g) && pf.slow >= Math.max(2, pf.n*0.3) && pf.slow <= pf.n*0.8 && pf.mid + pf.fast >= 2;   // 旧市街の低速区間が入るので、低速の割合の上限を少し広げる
   return true;
 }
 /* 市街地：街区の形（直角に近い多角形）をもとに作る。
@@ -4029,22 +4264,36 @@ function typeOk(type, pf, g){
    ・幅の狭いへこみの奥のヘアピン、長い直線の途中の緩いキンク、シケイン
    ・街区の角を長い斜めの道で切り落とした斜めのストレート。街区ごと斜めに向けることもある
    道は完全な碁盤目にせず、角の位置を少しずらして角度もばらつかせる */
-function streetBase(fs){
-  const cx = W/2, cy = H/2, rx = W*(0.36 + Math.random()*0.06), ry = H*(0.32 + Math.random()*0.07);
-  let poly = [{ x: cx-rx, y: cy-ry }, { x: cx+rx, y: cy-ry }, { x: cx+rx, y: cy+ry }, { x: cx-rx, y: cy+ry }];   // 時計回り
+/* 地区ごとに性格を分ける（2026-10 追加）：
+   ・大通り：上か下の長い辺を、角を加工しない長い全開の直線にする（ホームストレートになる）
+   ・旧市街：大通りの反対側の辺に、短い直角の曲がりが続く細い区間（階段状のクランク）を入れる
+   ・海沿い：左右どちらかの辺を、湾に沿って緩く弧を描く高速区間にする */
+function streetBase(fs, want){        // want：入れたい地区 { old, bay }（省略時はその場でランダム）
+  const cx = W/2, cy = H/2, rx = W*(0.40 + Math.random()*0.04), ry = H*(0.32 + Math.random()*0.07);
+  const poly = [{ x: cx-rx, y: cy-ry }, { x: cx+rx, y: cy-ry }, { x: cx+rx, y: cy+ry }, { x: cx-rx, y: cy+ry }];   // 時計回り。辺kは角k→角k+1
   const U = (a, b) => { const L = Math.hypot(b.x-a.x, b.y-a.y) || 1; return { x: (b.x-a.x)/L, y: (b.y-a.y)/L }; };
   const R = (lo, hi) => (lo + Math.random()*(hi - lo))*fs;
-  // 角をいくつか内側へ段にする（L字）。どの角を使うかはランダム
-  const corners = [0,1,2,3].sort(() => Math.random() - 0.5).slice(0, 1 + Math.floor(Math.random()*3));
-  const steps = new Map(corners.map(k => [k, { a: R(170, 300), b: R(160, 280) }]));
-  // 段にしなかった角のうち1〜2か所を、長い斜めの道で大きく切り落とす（斜めのストレート）
-  const free = [0,1,2,3].filter(k => !steps.has(k)).sort(() => Math.random() - 0.5);
-  const nCut = Math.random() < 0.8 ? 1 + (Math.random() < 0.4 ? 1 : 0) : 0;
-  const cuts = new Map(free.slice(0, nCut).map(k => [k, { a: R(230, 400), b: R(230, 400) }]));
-  // 角を段にも斜めにもしなかった辺のうち1本に、内側へのへこみ（コの字）を入れることがある
-  let notchEdge = -1;
-  const used = k => steps.has(k) || cuts.has(k);
-  if(Math.random() < 0.7){ const cand = [0,1,2,3].filter(e => !used(e) && !used((e+1)%4)); if(cand.length) notchEdge = cand[Math.floor(Math.random()*cand.length)]; }
+  const elen = e => Math.hypot(poly[(e+1)%4].x - poly[e].x, poly[(e+1)%4].y - poly[e].y);
+  const blvd = Math.random() < 0.5 ? 0 : 2;          // 大通り（上か下）
+  const town = (blvd + 2) % 4;                        // 旧市街（大通りの反対側）
+  const sides = [1, 3].sort(() => Math.random() - 0.5);
+  const bay = (want ? want.bay : Math.random() < 0.7) ? sides[0] : -1;    // 海沿い（左右のどちらか）
+  const oldTown = want ? want.old : Math.random() < 0.8;
+  // 角の加工は旧市街側の2つの角だけ（大通りの両端は加工しない）。旧市街を入れるときは片方だけにして場所を空ける
+  const steps = new Map(), cuts = new Map();
+  const cornerK = [town, (town+1)%4].sort(() => Math.random() - 0.5);
+  cornerK.slice(0, oldTown ? (Math.random() < 0.5 ? 1 : 0) : 2).forEach(k => {
+    const r = Math.random();
+    if(r < 0.45) steps.set(k, { a: R(150, 260), b: R(140, 240) });
+    else if(r < 0.8) cuts.set(k, { a: R(200, 340), b: R(200, 340) });
+  });
+  if(oldTown && steps.size + cuts.size){              // 旧市街の辺を食う量を抑える
+    const k = steps.size ? [...steps.keys()][0] : [...cuts.keys()][0], o = steps.get(k) || cuts.get(k);
+    if(k === town) o.b = Math.min(o.b, 150*fs); else o.a = Math.min(o.a, 150*fs);
+  }
+  // 辺の両端で角の加工が使った長さ（この範囲には区間の特徴を置かない）
+  const usedStart = e => { const o = steps.get(e) || cuts.get(e); return o ? o.b : 0; };
+  const usedEnd = e => { const k = (e+1)%4, o = steps.get(k) || cuts.get(k); return o ? o.a : 0; };
   const out = [];
   for(let k=0;k<4;k++){
     const C = poly[k], P = poly[(k+3)%4], Nx = poly[(k+1)%4], uin = U(P, C), uout = U(C, Nx), s = steps.get(k);
@@ -4055,24 +4304,49 @@ function streetBase(fs){
       const c = cuts.get(k);
       out.push({ x: C.x - uin.x*c.a, y: C.y - uin.y*c.a }, { x: C.x + uout.x*c.b, y: C.y + uout.y*c.b });
     } else out.push({ ...C });
-    if(k === notchEdge){
-      const L = Math.hypot(Nx.x - C.x, Nx.y - C.y), nIn = { x: -uout.y, y: uout.x };   // 時計回りなので左手側が内側
-      const wN = Math.random() < 0.45 ? R(105, 135) : R(170, 260), t1 = L*(0.25 + Math.random()*0.35), d = R(150, 230);   // 狭いへこみは奥がヘアピンになる
-      if(t1 + wN < L - 220*fs){
-        const p1 = { x: C.x + uout.x*t1, y: C.y + uout.y*t1 }, p4 = { x: C.x + uout.x*(t1 + wN), y: C.y + uout.y*(t1 + wN) };
-        out.push(p1, { x: p1.x + nIn.x*d, y: p1.y + nIn.y*d }, { x: p4.x + nIn.x*d, y: p4.y + nIn.y*d }, p4);
+    const L = elen(k), nIn = { x: -uout.y, y: uout.x };   // 時計回りなので左手側が内側
+    const at = (t, d) => ({ x: C.x + uout.x*t + nIn.x*d, y: C.y + uout.y*t + nIn.y*d });
+    const free0 = usedStart(k) + 110*fs, free1 = L - usedEnd(k) - 110*fs;
+    if(k === town){
+      if(oldTown){
+        // 旧市街：内側へ入る→横へ→さらに奥へ→横へ→大きく戻る、の階段状のクランク（直角の低速コーナーが6つ続く）
+        const w1 = R(150, 180), w2 = R(150, 180), d1 = R(142, 170), d2 = R(142, 170);   // 短い脚も、コースどうしの最小間隔より長くする
+        const f0 = free0 + 45*fs, f1 = free1 - 45*fs;   // 角のすぐ近くには置かない（コースどうしが近づきすぎる）
+        if(f1 - f0 >= w1 + w2){
+          const t1 = f0 + Math.random()*(f1 - f0 - w1 - w2);
+          const deepFirst = Math.random() < 0.5;          // 先に深く入って段々戻る形もある
+          const a = deepFirst ? d1 + d2 : d1, b = deepFirst ? d1 : d1 + d2;
+          [at(t1, 0), at(t1, a), at(t1 + w1, a), at(t1 + w1, b), at(t1 + w1 + w2, b), at(t1 + w1 + w2, 0)].forEach(q => out.push({ ...q, ot: true }));
+        }
+      } else if(Math.random() < 0.6){
+        // 旧市街を入れないときは、これまでどおり内側へのへこみ（狭いと奥がヘアピン）
+        const wN = Math.random() < 0.45 ? R(105, 135) : R(170, 260), d = R(150, 230);
+        if(free1 - free0 >= wN){
+          const t1 = free0 + Math.random()*(free1 - free0 - wN);
+          out.push(at(t1, 0), at(t1, d), at(t1 + wN, d), at(t1 + wN, 0));
+        }
+      }
+    } else if(k === bay){
+      // 海沿い：辺を内側へ緩く弓なりにへこませ、湾に沿った高速の曲がりにする
+      const t0 = usedStart(k) + 95*fs, t9 = L - usedEnd(k) - 95*fs;   // 辺のほぼ全体を使って弧にする（両端の角が小さくなりすぎない余白は残す）
+      if(t9 - t0 >= L*0.35){
+        const A = R(75, 115);   // 中高速のコーナーとして数えられるくらいの弧にする
+        const nS = Math.max(4, Math.min(8, Math.floor((t9 - t0)/(48*fs))));   // 点を細かく打って、角張らない滑らかな弧にする
+        for(let j=1;j<nS;j++){ const t = t0 + (t9 - t0)*j/nS; out.push({ ...at(t, A*(1 - Math.cos(2*Math.PI*j/nS))/2), wf: true }); }   // 両端は辺に沿って入り、中央で最も深い、なだらかな湾の形
       }
     }
   }
-  // 角の位置を少しずらす（道どうしが真っ直角には交わらない）
-  let pts = out.map(q => ({ x: q.x + (Math.random() - 0.5)*44*fs, y: q.y + (Math.random() - 0.5)*44*fs }));
+  // 角の位置を少しずらす（道どうしが真っ直角には交わらない）。大通りは直線を保つため両端をずらさない
+  const bA = poly[blvd], bB = poly[(blvd+1)%4];
+  let pts = out.map(q => (q === bA || (q.x === bA.x && q.y === bA.y) || (q.x === bB.x && q.y === bB.y)) ? { ...q }
+    : { ...q, x: q.x + (Math.random() - 0.5)*(q.wf || q.ot ? 14 : 44)*fs, y: q.y + (Math.random() - 0.5)*(q.wf || q.ot ? 14 : 44)*fs });
   // 街区ごと斜めに向けることがある（どの道も画面に対して斜めになる）。はみ出すぶんは縮めて収める
   if(Math.random() < 0.4){
     const th = (Math.random() < 0.5 ? 1 : -1) * (0.17 + Math.random()*0.35), c = Math.cos(th), s = Math.sin(th);
-    pts = pts.map(q => ({ x: cx + (q.x - cx)*c - (q.y - cy)*s, y: cy + (q.x - cx)*s + (q.y - cy)*c }));
+    pts = pts.map(q => ({ ...q, x: cx + (q.x - cx)*c - (q.y - cy)*s, y: cy + (q.x - cx)*s + (q.y - cy)*c }));
     const xs = pts.map(q => q.x), ys = pts.map(q => q.y), M = 60;
     const k = Math.min(1, (W/2 - M)/Math.max(cx - Math.min(...xs), Math.max(...xs) - cx), (H/2 - M)/Math.max(cy - Math.min(...ys), Math.max(...ys) - cy));
-    pts = pts.map(q => ({ x: cx + (q.x - cx)*k, y: cy + (q.y - cy)*k }));
+    pts = pts.map(q => ({ ...q, x: cx + (q.x - cx)*k, y: cy + (q.y - cy)*k }));
   }
   return pts;
 }
@@ -4084,13 +4358,13 @@ function styleCorners(poly, fs){
     const P = poly[(i-1+n)%n], C = poly[i], Nx = poly[(i+1)%n];
     const l1 = Math.hypot(C.x-P.x, C.y-P.y), l2 = Math.hypot(Nx.x-C.x, Nx.y-C.y), room = Math.min(l1, l2);
     const turn = Math.abs(wrapAng(Math.atan2(Nx.y-C.y, Nx.x-C.x) - Math.atan2(C.y-P.y, C.x-P.x)));
-    if(turn < 1){ out.push({ ...C }); continue; }      // 曲がりの小さい点（シケイン・キンク）はそのまま
+    if(turn < 1 || C.wf){ out.push({ ...C }); continue; }      // 曲がりの小さい点（シケイン・キンク）と海沿いの弧はそのまま
     const r = Math.random();
-    let style = r < 0.42 ? 'sharp' : (r < 0.72 ? 'cut' : 'sweep');
+    let style = C.ot ? 'sharp' : (r < 0.42 ? 'sharp' : (r < 0.72 ? 'cut' : 'sweep'));   // 旧市街は直角の急コーナーだけ
     if(style === 'sweep' && room < 330*fs) style = 'cut';            // 回り込むには前後の直線が足りない
     if(style === 'cut' && room < 230*fs) style = 'sharp';
     if(style === 'sharp'){
-      const d = Math.min((36 + Math.random()*30)*fs, room*0.3);
+      const d = C.ot ? Math.min((41 + Math.random()*8)*fs, room*0.3) : Math.min((41 + Math.random()*25)*fs, room*0.3);   // 旧市街は脚が短いので角を小さく（40未満の短い辺は後の検査で捨てられるので41以上）
       out.push(at(C, P, l1, d), { ...C }, at(C, Nx, l2, d));
     } else if(style === 'cut'){                                      // 斜めの短い道を通る（45°ずつ2回曲がる）
       const c = Math.min((75 + Math.random()*55)*fs, room*0.35);
@@ -4108,10 +4382,12 @@ function makeRandomPoints(type){
   // 広いマップ（S＝1、M＝1.5、L＝2）では、コーナーを大きく流れるように、直線を長くする
   const mk = MAP_SIZES[mapSize], grow = 1 + (mk - 1)*0.35, fs = Math.sqrt(mk);
   const width = courseW(type);
+  // 市街地：入れる地区を先に決め、最初の400回はその形で作る（小さいマップでは入らないこともあるので、その後はランダムに戻す）
+  const want = { old: Math.random() < 0.8, bay: Math.random() < 0.7 };
   for(let attempt=0; attempt<600; attempt++){
     let pts, skipClose = 2;
     if(type === 'street'){
-      let poly = streetBase(fs);
+      let poly = streetBase(fs, attempt < 400 ? want : null);
       // 長い辺に1か所シケインを入れることがある
       if(Math.random() < 0.55){
         const n = poly.length, lens = poly.map((q, i) => Math.hypot(poly[(i+1)%n].x - q.x, poly[(i+1)%n].y - q.y));
@@ -4133,7 +4409,7 @@ function makeRandomPoints(type){
         }
       }
       pts = styleCorners(poly, fs).map(q => ({ x: clamp(q.x, 40, W-40), y: clamp(q.y, 40, H-40) }));
-      skipClose = 3;
+      skipClose = 4;   // 直角コーナーは3点になるので、隣どうしのコーナーの点は比べない（重なりは後の trackSelfOverlap で見る）
     } else {
       const F = FEAT[type];
       const n = type === 'power' || type === 'stopgo' ? Math.round((6 + Math.floor(Math.random()*2))*grow) : Math.round((8 + Math.floor(Math.random()*4))*grow);
@@ -4250,9 +4526,12 @@ function trackSens(T){
   return (T.sens = top.length ? top : all.slice(0, 1));
 }
 function gridStartPos(t){
-  // グリッド（最大22台で約170）が収まる直線にスタートラインを置く
+  // グリッドが収まる直線にスタートラインを置く。まず広い間隔（約235）が取れる場所を探し、なければ従来の長さ（175）で探す
+  return gridStartPosLen(t, 235) ?? gridStartPosLen(t, 175);
+}
+function gridStartPosLen(t, glen){
   if(!t.zones || !t.zones.length) return null;
-  const need = Math.ceil(175/t.sp), after = Math.ceil(40/t.sp);
+  const need = Math.ceil(glen/t.sp), after = Math.ceil(40/t.sp);
   let bestIdx = -1, bestMin = 0;
   for(const z of t.zones){
     const len = (z.end - z.start + t.N) % t.N;
@@ -4511,10 +4790,11 @@ function pwGate(c){
   else msg = `そろそろ入りたい。${tyreName(want)}がいいと思う`;
   pwSay('drv', msg);
 }
-function pwServed(c, dur){
+function pwServed(c, dur, wait = 0){
   c.userBox = false; c.autoNoted = false; pw.suggest = null; pw.askKey = '';
-  // ピット作業の時間は、目立つとき（作業ミス・とても速い作業）だけ伝える
-  if(dur > 2) pwSay('eng', `ピット作業 ${dur.toFixed(1)}秒…作業でもたついた。${tyreName(c.comp)}で取り返そう`);
+  // ピット作業の時間は、目立つとき（作業ミス・とても速い作業）だけ伝える。ダブルスタックの待ちは入口で伝えているので、作業ミスだけ足す
+  if(wait > 0.05){ if(dur > 2) pwSay('eng', `待った上に作業も${dur.toFixed(1)}秒かかった…。${tyreName(c.comp)}で取り返そう`); }
+  else if(dur > 2) pwSay('eng', `ピット作業 ${dur.toFixed(1)}秒…作業でもたついた。${tyreName(c.comp)}で取り返そう`);
   else if(dur < 1.0) pwSay('eng', `ピット作業 ${dur.toFixed(1)}秒、完璧な作業だ！`);
   syncPwButtons();
 }
@@ -4643,6 +4923,11 @@ $('#pwBox').onclick = () => {
     const cv = pwConv();
     pwSay('eng', `BOX, BOX。${tyreName(c.nextComp)}で${dEntry < 60 ? '（入口を過ぎたので次の周）' : ''}`, false, cv);
     setTimeout(() => { if(MY && c.userBox) pwSay('drv', 'コピー、ピットに入る', false, cv); }, 900);
+    // チームメイトもピットに向かっている（作業中）なら、ダブルスタックになると先に伝える
+    const o = mateOf(c);
+    if(o && (o.pitReq || (o.inPit && (!o.served || o.stopUntil > race.t)))){
+      setTimeout(() => { if(MY && c.userBox && race.state === 'racing') pwSay('eng', `注意：${o.m.name}も${o.inPit ? 'ピットに入っている' : 'この周に入る予定'}だ。続けて入るとダブルスタックで、最大で約${(avgStopT(o) + STACK_GAP).toFixed(1)}秒待つ`, false, cv); }, 2000);
+    }
   }
   syncPwButtons();
 };
@@ -4720,16 +5005,24 @@ function drawMyMark(cx, cy){                            // 順位の札のすぐ
   ctx.restore();
 }
 // 結果画面：担当マシンの結果と作戦の振り返り
+// 結果画面の上段：担当マシンと、同じチームのマシンの成績（順位・グリッドからの変動・獲得ポイント・作戦）
+const isTeamCar = c => { const me = myCar(); return !!(me && c && (c === me || c.pitTeam === me.pitTeam)); };
 function pwResult(order){
   const el = $('#myRes'); if(!el) return;
-  const c = myCar();
-  if(!c){ el.hidden = true; return; }
-  const pos = order.indexOf(c) + 1, d = c.grid - pos;
-  const res = c.finish !== null ? `<b>P${pos}</b>` : '<b>DNF</b>';
-  const move = c.finish !== null ? (d > 0 ? `（グリッド${c.grid}番手から▲${d}）` : d < 0 ? `（グリッド${c.grid}番手から▼${-d}）` : `（グリッド${c.grid}番手のまま）`) : '';
-  const last = c.finish !== null ? race.laps : c.laps.length;
-  const plan = c.myLog.map((s, k) => { const end = k + 1 < c.myLog.length ? c.myLog[k+1].lap - 1 : last; return end > s.lap ? `${s.comp} ${s.lap}–${end}周` : `${s.comp} ${s.lap}周`; }).join(' → ');
-  el.innerHTML = `<span class="dot" style="background:${swatchBg(MY)}"></span><b>${esc(MY.name)}</b>（担当マシン）：${res}${move}<br>作戦：${plan}${c.pen ? `<br><span style="color:#d7263d">タイヤ規定違反 +${c.pen}秒</span>` : ''}`;
+  const me = myCar();
+  if(!me){ el.hidden = true; return; }
+  const cars = [me, ...race.cars.filter(o => o !== me && o.pitTeam === me.pitTeam)];
+  const line = c => {
+    const pos = order.indexOf(c) + 1, d = c.grid - pos, fin = c.finish !== null;
+    const res = fin ? `<b>P${pos}</b>` : '<b>DNF</b>';
+    const move = fin ? (d > 0 ? `（グリッド${c.grid}番手から▲${d}）` : d < 0 ? `（グリッド${c.grid}番手から▼${-d}）` : `（グリッド${c.grid}番手のまま）`) : '';
+    const pts = fin && pos <= 10 ? PTS[pos - 1] : 0;
+    const last = fin ? race.laps : c.laps.length;
+    const log = c.myLog || [{ lap: 1, comp: c.comp }];
+    const plan = log.map((s, k) => { const end = k + 1 < log.length ? log[k+1].lap - 1 : last; return end > s.lap ? `${s.comp} ${s.lap}–${end}周` : `${s.comp} ${s.lap}周`; }).join(' → ');
+    return `<div class="mrLine"><span class="dot" style="background:${swatchBg(c.m)}"></span><b>${esc(c.m.name)}</b>${c === me ? '（担当マシン）' : ''}：${res}${move}${pts ? ` ・ <b>+${pts}pt</b>` : ''}<br>作戦：${plan}${c.pen ? `<br><span style="color:#d7263d">タイヤ規定違反 +${c.pen}秒</span>` : ''}</div>`;
+  };
+  el.innerHTML = cars.map(line).join('');
   el.hidden = false;
 }
 /* 担当マシンのクラッシュ・リタイア・トラブルのときのチームラジオ。
@@ -5846,7 +6139,7 @@ function startComp(comp){
 function prepareGrid(){
   pwReset();
   if(race.state === 'idle') race.laps = +lapsSel.value || race.laps;   // スタート前は選んでいる周回数を使う
-  race.cars = []; race.inc = null; race.t = 0; race.firstFinish = null; race.sc = null; race.vsc = null; race.scCar = null; race.yellow = null; intT = -99; intCache = new Map();
+  race.cars = []; race.pitBusy = {}; race.inc = null; race.t = 0; race.firstFinish = null; race.sc = null; race.vsc = null; race.scCar = null; race.yellow = null; intT = -99; intCache = new Map();
   race.bestLap = null; race.bestSplits = null; race.lapDone = []; race.sparks = []; race.dust = []; race.spray = []; race.smoke = []; race.wind = null; race.skids = []; race.greenUntil = 0; race.greenSec = -1; race.red = null; race.form = null; hideRecord(); clearFlags(); race.leader = null; race.leadCand = null;
   DIR.events = []; DIR.shot = null; DIR.next = 0; DIR.fade = null; DIR.fadeA = 0; DIR.pan = null;
   RP.buf = []; RP.pbuf = []; RP.lastRec = -1; RP.pending = null; stopReplay();
@@ -5873,6 +6166,7 @@ function prepareGrid(){
       wetKey: 0, scPit: false,
       // 1ガレージを2台で共有。2台目は少し手前で止めて重ならないようにする
       boxIdx: carBox(T, m, i),   // 同じチームの2台は同じガレージ
+      pitTeam: (career && m.team) ? m.team : 'g' + Math.floor(i/2),   // ガレージを共有する組（ダブルスタックの順番待ちに使う）
       prevR:(idx - T.startIdx + T.N) % T.N
     };
     c.prog = -T.N + c.prevR;
@@ -5884,9 +6178,27 @@ function prepareGrid(){
   dirty = true;
 }
 /* グリッドの並び（2列の千鳥配置）。車の置き場所と路面の枠線で共通に使う */
-function gridSlots(T, n){
+/* グリッドの間隔はコースごとに決める：スタートラインの後ろに使える長さ（直線と、緩いカーブまで）を測り、
+   収まる範囲でできるだけ広く（最大 GRID_GAP_MAX）。マシンの全長は約17.4なので、22あれば前後に4〜5のすき間ができる */
+const GRID_GAP_MAX = 22, GRID_GAP_MIN = 14.5, GRID_FRONT = 16, GRID_R_OK = 160;   // GRID_R_OK：グリッドを置いてよいカーブの半径（これより急なら止める）
+function gridRoom(T){
+  if(T._gridRoom != null) return T._gridRoom;
+  const N = T.N; let k = 0;
+  for(; k < N/2; k++){
+    const q = T.pts[((T.startIdx - k) % N + N) % N];
+    if(q.r < GRID_R_OK) break;
+    if(T.crossings && T.crossings.some(c => Math.hypot(c.x - q.x, c.y - q.y) < 70)) break;
+    if(k*T.sp > 400) break;
+  }
+  return (T._gridRoom = k*T.sp);
+}
+function gridGap(T, n){
   const rows = Math.ceil(n/2);
-  const gap = clamp(124/Math.max(1, rows-1), 14.5, 24); // 台数が多いときはグリッドを詰める（22台でも20台時と同じ長さに収める）
+  if(rows <= 1) return GRID_GAP_MAX;
+  return clamp((gridRoom(T) - GRID_FRONT - 8)/(rows - 1 + 0.5), GRID_GAP_MIN, GRID_GAP_MAX);
+}
+function gridSlots(T, n){
+  const gap = gridGap(T, n);
   const out = [];
   for(let i=0;i<n;i++){
     const row = Math.floor(i/2), col = i%2;
@@ -6340,6 +6652,14 @@ function blockedRed(bl, inc){
    急に止まらず、ピット入口が近ければピットまで自走してガレージでリタイア、
    遠ければスピードを落としてコースの端に寄せ、グラベルに止めてリタイアする */
 const TROUBLE_PACE = 0.45;                               // トラブル車の速さ（最高速度に対する割合）
+/* グラベルにしっかり収めて止める：車体（幅約7）がコースから完全に出る位置（コースの端から5以上外）まで入れる。
+   その先のグラベルが狭い場所（市街地・ホームストレートなど）では、広い場所まで端を走って探す。見つからなければ（約14秒）その場で止める */
+const TROUBLE_GW_NEED = 12, TROUBLE_CLEAR = 5, TROUBLE_SEEK_T = 14;
+function troubleRoom(T, idx){                              // この先しばらく、止めるのに十分なグラベルがあるか
+  const gw = gravelW(T), N = T.N, k = Math.ceil(60/T.sp);
+  for(let o = 0; o <= k; o++) if(gw[(idx + o) % N] < TROUBLE_GW_NEED) return false;
+  return true;
+}
 function startTrouble(c){
   const T = track, N = T.N;
   const dEntry = ((T.pit.entry - c.idx + N) % N) * T.sp;
@@ -6374,18 +6694,20 @@ function retireCar(c, kind, multi, nth, inPlace){
   if(multi || kind === 'crash') return;                      // クラッシュの旗は事故がおさまってから決める（stepIncident）                                           // 旗やSCの判断はまとめて行う
   if(kind !== 'mech') crowdCheer(c.x, c.y, 0.8);             // どよめき
   const sec = sectorOf(c.idx);
-  const who = `${c.m.name} ${({ crash:'CRASH', mech:'STOPPED', burst:'TYRE FAILURE' })[kind] || 'STOPPED'}`;
+  // トラブル車がグラベルにしっかり収まった（車体がコースから出ている）なら、SC・VSCはほとんど出さずイエローフラッグで済ませる
+  const clearOff = kind === 'mech' && inPlace && Math.abs(c.lat ?? c.lane) >= track.width/2 + TROUBLE_CLEAR;
+  const who = `${c.m.name} ${clearOff ? 'STOPPED IN GRAVEL' : (({ crash:'CRASH', mech:'STOPPED', burst:'TYRE FAILURE' })[kind] || 'STOPPED')}`;
   showFlag('yellow', 'YELLOW FLAG', `SECTOR ${sec+1} · ${who}`);
   race.yellow = { sec, until: race.t + (kind === 'mech' ? 14 : 22), noted: false };
   // 止まった車が路上に近いほど、また残り周回があるほどセーフティカーが出やすい
-  const chance = kind === 'crash' ? 0.7 : (kind === 'burst' ? 0.5 : 0.4);
+  const chance = clearOff ? 0.04 : kind === 'crash' ? 0.7 : (kind === 'burst' ? 0.5 : 0.4);
   if(race.laps - c.laps.length > 1 && (!race.sc || race.sc.until <= race.t) && Math.random() < chance){
     // SCはピットから出動する。コースに合流した時点から20秒で解除の段取りに入る（実際の解除はピット入口）
     race.sc = { until: Infinity, dur: 20, ending: false };
     if(race.vsc) race.vsc = null;                       // VSCから本物のSCに切り替える
     showFlag('sc', 'SAFETY CAR', 'DEPLOYED');
   } else if(race.laps - c.laps.length > 1 && !race.sc && !race.vsc
-            && Math.random() < (kind === 'crash' ? 0.5 : (kind === 'burst' ? 0.6 : 0.7))){
+            && Math.random() < (clearOff ? 0.12 : kind === 'crash' ? 0.5 : (kind === 'burst' ? 0.6 : 0.7))){
     // SCを出すほどではないときは、バーチャル・セーフティカー（全車が一律に減速）にする
     race.vsc = { until: race.t + 14 + Math.random()*8, ending: false, endAt: 0 };
     showFlag('sc', 'VIRTUAL SAFETY CAR', 'DEPLOYED');
@@ -6742,6 +7064,7 @@ function stepCar(c, dt){
   // ピットレーン
   if(T.pit){
     if(race.red && !c.inPit && !c.pitReq && !c.redParked && c.finish === null){ c.pitReq = true; c.nextComp = redTyre(c); }   // 中断中は全車ピットへ
+    if(c.pitReq && !c.inPit && !race.red && !c.trouble && passedIdx(c.lastIdx, best, T.pit.entry, N)) stackCheck(c);   // チームメイトとかち合うか
     if(c.pitReq && !c.inPit && passedIdx(c.lastIdx, best, T.pit.entry, N)){
       c.inPit = true; c.pitReq = false; c.scPit = false; c.served = false;
       if(race.red) assignRedSpot(c);
@@ -6756,9 +7079,14 @@ function stepCar(c, dt){
     } else if(c.inPit && !c.served && passedIdx(c.lastIdx, best, c.boxIdx, N)){
       c.served = true; c.pits++; SFX.pit();
       c.comp = c.nextComp; c.wear = 0; c.wearLapStart = 0; noteTyre(c, c.comp);
-      c.stopUntil = race.t + pitStopT(c);
+      // ダブルスタック：チームメイトの作業中なら、それが終わって少し間を置くまで待つ
+      const busy = (race.pitBusy && race.pitBusy[c.pitTeam]) || 0;
+      const start = busy > race.t ? busy + STACK_GAP : race.t, dur = pitStopT(c);
+      c.stopUntil = start + dur; c.stackStart = start;
+      if(race.pitBusy) race.pitBusy[c.pitTeam] = c.stopUntil;
+      if(start > race.t){ const o = mateOf(c); showFlag('stack', 'DOUBLE STACK', `${o ? o.m.name + ' → ' : ''}${c.m.name} · WAIT +${(start - race.t).toFixed(1)}s`); }
       c.myLog.push({ lap: c.laps.length + 1, comp: c.comp });
-      if(c.m === MY) pwServed(c, c.stopUntil - race.t);   // タイヤ交換
+      if(c.m === MY) pwServed(c, dur, start - race.t);   // タイヤ交換
     }
   }
 
@@ -7063,7 +7391,7 @@ function stepCar(c, dt){
     const pad = Math.round(30/T.sp);
     const nearX = T.crossings.some(k => Math.hypot(k.x - c.x, k.y - c.y) < 100);
     const pitSide = tr.side === 1 && inArc(best, (T.pit.entry - pad + N) % N, (T.pit.exit + pad) % N, N);
-    if(tr.phase === 'pull' && race.t - tr.since > 2 && !nearX && !pitSide && Math.abs(c.lat - tr.side*(half - 5)) < 4) tr.phase = 'off';
+    if(tr.phase === 'pull' && race.t - tr.since > 2 && !nearX && !pitSide && Math.abs(c.lat - tr.side*(half - 5)) < 4 && (troubleRoom(T, best) || race.t - tr.since > TROUBLE_SEEK_T)) tr.phase = 'off';   // 広いグラベルが続く場所でコース外へ
     tgt = tr.phase === 'off' ? tr.side*Math.min(half + 12, fenceLat(T, best) - 1) : tr.side*(half - 5);
   }
   if(c.inPit){
@@ -7154,7 +7482,10 @@ function stepCar(c, dt){
   }
   if(c.trouble){                                                       // トラブル車：パワーが出ずゆっくり走る
     vt = Math.min(vt, c.vmax*TROUBLE_PACE); c.drs = false;
-    if(c.trouble.mode === 'stop' && c.trouble.phase === 'off' && Math.abs(c.lat) > Math.min(half + 3, fenceLat(T, best) - 1.5)) vt = 0;   // コース外に出たら止まる
+    if(c.trouble.mode === 'stop' && c.trouble.phase === 'off'){
+      vt = Math.min(vt, c.vmax*0.3);                                   // 曲がってグラベルに入れるよう、さらにゆっくり
+      if(Math.abs(c.lat) > Math.min(half + TROUBLE_CLEAR + 2, fenceLat(T, best) - 1.5)) vt = 0;   // 車体がコースから出きったら止まる
+    }
   }
   // ブレーキミス：強いブレーキを踏み始める瞬間に、まれにタイヤをロックさせたり、止まりきれずにオーバーランしたりする
   const inBZ = !man && !scOn && !vscOn && !redOn && !c.inPit && !c.pitReq && c.finish === null && race.t > 3 && c.v > 150 && vt < c.v - 2 && Math.sqrt(cornerV2) < c.v - 70;   // しっかり減速が要るコーナーのブレーキング
@@ -7898,7 +8229,7 @@ function renderStandings(force){
                        : (c.laps.length ? fmt(c.laps[c.laps.length-1]) : '—');
     const fast = c.best !== null && c.best === bestAll;
     const camOn = (cam.mode === 'car' && c.m === cam.follow) || (cam.mode === 'lead' && c === order.find(o=>!o.out)) || (cam.mode === 'auto' && DIR.shot && DIR.shot.car === c);
-    html += `<tr data-ci="${race.cars.indexOf(c)}" class="${camOn ? 'cam' : ''}${c.m === MY ? ' my' : ''}"><td class="pos num">${i+1}${chgMark(c)}</td><td><span class="dot" style="background:${swatchBg(c.m)}"></span>${esc(c.m.name)}<span class="sw" title="ファステストラップ">${fast ? STOPWATCH : ''}</span><span class="flag" style="color:${c.inPit ? '#ffc400' : '#3ce08c'}">${c.finish !== null ? CHECKER : (c.inPit ? 'IN PIT' : (c.drs && race.state === 'racing' ? (c.ot ? '<span style="color:#00c8ff">OT</span>' : '<span style="color:#ff9628">BOOST</span>') : ''))}</span></td>${gridCell(c,i)}<td class="num">${last}</td>${gapCell(c,i)}${$('#pitOn').checked ? tyreCell(c) : '<td class="num">—</td>'}${ersCell(c)}${secCell(c,0)}${secCell(c,1)}${secCell(c,2)}<td class="num">${lapNow}</td><td class="num ${fast?'fast':''}">${fmt(c.best)}</td></tr>`;
+    html += `<tr data-ci="${race.cars.indexOf(c)}" class="${camOn ? 'cam' : ''}${c.m === MY ? ' my' : ''}"><td class="pos num">${i+1}${chgMark(c)}</td><td><span class="dot" style="background:${swatchBg(c.m)}"></span>${esc(c.m.name)}<span class="sw" title="ファステストラップ">${fast ? STOPWATCH : ''}</span><span class="flag" style="color:${c.inPit ? '#ffc400' : '#3ce08c'}">${c.finish !== null ? CHECKER : (c.inPit ? (c.stackStart > race.t ? '<span style="color:#ff9f43" title="ダブルスタック：チームメイトの作業待ち">STACK</span>' : 'IN PIT') : (c.drs && race.state === 'racing' ? (c.ot ? '<span style="color:#00c8ff">OT</span>' : '<span style="color:#ff9628">BOOST</span>') : ''))}</span></td>${gridCell(c,i)}<td class="num">${last}</td>${gapCell(c,i)}${$('#pitOn').checked ? tyreCell(c) : '<td class="num">—</td>'}${ersCell(c)}${secCell(c,0)}${secCell(c,1)}${secCell(c,2)}<td class="num">${lapNow}</td><td class="num ${fast?'fast':''}">${fmt(c.best)}</td></tr>`;
   });
   if(!order.length) html = '<tr><td class="muted" style="color:#aab0b8">コースができるとグリッドが並びます。</td></tr>';
   $('#standings').innerHTML = html;
@@ -8110,20 +8441,27 @@ $('#closeResult').onclick = ()=>$('#resultModal').classList.remove('show');
 const lapsTxt = n => `${n} ${n === 1 ? 'LAP' : 'LAPS'}`;   // 周回数の表記
 function showResults(){
   const order = ranking();
-  let html = '<tr><th>POS</th><th></th><th>TIME</th><th>BEST</th><th>BEST S1</th><th>BEST S2</th><th>BEST S3</th><th>PITS</th><th>TYRES</th></tr>';
+  let html = '<tr><th>POS</th><th title="スターティンググリッドからの順位変動">GRID</th><th></th><th>TIME</th><th>BEST</th><th class="rPit">PITS</th><th>TYRES</th><th title="獲得したポイント">PTS</th></tr>';
   const tot = c => c.finish + (c.pen || 0);
   const win = order[0] && order[0].finish !== null ? tot(order[0]) : null;
   const penTag = c => c.pen ? `<br><span style="color:#d7263d;font-size:11px">タイヤ規定 +${c.pen}秒</span>` : '';
   const stintHtml = c => (c.stints || [c.comp]).map(k => `<span style="color:${k === 'H' ? 'inherit' : TYRES[k].color};font-weight:700">${k}</span>`).join('<span class="muted">→</span>');
   const bestAll = Math.min(...race.cars.map(c=>c.best ?? Infinity));
+  // スタートからの順位変動（▲上げた／▼下げた）と、獲得したポイント（10位までの完走者）
+  const gridChg = (c, i) => {
+    if(c.finish === null || !c.grid) return '<td class="num gchg">—</td>';
+    const d = c.grid - (i + 1);
+    return d > 0 ? `<td class="num gchg up" title="グリッド${c.grid}番手から">▲${d}</td>` : d < 0 ? `<td class="num gchg dn" title="グリッド${c.grid}番手から">▼${-d}</td>` : `<td class="num gchg" title="グリッド${c.grid}番手のまま">0</td>`;
+  };
+  const ptsCell = (c, i) => { const p = c.finish !== null && i < 10 ? PTS[i] : 0; return p ? `<td class="num rPts">${p}</td>` : '<td class="num muted">—</td>'; };
   order.forEach((c,i)=>{
     const fast = c.best !== null && c.best === bestAll;
     let time;
     const down = order[0] ? order[0].laps.length - c.laps.length : 0;   // トップとの周回差
-    if(c.finish !== null) time = (i === 0 ? fmt(tot(c)) : (down > 0 ? `+${down} LAP` : `${fmt(tot(c))}<br><span class="muted">+${(tot(c)-win).toFixed(3)}</span>`)) + penTag(c);
+    if(c.finish !== null) time = (i === 0 ? fmt(tot(c)) : (down > 0 ? `+${down} LAP` : `<span title="${fmt(tot(c))}">+${(tot(c)-win).toFixed(3)}</span>`)) + penTag(c);   // 2位以下はトップとの差だけ（1行に収める）
     else if(c.out) time = `DNF<span class="muted"> · ${lapsTxt(c.laps.length)}</span>`;             // リタイアは理由を出さず DNF に統一
     else time = `完走ならず<span class="muted"> · ${lapsTxt(c.laps.length)}</span>`;
-    html += `<tr class="${i===0?'p1':''}${c.m === MY ? ' my' : ''}"><td class="num">${c.finish!==null ? i+1 : '—'}</td><td><span class="dot" style="background:${swatchBg(c.m)}"></span>${esc(c.m.name)}${fast ? `<span class="sw" title="ファステストラップ">${STOPWATCH}</span>` : ''}</td><td class="num">${time}</td><td class="num ${fast?'fast':''}">${fmt(c.best)}</td>${[0,1,2].map(k=>`<td class="num">${c.bestSec[k]!=null?c.bestSec[k].toFixed(2):'—'}</td>`).join('')}<td class="num">${c.pits}</td><td class="num">${stintHtml(c)}</td></tr>`;
+    html += `<tr class="${i===0?'p1':''}${isTeamCar(c) ? ' my' : ''}"><td class="num">${c.finish!==null ? i+1 : '—'}</td>${gridChg(c, i)}<td><span class="dot" style="background:${swatchBg(c.m)}"></span>${esc(c.m.name)}${fast ? `<span class="sw" title="ファステストラップ">${STOPWATCH}</span>` : ''}</td><td class="num">${time}</td><td class="num ${fast?'fast':''}">${fmt(c.best)}</td><td class="num rPit">${c.pits}</td><td class="num">${stintHtml(c)}</td>${ptsCell(c, i)}</tr>`;
   });
   $('#resultTable').innerHTML = html;
   pwResult(order);
@@ -8330,12 +8668,17 @@ const DIST_PAY = 1.5;            // 参戦分配金：全チームに毎戦配�
 const LOAN = { step: 5, cap: 15, rate: 0.08, pay: 1.0 };   // 借入：$5M単位・残高$15Mまで・借りるときに利息8%を上乗せ・毎戦$1Mずつ自動で返す
 const SEASON_PRIZE = 2;         // シーズン終了時の賞金：コンストラクターズの順位が1つ上がるごとに$2M（1位$20M〜10位$2M）
 /* ---------- スポンサー契約（シーズンごとに3つの提案から1つ選ぶ） ---------- */
-const SPONSOR_NAMES = ['ミナト重工','ブルーリーフ飲料','ノヴァテック','サンライズ航空','グリッド証券','オーロラ化粧品','ハヤテ運輸','クレスト時計','ネオンゲームス','シーサイド銀行','ホクト電機','ルミナ通信'];
+const SPONSOR_NAMES = ['ミナト重工','ブルーリーフ飲料','ノヴァテック','サンライズ航空','グリッド証券','オーロラ化粧品','ハヤテ運輸','クレスト時計','ネオンゲームス','シーサイド銀行','ホクト電機','ルミナ通信',
+  'コメット石油','ヤマブキ食品','ソラノ保険','ブレイズスポーツ','ツバメ精機','モカ珈琲','シグマ半導体','カエデ製薬','ステラリゾート','アイアンクラウド'];   // 後半10社を追加（業種を広げた）
 const SPONSOR_TYPES = {
   stable: { n:'安定型', d:'成績に関係なく、毎戦決まった額が入る' },
   points: { n:'成績型', d:'ポイント・表彰台・優勝でボーナス' },
-  finish: { n:'完走型', d:'完走した台数と、上げた順位でボーナス' }
+  finish: { n:'完走型', d:'完走した台数と、上げた順位でボーナス' },
+  quali:  { n:'予選型', d:'予選の順位（スタート位置）でボーナス' },
+  pass:   { n:'露出型', d:'レース中のオーバーテイクの数でボーナス（テレビに映るほど喜ばれる）' },
+  youth:  { n:'若手育成型', d:'基本の報酬に加え、23歳以下のドライバーを起用するとボーナス' }
 };
+const YOUTH_AGE = 23;
 /* ---------- スポンサー企業の架空ロゴ ----------
    チームロゴと同じく「1色の地＋シンボル1つ」の正方形マークと、社名のワードマークの組み合わせ。
    シンボルはすべて図形から作ったオリジナル（実在の企業ロゴは参考にしていない）。
@@ -8376,7 +8719,38 @@ const SP_LOGO = {
     sym: (f, a) => { const P = [[8.5,16],[15,13.5],[21,17],[26.5,21.5],[27.5,32],[38.5,34.5],[40,23]]; return `<path d="M${P.map(p => p.join(' ')).join('L')}L${P[3].join(' ')}" fill="none" stroke="${f}" stroke-opacity=".55" stroke-width="1.3"/>` + P.map(([x, y], i) => i === 0 ? `<path d="M${x} ${y - 4.6}l1.3 3.3 3.3 1.3-3.3 1.3-1.3 3.3-1.3-3.3-3.3-1.3 3.3-1.3z" fill="${a}"/>` : `<circle cx="${x}" cy="${y}" r="${i === 3 ? 2.3 : 2.8}" fill="${f}"/>`).join(''); } },
   'ルミナ通信': { en:'LUMINA TELECOM', bg:'#f2a007', fg:'#2a2118', ac:'#fff', ty:'round',
     // 光る点から左右に広がる電波（アンテナ）
-    sym: (f, a) => `<circle cx="24" cy="22" r="4.2" fill="${a}"/><path d="M24 26.5V40M18.5 40h11" stroke="${f}" stroke-width="3" stroke-linecap="round"/><g fill="none" stroke="${f}" stroke-linecap="round"><path d="M29.47 15.49A8.5 8.5 0 0 1 29.47 28.51M18.53 15.49A8.5 8.5 0 0 0 18.53 28.51" stroke-width="3"/><path d="M33.64 10.51A15 15 0 0 1 33.64 33.49M14.36 10.51A15 15 0 0 0 14.36 33.49" stroke-width="2.6"/></g>` }
+    sym: (f, a) => `<circle cx="24" cy="22" r="4.2" fill="${a}"/><path d="M24 26.5V40M18.5 40h11" stroke="${f}" stroke-width="3" stroke-linecap="round"/><g fill="none" stroke="${f}" stroke-linecap="round"><path d="M29.47 15.49A8.5 8.5 0 0 1 29.47 28.51M18.53 15.49A8.5 8.5 0 0 0 18.53 28.51" stroke-width="3"/><path d="M33.64 10.51A15 15 0 0 1 33.64 33.49M14.36 10.51A15 15 0 0 0 14.36 33.49" stroke-width="2.6"/></g>` },
+  /* ---- 追加した10社 ---- */
+  'コメット石油': { en:'COMET ENERGY', bg:'#1b1b3a', fg:'#ffb020', ac:'#ff5a36', ty:'italic',
+    // 尾を引いて飛ぶ彗星（3本の尾）
+    sym: (f, a) => `<g stroke-linecap="round" fill="none"><path d="M8 34 26 23" stroke="${a}" stroke-width="3"/><path d="M10 40 27.5 27.5" stroke="${f}" stroke-width="2.4" opacity=".75"/><path d="M14 29 25.5 20.5" stroke="${f}" stroke-width="2" opacity=".55"/></g><circle cx="31" cy="20" r="8" fill="${f}"/><circle cx="33.5" cy="17.5" r="2.6" fill="#fff" opacity=".7"/>` },
+  'ヤマブキ食品': { en:'YAMABUKI FOODS', bg:'#f4b400', fg:'#5a3200', ac:'#fff', ty:'round',
+    // 山吹の花（5枚の花びら）と中心の実
+    sym: (f, a) => { let o = ''; for(let i = 0; i < 5; i++){ const t = i*72 - 90; o += `<ellipse cx="24" cy="14.5" rx="5.6" ry="8.4" fill="${a}" transform="rotate(${t + 90} 24 24)"/>`; } return o + `<circle cx="24" cy="24" r="5.4" fill="${f}"/>`; } },
+  'ソラノ保険': { en:'SORANO INSURANCE', bg:'#2a6fdb', fg:'#fff', ac:'#9fd2ff', ty:'classic',
+    // 開いた傘（守る）と雨粒
+    sym: (f, a) => `<path d="M7.5 25a16.5 14 0 0 1 33 0c-2.8-2.4-5.5-2.4-8.2 0-2.8-2.4-5.5-2.4-8.3 0-2.8-2.4-5.5-2.4-8.2 0-2.8-2.4-5.5-2.4-8.3 0z" fill="${f}"/><path d="M24 25v11a3.2 3.2 0 0 1-6.4 0" fill="none" stroke="${f}" stroke-width="2.4" stroke-linecap="round"/><path d="M38 31.5c1.4 1.9 2.2 3.1 2.2 4.2a2.2 2.2 0 0 1-4.4 0c0-1.1.8-2.3 2.2-4.2z" fill="${a}"/>` },
+  'ブレイズスポーツ': { en:'BLAZE SPORTSWEAR', bg:'#111214', fg:'#ff4d1f', ac:'#ffd23f', ty:'wide',
+    // 前に流れる炎（スポーツウェアのスウッシュ風）
+    sym: (f, a) => `<path d="M6 33c9 1.5 19-1.5 27-9.5 3.5-3.5 6-7.5 8.5-12-1 7.5-3.5 14-8 19-6.5 7-16.5 9.5-27.5 2.5z" fill="${f}"/><path d="M16 32.5c6 .3 11.5-2 15.5-6.5-1.3 4.5-4.5 7.5-8.5 8.6-2.4.6-4.8.1-7-2.1z" fill="${a}"/>` },
+  'ツバメ精機': { en:'TSUBAME PRECISION', bg:'#203040', fg:'#e8edf2', ac:'#e8434a', ty:'heavy',
+    // 燕の飛ぶ形を、歯車の輪が囲む
+    sym: (f, a) => { let o = `<circle cx="24" cy="24" r="15.5" fill="none" stroke="${f}" stroke-width="2.2" stroke-opacity=".6"/>`; for(let i = 0; i < 12; i++) o += `<rect x="22.6" y="5.6" width="2.8" height="3.6" rx=".6" fill="${f}" fill-opacity=".6" transform="rotate(${i*30} 24 24)"/>`; return o + `<path d="M11 21.5c5 .2 9 1.8 12.5 5 3.8-4.5 8.4-7.3 14-8.3-4.6 2.6-7.8 6.4-9.6 11.6l-3.5 2.4-3.4-3.6C18.6 25 15 23 11 21.5z" fill="${f}"/><circle cx="26" cy="23.5" r="1.4" fill="${a}"/>`; } },
+  'モカ珈琲': { en:'MOKA COFFEE', bg:'#4a2c1d', fg:'#f3dfc3', ac:'#c98a4b', ty:'serif',
+    // コーヒー豆と、立ちのぼる湯気
+    sym: (f, a) => `<ellipse cx="24" cy="29" rx="10.5" ry="13" fill="${f}" transform="rotate(28 24 29)"/><path d="M19.5 18.5c5.5 4.5 3.5 12.5 9 21" fill="none" stroke="${'#4a2c1d'}" stroke-width="2.2" stroke-linecap="round"/><g fill="none" stroke="${a}" stroke-width="1.8" stroke-linecap="round"><path d="M31 12c-2-2 2-3.5 0-6"/><path d="M36 13.5c-2-2 2-3.5 0-6"/></g>` },
+  'シグマ半導体': { en:'SIGMA SEMICONDUCTOR', bg:'#0b3d2e', fg:'#7cf2c0', ac:'#e9fff5', ty:'mono',
+    // 足の出たチップの中に Σ
+    sym: (f, a) => { let o = `<rect x="13" y="13" width="22" height="22" rx="3" fill="none" stroke="${f}" stroke-width="2.4"/>`; for(let i = 0; i < 4; i++){ const q = 17 + i*4.7; o += `<path d="M${q} 7.5v5M${q} 35.5v5M7.5 ${q}h5M35.5 ${q}h5" stroke="${f}" stroke-width="1.8" stroke-linecap="round"/>`; } return o + `<path d="M29.5 18.5h-11l5.6 5.5-5.6 5.5h11" fill="none" stroke="${a}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`; } },
+  'カエデ製薬': { en:'KAEDE PHARMACEUTICAL', bg:'#f5f6f8', fg:'#c62828', ac:'#2e7d32', ty:'light',
+    // 楓の葉の中に、白い十字
+    sym: (f, a) => `<path d="M24 6.5l3.3 7 6.2-3-1.4 8.2 7.4-1.5-3.4 6.4 5.4 2.7-8.6 4.3 1.4 4.6-7.7-1.9L26 41h-4l-.6-7.7-7.7 1.9 1.4-4.6-8.6-4.3 5.4-2.7-3.4-6.4 7.4 1.5-1.4-8.2 6.2 3z" fill="${f}"/><path d="M24 17.5v11M18.5 23h11" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M24 33v8" stroke="${a}" stroke-width="2" stroke-linecap="round"/>` },
+  'ステラリゾート': { en:'STELLA RESORTS', bg:'#0e7490', fg:'#fff', ac:'#ffd76a', ty:'light',
+    // ヤシの木と、空の星
+    sym: (f, a) => `<path d="M25 40c-.5-8 .2-14 2.4-19" fill="none" stroke="${f}" stroke-width="2.6" stroke-linecap="round"/><g fill="${f}"><path d="M27 21c-3.5-4-8.5-5-13-3 4.5-.5 8.5 1 11 4z"/><path d="M27.5 21c1-5 4.5-8 9.5-8.5-4 1.5-6.5 4.5-7.5 9z"/><path d="M27.5 21.5c4.5-1.5 9 0 11.5 4-3.5-2-7.5-2.5-11 -2z"/><path d="M27 21.5c-3 2-4.5 5.5-4 9.5-1.5-4 .5-8 3-10.5z"/></g><path d="M12 9l1.4 3 3.2.4-2.4 2.2.6 3.2-2.8-1.6-2.8 1.6.6-3.2-2.4-2.2 3.2-.4z" fill="${a}"/><path d="M8 40h32" stroke="${f}" stroke-width="2" stroke-linecap="round" opacity=".7"/>` },
+  'アイアンクラウド': { en:'IRONCLOUD SOFTWARE', bg:'#3b2a8f', fg:'#fff', ac:'#7de0ff', ty:'wide',
+    // 雲の形の中に、上向きの矢印（アップロード）
+    sym: (f, a) => `<path d="M14.5 35.5h20a8 8 0 0 0 .9-15.9 10.5 10.5 0 0 0-20.2-1.9A9 9 0 0 0 14.5 35.5z" fill="${f}"/><path d="M24 31V20.5M19.5 25l4.5-4.5 4.5 4.5" fill="none" stroke="${a}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>` },
 };
 const SP_TYPE = {                      // ワードマークの書体（日本語の社名・英字）
   heavy:   { jp:'font-weight:900', en:'font-weight:800;letter-spacing:.16em' },
@@ -8412,15 +8786,23 @@ for(const name of Object.keys(SP_LOGO)){
 function makeSponsorOffers(){
   const me = myTeam(), k = (0.85 + clamp((me.spons - 2.8)/3.2, 0, 1)*0.35)*(1 + facLv(me, 'hosp')*0.05), v = x => r1(x*k*(0.9 + Math.random()*0.2));
   const names = shuffled(SPONSOR_NAMES);
-  return [
-    { type:'stable', name:names[0], base:v(2.6) },
-    { type:'points', name:names[1], base:v(0.8), perPt:r1(0.2*k*100)/100, podium:v(3), win:v(6) },
-    { type:'finish', name:names[2], base:v(1.0), perFin:v(1.1), perGain:r1(0.3*k*100)/100 }
-  ];
+  const all = {
+    stable: () => ({ type:'stable', base:v(2.6) }),
+    points: () => ({ type:'points', base:v(0.8), perPt:r1(0.2*k*100)/100, podium:v(3), win:v(6) }),
+    finish: () => ({ type:'finish', base:v(1.0), perFin:v(1.1), perGain:r1(0.3*k*100)/100 }),
+    quali:  () => ({ type:'quali', base:v(2.0), top10:v(0.7), top3:v(0.9), pole:v(1.5) }),   // 平均すると1戦 約$3.1M（中団チームの場合）
+    pass:   () => ({ type:'pass', base:v(1.3), perPass:r1(0.1*k*100)/100 }),           // 1チーム平均およそ19回/戦 → 約$3.2M
+    youth:  () => ({ type:'youth', base:v(2.0), perYoung:v(0.9) })                     // 若手0人 $2.0M・1人 $2.9M・2人 $3.8M
+  };
+  // 6タイプのうち3つを、毎回違う組み合わせで出す
+  return shuffled(Object.keys(all)).slice(0, 3).map((t, i) => ({ ...all[t](), name: names[i] }));
 }
 function sponsorTerms(s){
   if(s.type === 'stable') return `毎戦 ${money(s.base)}`;
   if(s.type === 'points') return `毎戦 ${money(s.base)} ＋ 1ポイントごと $${s.perPt.toFixed(2)}M ＋ 表彰台 ${money(s.podium)} ＋ 優勝 ${money(s.win)}`;
+  if(s.type === 'quali') return `毎戦 ${money(s.base)} ＋ 予選トップ10の1台ごと ${money(s.top10)} ＋ トップ3でさらに ${money(s.top3)} ＋ ポール ${money(s.pole)}`;
+  if(s.type === 'pass') return `毎戦 ${money(s.base)} ＋ オーバーテイク1回ごと $${s.perPass.toFixed(2)}M`;
+  if(s.type === 'youth') return `毎戦 ${money(s.base)} ＋ ${YOUTH_AGE}歳以下のドライバー1人の起用ごと ${money(s.perYoung)}`;
   return `毎戦 ${money(s.base)} ＋ 完走1台ごと ${money(s.perFin)} ＋ 上げた順位1つごと $${s.perGain.toFixed(2)}M`;
 }
 function sponsorPay(s, myCars, order){
@@ -8428,6 +8810,9 @@ function sponsorPay(s, myCars, order){
   let v = s.base;
   if(s.type === 'points') myCars.forEach(c => { const pos = order.indexOf(c) + 1, fin = c.finish !== null, pts = fin && pos <= 10 ? PTS[pos - 1] : 0; v += pts*s.perPt + (fin && pos <= 3 ? s.podium : 0) + (fin && pos === 1 ? s.win : 0); });
   if(s.type === 'finish') myCars.forEach(c => { if(c.finish === null) return; const pos = order.indexOf(c) + 1; v += s.perFin + Math.max(0, c.grid - pos)*s.perGain; });
+  if(s.type === 'quali') myCars.forEach(c => { const g = c.grid || 99; if(g <= 10) v += s.top10; if(g <= 3) v += s.top3; if(g === 1) v += s.pole; });
+  if(s.type === 'pass') myCars.forEach(c => { v += (c.passN || 0)*s.perPass; });
+  if(s.type === 'youth') myCars.forEach(c => { const d = career.drivers[c.m.name]; if(d && d.age != null && d.age <= YOUTH_AGE) v += s.perYoung; });
   return r1(v);
 }
 /* ---------- 遊び方ガイド ----------
@@ -8446,7 +8831,7 @@ function guideHtml(){
     <p>あなたはF1風レーシングチームの<b>チーム代表</b>です。資金をやりくりしてマシンを開発し、ドライバーを育て・雇い、全${ROUNDS}戦のシーズンで選手権を争います。レースではピットの指示やペースの指示を出して、作戦で順位を上げます。</p>
     <ol class="gSteps">
       <li><b>チームを選ぶ</b>：強豪は勝って当たり前、下位チームは少ない予算で這い上がる戦いです。オリジナルチームも作れます。レースの長さ（周回数）もここで選びます。</li>
-      <li><b>スポンサーと契約</b>：シーズンの最初に3社から1社を選びます（安定型・成績型・完走型）。</li>
+      <li><b>スポンサーと契約</b>：シーズンの最初に3社から1社を選びます（安定型・成績型・完走型・予選型・露出型・若手育成型のうち3タイプが並びます）。</li>
       <li><b>チーム本部で準備</b>：開発・トレーニング・施設・契約などを済ませたら「予選へ」。</li>
       <li><b>予選</b>：Q1・Q2・Q3で履くタイヤを選び、決勝のグリッドが決まります。</li>
       <li><b>決勝</b>：担当マシンにピット・タイヤ・ペースの指示を出します。終わったらチーム本部へ戻り、次のレースへ。</li>
@@ -8466,7 +8851,7 @@ function guideHtml(){
     <p>毎戦の収支は「前戦の結果」の「この戦いの収支」で確認できます。</p>
     ${tbl(['収入', '内容'], [
       ['基本スポンサー収入', 'チームごとに決まった額（ホスピタリティ施設で増える）'],
-      ['スポンサー契約', '契約したスポンサーの条件による（安定型：毎戦定額／成績型：ポイント・表彰台・優勝／完走型：完走台数・上げた順位）'],
+      ['スポンサー契約', '契約したスポンサーの条件による（安定型：毎戦定額／成績型：ポイント・表彰台・優勝／完走型：完走台数・上げた順位／予選型：予選の順位／露出型：オーバーテイクの数／若手育成型：23歳以下の起用）'],
       ['賞金', `1ポイントごと ${M(PT_PRIZE)}、完走1台ごと ${M(FIN_PRIZE)}`],
       ['参戦分配金', `全チームに毎戦 ${M(DIST_PAY)}`],
       ['スポンサー目標ボーナス', '毎戦2つの目標（例：2台とも完走、ポイント獲得）を達成すると、それぞれ $1〜3M'],
@@ -8497,11 +8882,20 @@ function guideHtml(){
     <p>3人目として<b>リザーブ</b>を契約できます（年俸・契約金は市場価値の${Math.round(RES_K*100)}%）。リザーブは走らない間もシミュレーターで少しずつ伸び、次の場面で走ります。</p>
     <ul><li><b>負傷</b>：クラッシュでリタイアしたドライバーは、まれに（約${Math.round(RES_INJ_P*100)}%）負傷して1〜2戦欠場します。リザーブがいなければ、移籍市場の選手が代役になります（年俸の${SUB_FEE_K}倍/戦）。</li>
       <li><b>自分で起用</b>：次戦だけ、レギュラーの代わりにリザーブを走らせられます。</li>
-      <li><b>昇格</b>：加入から2戦たつと、契約金なしでレギュラーに昇格できます。</li></ul>`)}
+      <li><b>昇格</b>：加入から2戦たつと、契約金なしでレギュラーに昇格できます。</li>
+      <li><b>シミュレーター作業</b>：リザーブがいると、パワーユニットとブレーキの開発が失敗しにくくなり（最大でシミュレーター施設3レベル分）、レギュラーの予選が少し速くなります（最大 −0.1%）。効果の強さはリザーブの腕前とシミュレーター施設のレベルで決まります。負傷中や、リザーブ自身が走る戦は効果がありません。</li>
+      <li><b>リザーブ特殊能力</b>：一部の選手（約1割）は、リザーブのときだけ効く能力を1つ持っています（点線の枠の札）。フィードバック○×（シミュレーター作業の効果1.5倍／半分）、広告塔（スポンサー収入 +$0.3M/戦）、緊急登板○×（代役で走るとき全能力 ±3）、リザーブ×（ときどき移籍・契約解除・更新拒否を要求。断ると3戦やる気が下がる）。</li></ul>`)}
   ${sec('machine', 'マシンと施設', `
-    <p>マシンは7項目を開発できます（1回 +${DEV_STEP}。値が高いほど費用も上がります）。棒が自チームの値、赤い線がライバルの最高値です。「次戦」の印は、次のコースで効きやすい項目です。</p>
+    <p>マシンは7項目を開発できます（1回 +${DEV_STEP}。値が8を超えると+0.3、9を超えると+0.2。値が高いほど費用も上がります）。棒が自チームの値、赤い線がライバルの最高値です。「次戦」の印は、次のコースで効きやすい項目です。</p>
     ${tbl(['項目', '効くところ'], PARTS.flatMap(([, , items]) => items.map(([k, lab]) => [lab, esc(CAR_DESC[k])])))}
     <p class="gNote">タイヤの持ちはマシンでは変わりません。コンパウンドの性能と、ドライバーの「タイヤ」能力で決まります。</p>
+    ${sub('reg', '開発枠と大規則変更')}
+    <p><b>開発枠</b>：1戦ごとに開発できる回数には上限があります。前年のコンストラクターズ順位が低いほど多く、1〜3位は2回、4〜7位は3回、8〜10位は4回です。</p>
+    <p><b>開発の結果</b>：開発は「失敗（伸び×0.25）・成功（×1）・大成功（×1.75、攻めは×2）」のどれかになります。失敗しても値は下がりません。開発方針で確率が変わり、慎重＝失敗5%・大成功なし、標準＝失敗15%・大成功15%（平均すると以前と同じ伸び）、攻め＝失敗30%・大成功30%です。空力は風洞、パワーユニットとブレーキはシミュレーターのレベルが高いほど失敗しにくくなります（1レベルにつき失敗の10%が大成功に回ります。慎重は成功に回ります）。ライバルも同じ仕組みで開発し、ときどき開発枠を買い足します。</p>
+    <p><b>開発枠の追加</b>：お金を払えば、1戦に1つだけ枠を足せます（その戦だけ有効）。値段は前年の順位が高いほど高く（1〜3位 $4.0M・4〜7位 $3.0M・8〜10位 $2.0M）、同じシーズンで買うたびに50%ずつ上がります。風洞のレベルが高いほど安くなります。</p>
+    <p><b>大規則変更</b>：2〜3シーズンごとに、空力・パワーユニット・全面のどれかの規則が大きく変わります。変わる部分は全チームが平均近くまで作り直しになり、勢力図がリセットされます。変更の前のシーズンの開幕に予告されます。</p>
+    <p><b>先行研究</b>：予告されたシーズンだけ、開発枠を使って来季の研究ができます（1回 ${M(RES_COST)}）。研究するほど来季の初期値が平均より高くなります（効果の上限は、変わる項目が少ないテーマほど1項目あたり大きく、空力 +${REG_THEMES.aero.max.toFixed(1)}・パワーユニット +${REG_THEMES.pu.max.toFixed(1)}・全面 +${REG_THEMES.all.max.toFixed(1)}。当たり外れ ±25%）。今季を強くするか、今季を捨てて来季に賭けるかの判断です。研究を${RES_EASE[0]}回以上すると、オーナーは目標より1つ下（${RES_EASE[1]}回以上で2つ下）の順位までを「達成」として扱います。ライバルもそれぞれの方針で研究します。</p>
+    <p><b>新規則1年目</b>：変わった部分の開発は、1回あたり ×${REG_BOOST} 伸びます。</p>
     ${sub('fac', '施設')}
     <p>強化するとすぐに効きます（工期なし）。強化の費用は ${M(facCost(1))}（Lv1）〜 ${M(facCost(FAC_MAX))}（Lv${FAC_MAX}）。レベルごとに毎戦の維持費がかかります。チームによって最初のレベルが違い、ライバルもシーズンの終わりに強化します。</p>
     ${tbl(['施設', 'Lv1', `Lv${FAC_MAX}`], FACS.map(f => [`<b>${f.n}</b><br><small>${esc(f.d)}</small>`, esc(f.eff(1)), esc(f.eff(FAC_MAX))]))}`)}
@@ -8622,19 +9016,19 @@ function evalGoals(order, myCars){
 function borrow(){
   const L = career.loan || (career.loan = { bal: 0 });
   if(L.bal + LOAN.step*(1 + LOAN.rate) > LOAN.cap + 0.01) return;
-  if(!confirmTwice('loan')) return;
+  if(!confirmTwice('loan', -LOAN.step)) return;
   career.money = r1(career.money + LOAN.step); L.bal = r1(L.bal + LOAN.step*(1 + LOAN.rate));
   saveCareer(); renderHQ(`${money(LOAN.step)}を借りました。返済額は${money(LOAN.step*(1 + LOAN.rate))}で、毎戦${money(LOAN.pay)}ずつ自動で返します。`);
 }
 function repayAll(){
   const L = career.loan; if(!L || L.bal <= 0 || career.money < L.bal) return;
-  if(!confirmTwice('repay')) return;
+  if(!confirmTwice('repay', L.bal)) return;
   career.money = r1(career.money - L.bal); const b = L.bal; L.bal = 0;
   saveCareer(); renderHQ(`借入を${money(b)}全額返しました。`);
 }
 function sellFac(k){
   const t = myTeam(), lv = facLv(t, k); if(lv <= 0) return;
-  if(!confirmTwice('facsell' + k)) return;
+  if(!confirmTwice('facsell' + k, -r1(facCost(lv)*0.5))) return;
   const back = r1(facCost(lv)*0.5);
   t.fac[k] = lv - 1; career.money = r1(career.money + back);
   saveCareer(); renderHQ(`${FAC_K[k].n}をLv${lv - 1}に下げ、${money(back)}を受け取りました。`);
@@ -8666,7 +9060,7 @@ const TEAM_DEFS = [
   { id:'sol', name:'ソル・グランプリ',            pal:2,  car:6.4, spons:4.8 },
   { id:'tid', name:'タイダル・レーシング',        pal:7,  car:6.0, spons:4.4 },
   { id:'emb', name:'エンバー・モータースポーツ',  pal:5,  car:5.6, spons:4.0 },
-  { id:'for', name:'フォレスト・エンジニアリング',pal:3,  car:5.2, spons:3.7 },
+  { id:'for', name:'フォレスト eng.',             pal:3,  car:5.2, spons:3.7 },   // 長い名前は表で2行になるので短くした（旧：フォレスト・エンジニアリング）
   { id:'vio', name:'ヴァイオレット・ワークス',    pal:4,  car:4.8, spons:3.4 },
   { id:'blo', name:'ブロッサムGP',                pal:8,  car:4.4, spons:3.1 },
   { id:'irn', name:'アイアン・ホース',            pal:19, car:4.0, spons:2.8 }
@@ -8680,7 +9074,7 @@ const DRIVER_POOL = [
   ['PET','ミロ・ペトロフ',5.4],['GRA','ベン・グラハム',5.2],['KIM','ジュン・キム',5.0],['ZAN','ルカ・ザネッティ',4.8],
   ['ABE','ショウ・アベ',7.9],['LUN','フェリックス・ルンド',6.5],['COS','アンドレ・コスタ',6.1],['WEB','ニコ・ウェーバー',5.5],['IVA','ユーリ・イヴァノフ',5.0],['ORT','パブロ・オルテガ',4.5]
 ];
-const GP_NAMES = ['ミナトベイ','ヴァルカ','ノースリッジ','サン・オルモ','カスケード','レッドメサ','ハーバーライン','ゼニス','アルトフェルト','コーラルコースト','シルバーレイク','カナリア'];
+const GP_NAMES = ['日本','ハンガリー','オランダ','イタリア','オーストリア','コロンビア','ドイツ','フランス','ベルギー','タイ','フィンランド','スペイン'];
 const WX_TXT = { dry:'晴れ', mixed:'変わりやすい', wet:'雨' };
 const r1 = v => Math.round(v*10)/10;
 const money = v => (v < 0 ? '−' : '') + '$' + Math.abs(v).toFixed(1) + 'M';
@@ -8694,8 +9088,29 @@ function makeDriver(code, name, base){
   const nr = Math.random() < (8.5 - base)/5 ? 1 : 0;
   for(const [n, ids] of [[nb, BLUE_IDS], [nr, RED_IDS]]){ for(const id of shuffled(ids)){ if(ab.filter(x => ids.includes(x)).length >= n) break; if(!has(id)) ab.push(id); } }
   const d = { code, name, st, ab }; d.sal = salaryFor(d);
+  rollRab(d);
   return d;
 }
+/* ---------- リザーブ特殊能力（1人につき1つまで、低い確率で付く） ----------
+   リザーブとして契約しているときだけ効く。レギュラーに昇格すると効かない */
+const RABIL = {
+  fb:      { n:'フィードバック○', blue:true,  w:25, d:'リザーブのとき：シミュレーター作業の効果（開発の失敗しにくさ・予選）が1.5倍' },
+  nofb:    { n:'フィードバック×', blue:false, w:12, d:'リザーブのとき：シミュレーター作業の効果が半分' },
+  ad:      { n:'広告塔',         blue:true,  w:20, d:'リザーブのとき：毎戦のスポンサー収入 +$0.3M' },
+  emg:     { n:'緊急登板○',      blue:true,  w:20, d:'代役で走るとき：全能力 +3（ぶっつけ本番に強い）' },
+  noemg:   { n:'緊急登板×',      blue:false, w:12, d:'代役で走るとき：全能力 −3（準備不足に弱い）' },
+  grumble: { n:'リザーブ×',      blue:false, w:11, d:'リザーブのままだと出場機会を求めて、移籍・契約解除・更新拒否を要求しやすい' }
+};
+const RAB_P = 0.1;                                   // リザーブ特殊能力が付く確率
+const RAB_AD = 0.3, RAB_EMG = 0.3;                   // 広告塔の収入（$M/戦）、緊急登板の能力の上下（内部の1〜10の値で。表示では3）
+function rollRab(d){
+  d.rabRolled = true;
+  if(d.rab || Math.random() >= RAB_P) return;
+  const ks = Object.keys(RABIL), tot = ks.reduce((a, k) => a + RABIL[k].w, 0);
+  let r = Math.random()*tot; d.rab = ks.find(k => (r -= RABIL[k].w) < 0) || ks[0];
+}
+const rabChip = id => RABIL[id] ? `<span class="ab ${RABIL[id].blue ? 'blue' : 'red'} rabC" title="${esc(RABIL[id].d)}">${esc(RABIL[id].n)}</span>` : '';
+const rabOf = t => (t && t.reserve && career.drivers[t.reserve] && career.drivers[t.reserve].rab) || null;
 const devCost = v => r1(1 + v*0.5);
 /* ---------- チームの施設（Lv0〜5） ----------
    建てるとすぐ効く（工期なし）。レベルに応じて毎戦の維持費がかかる。
@@ -8703,9 +9118,9 @@ const devCost = v => r1(1 + v*0.5);
 const FAC_MAX = 5;
 const FACS = [
   { k:'wind',  n:'風洞',               ico:'M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h8', d:'空力（ダウンフォース・空力効率）の開発費が安くなる',
-    eff: lv => `空力の開発費 −${lv*6}%` },
-  { k:'sim',   n:'シミュレーター',     ico:'M3 5h18v11H3zM8 20h8M12 16v4', d:'重点トレーニングの伸びが大きくなり、予選で少し速くなる',
-    eff: lv => `トレーニングの伸び +${lv*12}%・予選タイム −${(lv*0.06).toFixed(2)}%` },
+    eff: lv => `空力の開発費 −${lv*6}%・追加の開発枠 −${lv*6}%・空力開発の失敗 −${lv*10}%` },
+  { k:'sim',   n:'シミュレーター',     ico:'M3 5h18v11H3zM8 20h8M12 16v4', d:'重点トレーニングの伸びが大きくなり、予選で少し速くなる。パワーユニットとブレーキの開発も失敗しにくくなる',
+    eff: lv => `トレーニングの伸び +${lv*12}%・予選タイム −${(lv*0.06).toFixed(2)}%・PU/ブレーキ開発の失敗 −${lv*10}%` },
   { k:'pit',   n:'ピットクルー訓練施設', ico:'M12 3v4M12 17v4M3 12h4M17 12h4M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z', d:'タイヤ交換の静止時間が短くなり、作業ミスが減る',
     eff: lv => `静止 ${pitRange(lv)}秒・作業ミス ${Math.round(pitMiss(lv)*100)}%` },
   { k:'scout', n:'スカウト部門',       ico:'M10 4a6 6 0 1 0 0 12 6 6 0 0 0 0-12zM14.5 14.5 20 20', d:'伸びしろの★が正確になり、Lv4からは移籍市場の選手の数値も分かる',
@@ -8728,6 +9143,117 @@ function ensureFacilities(){
   career.teams.forEach(t => { if(!t.fac){ const c = CAR_KEYS.reduce((a, k) => a + t.car[k], 0)/CAR_KEYS.length; t.fac = initFac(c); } });
 }
 /* 空力の開発費（風洞で割り引く） */
+/* ---------- 開発枠・大規則変更・先行研究 ----------
+   ・開発枠：1戦ごとに開発（と先行研究）ができる回数。前年のコンストラクターズ順位が低いチームほど多い（実際のF1の風洞時間の制限に近い）
+   ・値が8を超えると1回の伸びが小さくなる（8〜9：+0.3、9〜：+0.2）
+   ・2〜3シーズンごとに大規則変更。前のシーズンの開幕に予告し、そのシーズンだけ開発枠を「来季の先行研究」にも使える
+   ・変更の部分（テーマ）は平均近くまで作り直しになり、先行研究の量に応じて平均より少し高く始められる（上限と当たり外れあり）
+   ・変更1年目は、変わった部分の開発がよく伸びる */
+const REG_THEMES = {
+  aero: { n:'空力', max:2.0, keys:['df','eff'], d:'空力の規則が大きく変わります。ダウンフォース・空力効率が作り直しになります' },
+  pu:   { n:'パワーユニット', max:1.6, keys:['power','drive','rel'], d:'パワーユニットの規則が大きく変わります。出力・ドライバビリティ・信頼性が作り直しになります' },
+  all:  { n:'全面', max:1.0, keys:['power','drive','rel','df','eff','bpow','bstab'], d:'マシン全体の規則が大きく変わります。全項目が作り直しになります' }
+};
+const REG_KEEP = 0.25;                      // 変わる部分で、平均との差のうち引き継げる割合
+const RSC_K = 10, RES_COST = 4;              // 先行研究：効き方・1回の費用。効果の上限はテーマごと（変わる項目が少ないほど1項目あたりの効果が大きい。合計ではどれも開発と同じくらいの価値になるように）
+const RES_EASE = [8, 16];                   // 先行研究の回数がこれ以上なら、オーナー目標を1つ（2つ）ゆるめて評価する
+const REG_BOOST = 1.3;                      // 変更1年目、変わった部分の開発の伸び
+const AI_RES = { now: { n:'今季重視', pts:0.4, dev:1.15 }, bal: { n:'両にらみ', pts:1.2, dev:0.85 }, next: { n:'来季重視', pts:2.2, dev:0.55 } };
+const pickTheme = () => { const r = Math.random(); return r < 0.4 ? 'aero' : r < 0.75 ? 'pu' : 'all'; };
+const regAnnounced = () => !!(career && career.reg && career.season === career.reg.at - 1);
+const regFirstYear = () => !!(career && career.reg && career.reg.cur && career.reg.cur.season === career.season);
+const resBonus = (pts, theme) => REG_THEMES[theme].max*(1 - Math.exp(-pts/RSC_K));
+const myRes = () => (career && career.reg && career.reg.res[career.team]) || 0;
+const resEase = pts => pts >= RES_EASE[1] ? 2 : pts >= RES_EASE[0] ? 1 : 0;
+function assignRegPol(){
+  career.reg.pol = {};
+  career.teams.forEach(t => { if(t.id === career.team) return; const r = Math.random(); career.reg.pol[t.id] = r < 0.3 ? 'now' : r < 0.75 ? 'bal' : 'next'; });
+}
+function ensureReg(){
+  if(!career) return;
+  if(!career.reg) career.reg = { at: career.season + 2, theme: pickTheme(), res: {}, pol: {} };
+  if(regAnnounced() && !Object.keys(career.reg.pol || {}).length) assignRegPol();
+}
+// 前年のコンストラクターズ順位（1年目はオーナーの目標から見積もる）
+function devRank(){
+  const h = career.history && career.history[career.history.length - 1];
+  return h ? h.myPos : clamp(ownerTarget() - 1, 1, 10);
+}
+function devSlots(){
+  const r = devRank();
+  return (r <= 3 ? 2 : r <= 7 ? 3 : 4) + slotBought();
+}
+/* ---------- 開発枠の追加購入 ----------
+   ・1戦に1枠まで、お金で開発枠を1つ足せる（その戦だけ。持ち越しはできない）
+   ・値段は前年の順位が高いほど高い（1〜3位 $4.0M・4〜7位 $3.0M・8〜10位 $2.0M）。追い上げの仕組み（下位ほど枠が多い）と同じ向き
+   ・同じシーズンで買うたびに +50% ずつ値上がり（シーズンが変わると元に戻る）
+   ・風洞のレベル1つにつき 6% 安くなる */
+const SLOT_BASE = r => r <= 3 ? 4.0 : r <= 7 ? 3.0 : 2.0;
+const slotBought = () => { const b = career && career.slotBuy; return b && b.s === career.season && b.r === career.round ? 1 : 0; };
+const slotBuysSeason = () => { const b = career && career.slotBuy; return b && b.s === career.season ? (b.n || 0) : 0; };
+const slotPrice = () => r1(SLOT_BASE(devRank()) * (1 + 0.5*slotBuysSeason()) * (1 - myFac('wind')*0.06));
+function buySlot(){
+  if(!career || slotBought() || career.round >= career.calendar.length) return;
+  const cost = slotPrice(); if(career.money < cost) return;
+  if(!confirmTwice('buyslot', cost)) return;                                    // 2回押して確定
+  career.money = r1(career.money - cost);
+  career.slotBuy = { s: career.season, r: career.round, n: slotBuysSeason() + 1 };
+  saveCareer(); renderHQ(`開発枠を1つ追加しました（${money(cost)}）。今戦だけ使えます。`);
+}
+const slotsUsed = () => { const u = career.devUsed; return u && u.s === career.season && u.r === career.round ? u.n : 0; };
+const slotsLeft = () => Math.max(0, devSlots() - slotsUsed());
+function useSlot(){ career.devUsed = { s: career.season, r: career.round, n: slotsUsed() + 1 }; }
+function devStep(key, v){
+  let st = v < 8 ? 0.4 : v < 9 ? 0.3 : 0.2;
+  if(regFirstYear() && REG_THEMES[career.reg.cur.theme].keys.includes(key)) st *= REG_BOOST;
+  return st;
+}
+/* ---------- 開発の結果（失敗・成功・大成功）と開発方針 ----------
+   ・1回の開発は、基本の伸び（devStep）に結果の倍率を掛ける。失敗しても値は下がらない（伸びが小さいだけ）
+   ・方針：慎重＝失敗が少なく大成功なし／標準＝平均すると以前と同じ伸び／攻め＝失敗も大成功も多い（平均は少し高い）
+   ・施設：空力は風洞、パワーユニットとブレーキはシミュレーターのレベルが高いほど失敗しにくい（失敗の一部が大成功に回る。慎重は成功に回る）
+   ・AIも同じ仕組みで開発する（方針はチームごと） */
+const DEV_POL = {
+  safe: { n:'慎重', d:'失敗が少なく、大成功はない', fail:0.05, great:0,    k:[0.25, 1, 1.75] },
+  norm: { n:'標準', d:'平均すると以前と同じ伸び',     fail:0.15, great:0.15, k:[0.25, 1, 1.75] },
+  risk: { n:'攻め', d:'失敗も大成功も多い',           fail:0.30, great:0.30, k:[0.25, 1, 2.0] }
+};
+const DEV_RES = [['fail','失敗','#d7263d'], ['ok','成功','#1a9a55'], ['great','大成功','#c026d3']];
+const devFacKey = key => (key === 'df' || key === 'eff') ? 'wind' : 'sim';
+// 方針・施設レベルから、失敗・成功・大成功の確率を出す
+function devOdds(polKey, facLevel){
+  const P = DEV_POL[polKey] || DEV_POL.norm, moved = P.fail*0.1*facLevel;   // 施設1レベルごとに、失敗の10%を減らす
+  const fail = P.fail - moved, great = P.great + (P.great > 0 ? moved : 0);
+  return { fail, ok: 1 - fail - great, great };
+}
+// 1回の開発の結果を決める。返り値 { tier: 0失敗/1成功/2大成功, add: 伸び }
+function rollDev(polKey, facLevel, base){
+  const o = devOdds(polKey, facLevel), r = Math.random(), P = DEV_POL[polKey] || DEV_POL.norm;
+  const tier = r < o.fail ? 0 : r < o.fail + o.ok ? 1 : 2;
+  return { tier, add: base*P.k[tier] };
+}
+const devPol = () => (career && DEV_POL[career.devPol]) ? career.devPol : 'norm';
+/* ---------- リザーブのシミュレーター作業 ----------
+   リザーブがシミュレーターで働くと、パワーユニット・ブレーキの開発が失敗しにくくなり、レギュラーの予選が少し速くなる。
+   強さ（0〜1）＝リザーブの腕前（総合40で0.2〜90で1）×シミュレーター施設（Lv0で0.5〜Lv5で1）。
+   負傷中や、その戦にリザーブ自身が走るときは働けない（0） */
+function resSupport(t){
+  if(!career || !t || !t.reserve) return 0;
+  const d = career.drivers[t.reserve]; if(!d || !d.st || d.inj) return 0;
+  try{ const L = lineupAll()[t.id]; if(L && L.some(x => x.code === t.reserve)) return 0; }catch(e){}
+  const k = (d.rab === 'fb' ? 1.5 : d.rab === 'nofb' ? 0.5 : 1) * (resSulking(t) ? 0.5 : 1);   // フィードバック○×・要求を断られてやる気が下がっている
+  return Math.round(clamp((ovr(d) - 4)/5, 0.2, 1)*(0.5 + facLv(t, 'sim')*0.1)*k*100)/100;
+}
+const resSulking = t => { const s = career && career.resSulk; return !!(s && t && s.code === t.reserve && career.season*100 + career.round < s.until); };
+const RES_DEV_LV = 3, RES_Q = 0.001;          // 強さ1のとき：開発はシミュレーター施設+3レベル分、予選タイム −0.1%
+const resDevLv = t => resSupport(t)*RES_DEV_LV;
+const puFacLv = t => facLv(t, 'sim') + resDevLv(t);   // パワーユニット・ブレーキ開発の失敗率に効くレベル（施設＋リザーブ）
+function research(){
+  if(!regAnnounced() || slotsLeft() <= 0 || career.money < RES_COST) return;
+  career.money = r1(career.money - RES_COST); useSlot();
+  career.reg.res[career.team] = myRes() + 1;
+  saveCareer(); renderHQ();
+}
 const devCostFor = (key, v) => r1(devCost(v)*((key === 'df' || key === 'eff') ? 1 - myFac('wind')*0.06 : 1));
 /* ピットの静止時間（レース中、キャリアの車だけ施設のレベルで変わる） */
 function pitStopT(c){
@@ -8735,6 +9261,42 @@ function pitStopT(c){
   if(lv == null) return 1.0 + Math.random()*0.4;
   const t = 1.0 - lv*0.02 + Math.random()*(0.5 - lv*0.06);
   return Math.random() < pitMiss(lv) ? t + 1.2 + Math.random()*1.2 : t;   // 作業ミス（ホイールナットの締めに手間取るなど）
+}
+/* ---------- ダブルスタック（同じチームの2台が続けてピットに入る） ----------
+   ガレージは2台で1つ。前の車の作業中に着いた車は、自分の停止位置で止まったまま待ち、
+   前の車が出てから少し間を置いて作業を始める（待った時間がそのままロスになる）。
+   AIは、SC・VSC中や急ぐ理由があるときはそのまま重ねて入り、そうでなければたいてい1周遅らせる */
+const STACK_GAP = 0.4;                                  // 前の車が出てから、次の車の作業を始めるまでの間（秒）
+const mateOf = c => race.cars.find(o => o !== c && o.pitTeam === c.pitTeam && !o.out);
+function avgStopT(c){ const lv = c && c.m && c.m.pitLv; return lv == null ? 1.2 : 1.0 - lv*0.02 + (0.5 - lv*0.06)/2; }
+// いまピットに入ったら、チームメイトの作業でどれだけ待たされそうか（秒。0なら待ちなし）
+function stackWaitEst(c){
+  const o = mateOf(c), T = track; if(!o || !T || !T.pit) return 0;
+  const N = T.N, sp = T.sp;
+  const myArrive = race.t + (((c.boxIdx - c.idx + N) % N) * sp) / PIT_LIM;   // 入口から自分の停止位置まで（リミッター速度で）
+  let free;
+  if(o.inPit && o.served && !o.redParked) free = o.stopUntil;
+  else if(o.inPit && !o.served && !o.redSpot && !o.trouble) free = race.t + (((o.boxIdx - o.idx + N) % N) * sp) / PIT_LIM + avgStopT(o);
+  else return 0;
+  if(!isFinite(free)) return 0;
+  return Math.max(0, free + STACK_GAP - myArrive);
+}
+// ピット入口を通る瞬間：チームメイトとボックスがかち合うなら、重ねて入るか1周遅らせるかを決める
+function stackCheck(c){
+  const w = stackWaitEst(c); if(w < 0.3) return;
+  const o = mateOf(c), mine = !!(careerRace && career && c.m.team === career.team);
+  const ordered = c.m === MY && c.userBox;                                     // プレイヤーが自分で BOX を指示した
+  const scv = !!((race.sc && race.sc.until > race.t) || race.vsc);             // SC・VSC中はロスが小さいので重ねて入る
+  const remain = race.laps - c.laps.length;
+  const urgent = c.wear > 0.9 || (c.nextComp && isSlick(c.comp) !== isSlick(c.nextComp)) || remain <= 2 || (needStop(c) && remain <= RULE_FORCE_LAPS + 1);
+  if(!ordered && !scv && !urgent && Math.random() < 0.85){
+    c.pitReq = false; c.scPit = false; c.autoNoted = false;                     // この周は見送り、次の周にもう一度判断する
+    if(c.m === MY) pwSay('eng', `${o.m.name}が先にピットに入る。ダブルスタックを避けて、もう1周引っ張ろう`);
+    else if(mine) radioLine(c.m, 'eng', `${o.m.name}が先に入る。この周はステイアウト、次の周に入ろう`);
+    return;
+  }
+  if(c.m === MY) pwSay('eng', `ダブルスタックだ。${o.m.name}の作業が終わるまで、約${w.toFixed(1)}秒待つことになる`);
+  else if(mine) radioLine(c.m, 'eng', `ダブルスタックで入る。${o.m.name}の後ろで少し待つぞ`);
 }
 /* スカウトの★：伸びしろ（pot）に、ドライバーごとに決まったずれを足す。スカウト部門のレベルが高いほどずれが小さい */
 function scoutStars(d){
@@ -8746,7 +9308,7 @@ function upgradeFac(k){
   const t = myTeam(), lv = facLv(t, k);
   if(lv >= FAC_MAX) return;
   const cost = facCost(lv + 1); if(career.money < cost) return;
-  if(!confirmTwice('fac' + k)) return;                                   // 高い買い物なので、2回押して確定
+  if(!confirmTwice('fac' + k, cost)) return;                                   // 高い買い物なので、2回押して確定
   career.money = r1(career.money - cost); t.fac[k] = lv + 1;
   saveCareer(); renderHQ(`${FAC_K[k].n}をLv${lv + 1}に強化しました（${money(cost)}）。`);
 }
@@ -8881,16 +9443,16 @@ function showAwakenFx(){
 /* ---------- 新人ドライバーの名前（国ごとの名前の候補） ----------
    国を選び、その国らしい名と姓を組み合わせる。略号（3文字）は姓のローマ字から作る。
    実在のF1ドライバーと同じ組み合わせにならないよう、有名な名前は避けている */
-const NAME_POOL = {
-  JP: { w: 2, g: ['ハルト','ソウタ','ユウト','レン','ミナト','イツキ','アオイ','コウキ','ダイチ','リョウ','タクミ','シン','ユウマ','カイト'],
+const NAME_POOL = {   // w：生まれやすさ。どの国も同じ（1）にそろえた
+  JP: { w: 1, g: ['ハルト','ソウタ','ユウト','レン','ミナト','イツキ','アオイ','コウキ','ダイチ','リョウ','タクミ','シン','ユウマ','カイト'],
         s: [['サクラギ','SAKURAGI'],['ミヤモト','MIYAMOTO'],['フジサワ','FUJISAWA'],['キリシマ','KIRISHIMA'],['タチバナ','TACHIBANA'],['ナルセ','NARUSE'],['イチノセ','ICHINOSE'],['カザマ','KAZAMA'],['ホシノ','HOSHINO'],['アマミヤ','AMAMIYA'],['クジョウ','KUJO'],['シノハラ','SHINOHARA'],['ハルミ','HARUMI'],['タカミ','TAKAMI'],['ヤマセ','YAMASE'],['サトミ','SATOMI']] },
-  IT: { w: 1.2, g: ['マッテオ','ロレンツォ','ジャコモ','フランチェスコ','アレッサンドロ','トンマーゾ','ダヴィデ','フェデリコ','リッカルド','ステファノ','エンツォ'],
+  IT: { w: 1, g: ['マッテオ','ロレンツォ','ジャコモ','フランチェスコ','アレッサンドロ','トンマーゾ','ダヴィデ','フェデリコ','リッカルド','ステファノ','エンツォ'],
         s: [['ベルナルディ','BERNARDI'],['コロンボ','COLOMBO'],['リッチ','RICCI'],['マリーニ','MARINI'],['ガッリ','GALLI'],['フォンタナ','FONTANA'],['カルーゾ','CARUSO'],['ヴィターリ','VITALI'],['デ・アンジェリス','DEANGELIS'],['ロンバルディ','LOMBARDI'],['ロッサーノ','ROSSANO'],['モローニ','MORONI']] },
   FR: { w: 1, g: ['ユーゴ','アントワーヌ','バティスト','クレマン','マキシム','ロマン','ガブリエル','ラファエル','ルイ','テオ'],
         s: [['ギャルニエ','GARNIER'],['モロー','MOREAU'],['ルロワ','LEROY'],['ボネ','BONNET'],['ルソー','ROUSSEAU'],['フォーレ','FAURE'],['シュヴァリエ','CHEVALIER'],['ブラン','BLANC'],['メルシエ','MERCIER'],['ドラクロワ','DELACROIX'],['リヴィエール','RIVIERE']] },
-  DE: { w: 1.2, g: ['ヨナス','レオン','フィン','パウル','エリアス','マクシミリアン','ティモ','ヤニック','ファビアン','マックス'],
+  DE: { w: 1, g: ['ヨナス','レオン','フィン','パウル','エリアス','マクシミリアン','ティモ','ヤニック','ファビアン','マックス'],
         s: [['シュミット','SCHMIDT'],['ホフマン','HOFFMANN'],['ケーニヒ','KOENIG'],['リヒター','RICHTER'],['ツィンマー','ZIMMER'],['ハルトマン','HARTMANN'],['ブラウン','BRAUN'],['ヴォルフ','WOLF'],['シュレーダー','SCHROEDER'],['ベッカー','BECKER'],['クライン','KLEIN'],['エッカート','ECKERT']] },
-  GB: { w: 1.2, g: ['オリバー','ハリー','ジョージ','ジャック','チャーリー','トーマス','ジェームズ','ウィリアム','アルフィー','ルイス','エドワード'],
+  GB: { w: 1, g: ['オリバー','ハリー','ジョージ','ジャック','チャーリー','トーマス','ジェームズ','ウィリアム','アルフィー','ルイス','エドワード'],
         s: [['ハリントン','HARRINGTON'],['ブレイク','BLAKE'],['フレッチャー','FLETCHER'],['ウォーカー','WALKER'],['ベネット','BENNETT'],['カーター','CARTER'],['ヘイズ','HAYES'],['モーガン','MORGAN'],['エリス','ELLIS'],['クロフォード','CRAWFORD'],['ソーンダース','SAUNDERS']] },
   ES: { w: 1, g: ['アレハンドロ','パブロ','アルバロ','ハビエル','セルヒオ','アドリアン','ダニエル','イケル','マルコス','ルベン'],
         s: [['ナバロ','NAVARRO'],['ロメロ','ROMERO'],['ガリード','GARRIDO'],['モレノ','MORENO'],['ドミンゲス','DOMINGUEZ'],['ベガ','VEGA'],['イグレシアス','IGLESIAS'],['ソト','SOTO'],['カブレラ','CABRERA'],['メディナ','MEDINA']] },
@@ -8898,35 +9460,35 @@ const NAME_POOL = {
         s: [['デ・フリース','DEVRIES'],['バッケル','BAKKER'],['ヤンセン','JANSEN'],['ファン・ベルク','VANBERG'],['フィッセル','VISSER'],['スミット','SMIT'],['ムルデル','MULDER'],['ボス','BOS'],['デ・ハーン','DEHAAN'],['ヴォス','VOS']] },
   BR: { w: 1, g: ['ペドロ','エンリケ','カイオ','ヴィニシウス','チアゴ','フェリペ','ブルーノ','ジョアン','グスタヴォ','ルアン'],
         s: [['サントス','SANTOS'],['オリヴェイラ','OLIVEIRA'],['ソウザ','SOUZA'],['ペレイラ','PEREIRA'],['フェレイラ','FERREIRA'],['ロドリゲス','RODRIGUES'],['バローゾ','BARROSO'],['カルドーゾ','CARDOSO'],['モンテイロ','MONTEIRO'],['アルメイダ','ALMEIDA']] },
-  AU: { w: 0.8, g: ['ジャクソン','ライリー','クーパー','ブロディ','リアム','ハリソン','ジョシュ','ケイデン','ザック'],
+  AU: { w: 1, g: ['ジャクソン','ライリー','クーパー','ブロディ','リアム','ハリソン','ジョシュ','ケイデン','ザック'],
         s: [['マクレガー','MCGREGOR'],['ドノヴァン','DONOVAN'],['キャンベル','CAMPBELL'],['ヒューズ','HUGHES'],['ケリー','KELLY'],['パーマー','PALMER'],['オコナー','OCONNOR'],['ラング','LANG'],['ブルックス','BROOKS']] },
-  FI: { w: 0.8, g: ['ユホ','エーロ','ラウリ','オンニ','トゥオマス','ヴィレ','サミ','ヤルノ','ペッテリ','イーロ'],
+  FI: { w: 1, g: ['ユホ','エーロ','ラウリ','オンニ','トゥオマス','ヴィレ','サミ','ヤルノ','ペッテリ','イーロ'],
         s: [['ヴィルタネン','VIRTANEN'],['コルホネン','KORHONEN'],['マキネン','MAKINEN'],['ニエミ','NIEMI'],['ヘイッキネン','HEIKKINEN'],['ラハティ','LAHTI'],['サロ','SALO'],['ラウタ','RAUTA'],['ヨキネン','JOKINEN']] },
-  MX: { w: 0.8, g: ['サンティアゴ','エミリアーノ','ロドリゴ','ファン','ウリセス','アルトゥーロ','ハイメ','ラウル','エクトル','フリオ'],
+  MX: { w: 1, g: ['サンティアゴ','エミリアーノ','ロドリゴ','ファン','ウリセス','アルトゥーロ','ハイメ','ラウル','エクトル','フリオ'],
         s: [['エルナンデス','HERNANDEZ'],['ゲレーロ','GUERRERO'],['フローレス','FLORES'],['サラサール','SALAZAR'],['メンドーサ','MENDOZA'],['アギラール','AGUILAR'],['カスティージョ','CASTILLO'],['ロハス','ROJAS'],['オチョア','OCHOA'],['バルデス','VALDEZ']] },
-  CA: { w: 0.8, g: ['イーサン','ローガン','ネイサン','ディラン','オーウェン','タイラー','マシュー','サミュエル','ゼイン'],
+  CA: { w: 1, g: ['イーサン','ローガン','ネイサン','ディラン','オーウェン','タイラー','マシュー','サミュエル','ゼイン'],
         s: [['トランブレ','TREMBLAY'],['ガニョン','GAGNON'],['ブシャール','BOUCHARD'],['ラヴォワ','LAVOIE'],['マクドナルド','MACDONALD'],['フォーティエ','FORTIER'],['ペルティエ','PELLETIER'],['ベランジェ','BELANGER']] },
-  DK: { w: 0.6, g: ['マグヌス','オスカー','フレデリク','ミケル','ラスムス','カスパー','ソーレン','イェスパー'],
+  DK: { w: 1, g: ['マグヌス','オスカー','フレデリク','ミケル','ラスムス','カスパー','ソーレン','イェスパー'],
         s: [['ラーセン','LARSEN'],['ペデルセン','PEDERSEN'],['イェンセン','JENSEN'],['クリステンセン','CHRISTENSEN'],['モーテンセン','MORTENSEN'],['ダール','DAHL'],['ホルム','HOLM']] },
-  SE: { w: 0.6, g: ['エリック','アクセル','ヴィクトル','ルドヴィグ','ヒューゴ','アルヴィド','オスカル','セバスティアン'],
+  SE: { w: 1, g: ['エリック','アクセル','ヴィクトル','ルドヴィグ','ヒューゴ','アルヴィド','オスカル','セバスティアン'],
         s: [['リンドクヴィスト','LINDQVIST'],['エクストレム','EKSTROM'],['ベリ','BERG'],['サンドベリ','SANDBERG'],['ニーマン','NYMAN'],['ホルムベリ','HOLMBERG'],['ストランド','STRAND']] },
-  AT: { w: 0.6, g: ['ジモン','ラファエル','ダヴィト','ファビアン','ミヒャエル','クレメンス','ヴァレンティン'],
+  AT: { w: 1, g: ['ジモン','ラファエル','ダヴィト','ファビアン','ミヒャエル','クレメンス','ヴァレンティン'],
         s: [['グルーバー','GRUBER'],['フーバー','HUBER'],['ヴィンクラー','WINKLER'],['アイヒャー','EICHER'],['ライトナー','LEITNER'],['シュタイナー','STEINER']] },
-  BE: { w: 0.6, g: ['アルノー','シモン','ロビン','ヴァウト','ヤン','ブノワ','セドリック'],
+  BE: { w: 1, g: ['アルノー','シモン','ロビン','ヴァウト','ヤン','ブノワ','セドリック'],
         s: [['ペータース','PEETERS'],['ヤンセンス','JANSSENS'],['マース','MAES'],['ヴェルメーレン','VERMEULEN'],['デュポン','DUPONT'],['ランベール','LAMBERT']] },
-  PL: { w: 0.5, g: ['ヤクプ','カツペル','ミハウ','バルトシュ','パヴェウ','シモン','フィリップ'],
+  PL: { w: 1, g: ['ヤクプ','カツペル','ミハウ','バルトシュ','パヴェウ','シモン','フィリップ'],
         s: [['ノヴァコフスキ','NOWAKOWSKI'],['ヴィシニェフスキ','WISNIEWSKI'],['マズル','MAZUR'],['クラフチク','KRAWCZYK'],['ヴォイチク','WOJCIK'],['ザヤンツ','ZAJAC']] },
-  PT: { w: 0.5, g: ['ティアゴ','ルイ','ディオゴ','ゴンサロ','ドゥアルテ','ヌーノ','ベルナルド'],
+  PT: { w: 1, g: ['ティアゴ','ルイ','ディオゴ','ゴンサロ','ドゥアルテ','ヌーノ','ベルナルド'],
         s: [['ピント','PINTO'],['ソアレス','SOARES'],['マトス','MATOS'],['テイシェイラ','TEIXEIRA'],['ヴァスコンセロス','VASCONCELOS'],['ラモス','RAMOS'],['ヴァレンテ','VALENTE']] },
-  CH: { w: 0.5, g: ['ニルス','ヤニス','ルカ','ラファエル','ティム','マルコ'],
+  CH: { w: 1, g: ['ニルス','ヤニス','ルカ','ラファエル','ティム','マルコ'],
         s: [['ミュラー','MUELLER'],['メイヤー','MEYER'],['ブルンナー','BRUNNER'],['フライ','FREI'],['ケラー','KELLER'],['ガイザー','GEISER'],['ベルナー','BERNER']] },
-  CZ: { w: 0.4, g: ['トマーシュ','ヤクプ','オンドジェイ','ルカーシュ','マルティン','ダヴィト'],
+  CZ: { w: 1, g: ['トマーシュ','ヤクプ','オンドジェイ','ルカーシュ','マルティン','ダヴィト'],
         s: [['ドヴォルザーク','DVORAK'],['スヴォボダ','SVOBODA'],['ノヴォトニー','NOVOTNY'],['ホラーク','HORAK'],['ポコルニー','POKORNY'],['ノヴァク','NOVAK']] },
-  AR: { w: 0.5, g: ['マティアス','ニコラス','ファクンド','アグスティン','ラウタロ','フランコ'],
+  AR: { w: 1, g: ['マティアス','ニコラス','ファクンド','アグスティン','ラウタロ','フランコ'],
         s: [['ゴメス','GOMEZ'],['フェルナンデス','FERNANDEZ'],['アコスタ','ACOSTA'],['ベニテス','BENITEZ'],['ペラルタ','PERALTA'],['ルセロ','LUCERO'],['ソサ','SOSA']] },
-  KR: { w: 0.5, g: ['ミンジュン','ソジュン','ドユン','ハジュン','ジホ','ユチャン','テヒョン'],
+  KR: { w: 1, g: ['ミンジュン','ソジュン','ドユン','ハジュン','ジホ','ユチャン','テヒョン'],
         s: [['パク','PARK'],['チェ','CHOI'],['チョン','JUNG'],['カン','KANG'],['ユン','YOON'],['ハン','HAN'],['ソン','SONG']] },
-  HU: { w: 0.4, g: ['ベンツェ','マーテー','レヴェンテ','ドミニク','バラージュ'],
+  HU: { w: 1, g: ['ベンツェ','マーテー','レヴェンテ','ドミニク','バラージュ'],
         s: [['ナジ','NAGY'],['ホルヴァート','HORVATH'],['サボー','SZABO'],['ヴァルガ','VARGA'],['ゴルディ','GORDI']] }
 };
 /* 姓のローマ字から、まだ使われていない3文字の略号を作る */
@@ -8937,19 +9499,25 @@ function rookieCode(rom, used){
   for(const c of cand) if(c && c.length === 3 && !used.has(c)) return c;
   return null;
 }
-function makeRookie(){
-  const used = new Set(Object.keys(career.drivers)), names = new Set(Object.values(career.drivers).map(d => d.name));
-  DRIVER_POOL.forEach(([c]) => used.add(c));
+// 国籍・名前・略号をランダムに決める（used：使用済みの略号、names：使用済みの名前。決めたものは両方に足す）
+function genIdentity(used, names){
   const keys = Object.keys(NAME_POOL), tot = keys.reduce((a, k) => a + NAME_POOL[k].w, 0);
   let nat, name, code;
   for(let t = 0; t < 60 && !code; t++){
-    let r = Math.random()*tot; nat = keys.find(k => (r -= NAME_POOL[k].w) < 0) || 'JP';
+    // 国籍は最初に1回だけ決め、名前がかぶったら同じ国籍の中で引き直す（かぶりやすい国が減って、国の偏りが出ないように）
+    if(t % 20 === 0){ let r = Math.random()*tot; nat = keys.find(k => (r -= NAME_POOL[k].w) < 0) || keys[keys.length - 1]; }
     const P = NAME_POOL[nat], [sk, rom] = P.s[Math.floor(Math.random()*P.s.length)];
     name = P.g[Math.floor(Math.random()*P.g.length)] + '・' + sk;
     if(names.has(name)) continue;
     code = rookieCode(rom, used);
   }
   if(!code){ for(let i = 0; i < 99; i++){ const c = 'R' + String(i).padStart(2, '0'); if(!used.has(c)){ code = c; break; } } }
+  used.add(code); names.add(name);
+  return { nat, name, code };
+}
+function makeRookie(){
+  const used = new Set(Object.keys(career.drivers)), names = new Set(Object.values(career.drivers).map(d => d.name));
+  const { nat, name, code } = genIdentity(used, names);
   const d = makeDriver(code, name, 4.4 + Math.random()*1.8);
   setAgePot(d, 18 + Math.floor(Math.random()*4));
   d.rookie = true; d.nat = nat;
@@ -8958,15 +9526,27 @@ function makeRookie(){
 const shuffled = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; };
 
 let career = lsGet(LS_CAREER, null);
+/* グランプリ名を架空の地名から国名に変えた（「ミナトベイ GP」→「日本GP」）。保存済みのキャリアの名前も書き換える */
+{ const GP_OLD = { 'ミナトベイ':'日本', 'ヴァルカ':'ハンガリー', 'ノースリッジ':'オランダ', 'サン・オルモ':'イタリア', 'カスケード':'オーストリア', 'レッドメサ':'コロンビア', 'ハーバーライン':'ドイツ', 'ゼニス':'フランス', 'アルトフェルト':'ベルギー', 'コーラルコースト':'タイ', 'シルバーレイク':'フィンランド', 'カナリア':'スペイン' };
+  const fix = nm => { const k = String(nm || '').replace(/\s*GP$/, ''); return GP_OLD[k] ? GP_OLD[k] + 'GP' : nm; };
+  if(career){ (career.calendar || []).forEach(r => r.name = fix(r.name)); (career.raceLog || []).forEach(r => r.name = fix(r.name)); if(career.last) career.last.name = fix(career.last.name); lsSet(LS_CAREER, career); } }
 if(career && (!career.teams || !career.calendar)) career = null;
 /* 成長システムより前に作ったキャリアのドライバーに、年齢と伸びしろを付ける */
 if(career){ Object.values(career.drivers).forEach(d => { if(d.st && d.age == null) setAgePot(d, ageFor(ovr(d))); }); lsSet(LS_CAREER, career); }
+if(career){ Object.values(career.drivers).forEach(d => { if(d.st && !d.rabRolled) rollRab(d); }); lsSet(LS_CAREER, career); }
+// 保存済みのキャリア：今季の市街地が2戦以上あれば、2戦目以降のまだ走っていないラウンドを別のタイプに作り直す（市街地は1シーズンに1戦まで）
+if(career && career.calendar){ let seen = 0, ch = false;
+  career.calendar.forEach((rd, i) => { if(rd.type !== 'street') return; seen++;
+    if(seen > 1 && !rd.res && i > career.round){ rd.type = ['power','flow','stopgo'][Math.floor(Math.random()*3)]; rd.points = null; ch = true; } });
+  if(ch) lsSet(LS_CAREER, career); }
+if(career){ const t = career.teams.find(x => x.id === 'for' && x.name === 'フォレスト・エンジニアリング'); if(t){ t.name = 'フォレスト eng.'; lsSet(LS_CAREER, career); } }   // 保存済みのキャリアのチーム名も新しい名前に   // 保存済みのキャリアにもリザーブ特殊能力を1回だけ抽選
 /* オーナー目標とスポンサー契約より前に作ったキャリアに、今シーズンの目標と契約の提案を用意する */
 function ensureOwnerSponsor(){
   if(!career) return;
   ensureStats();
   career.teams.forEach(t => { delete t.car.wear; delete t.car.deg; });   // マシンのタイヤ性能は廃止
   if(!career.owner) career.owner = { trust: 60, target: ownerTarget() };
+  ensureReg();
   if(!career.sponsor && !(career.sponsorOffers && career.sponsorOffers.length)) career.sponsorOffers = makeSponsorOffers();
   lsSet(LS_CAREER, career);
 }
@@ -9060,12 +9640,30 @@ const myTeam = () => teamOf(career.team);
 const palOf = t => t.col ? [t.col, t.short || '', t.col2] : PALETTE[t.pal % PALETTE.length];   // オリジナルチームは自分で決めた2色
 const liveryBg = t => { const p = palOf(t); return `linear-gradient(135deg,${p[0]} 58%,${p[2]} 58%)`; };
 
-function newCareer(teamId, laps){
-  const pool = DRIVER_POOL.slice(0, 20);
-  // 腕前順に2人ずつ割り当てるが、隣のチームと少し入れ替えて毎回違う顔ぶれにする
+/* 新しいキャリアの選手（25人）をランダムに作る。国籍・名前・略号・年齢・能力はすべて毎回変わる。
+   腕前の幅はこれまでの固定の選手と同じ（DRIVER_POOL の腕前に少しの揺らぎを足す）。
+   先頭20人を2人ずつ強いチームから順に割り当て（隣のチームと少し入れ替える）、残り5人は移籍市場へ。
+   チーム選択の画面で先に作っておき、表示したランクと同じ顔ぶれでキャリアを始める */
+let nextRoster = null;
+function makeRoster(){
+  const used = new Set(), names = new Set();
+  const sk = DRIVER_POOL.map(d => r1(clamp(d[2] + (Math.random() - 0.5)*0.6, 3.5, 9.5)));
+  const top = sk.slice(0, 20).sort((a, b) => b - a), fa = sk.slice(20);
+  const all = [...top, ...fa].map(base => {
+    const { nat, name, code } = genIdentity(used, names);
+    const d = makeDriver(code, name, base); setAgePot(d, ageFor(base)); d.nat = nat;
+    return d;
+  });
+  const pool = all.slice(0, 20);
   for(let i=0;i<pool.length-2;i+=2) if(Math.random() < 0.45){ const j = i + 2 + Math.floor(Math.random()*2); [pool[i+1], pool[j]] = [pool[j], pool[i+1]]; }
+  return { pool, fa: all.slice(20) };
+}
+const rosterOf = () => nextRoster || (nextRoster = makeRoster());
+function newCareer(teamId, laps){
+  const R = rosterOf(); nextRoster = null;
+  const pool = R.pool.map(d => [d.code]);
   const drivers = {};
-  DRIVER_POOL.forEach(([code,name,skill]) => { const d = makeDriver(code, name, skill); setAgePot(d, code === 'ABE' ? 33 : ageFor(skill)); drivers[code] = d; });
+  [...R.pool, ...R.fa].forEach(d => { drivers[d.code] = d; });
   // オリジナルチーム：最下位チームの枠を引き継ぎ、マシンの強さの順の位置に入る（ドライバーもその位置の2人）
   let defs = TEAM_DEFS, st = null;
   if(teamId === OWN_ID){
@@ -9082,7 +9680,7 @@ function newCareer(teamId, laps){
   });
   const me = defs.find(d => d.id === teamId);
   career = { v:2, season:1, round:0, team:teamId, laps, money: r1(10 + me.spons*1.5 + (st ? st.bonus : 0)), teams, drivers,
-    fa: DRIVER_POOL.slice(20).map(d => d[0]), calendar: makeCalendar(), dpts:{}, cpts:{}, last:null, history:[], startTyre:{} };
+    fa: R.fa.map(d => d.code), calendar: makeCalendar(), dpts:{}, cpts:{}, last:null, history:[], startTyre:{} };
   career.owner = { trust: st ? st.trust : 60, target: ownerTarget() };
   career.offers = []; ensureContracts();
   career.sponsor = null; career.sponsorOffers = makeSponsorOffers();
@@ -9090,11 +9688,12 @@ function newCareer(teamId, laps){
   saveCareer();
 }
 function makeCalendar(){
-  const types = shuffled(['power','flow','stopgo','street', ...shuffled(['power','flow','stopgo','street']).slice(0, ROUNDS - 4)]);
+  // 4タイプを1戦ずつ入れ、残りは市街地以外から選ぶ（市街地は1シーズンに1戦まで）
+  const types = shuffled(['power','flow','stopgo','street', ...Array.from({ length: Math.max(0, ROUNDS - 4) }, () => ['power','flow','stopgo'][Math.floor(Math.random()*3)])]);
   const names = shuffled(GP_NAMES);
   return types.map((type, i) => {
     const r = Math.random();
-    const rd = { name: names[i] + ' GP', type, weather: r < 0.62 ? 'dry' : r < 0.85 ? 'mixed' : 'wet', points: null, startPos: 0, res: null };
+    const rd = { name: names[i] + 'GP', type, weather: r < 0.62 ? 'dry' : r < 0.85 ? 'mixed' : 'wet', points: null, startPos: 0, res: null };
     ensureForecast(rd);
     return rd;
   });
@@ -9121,8 +9720,8 @@ const WX_ICO = {
 };
 const THERMO_ICO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4a2 2 0 0 1 4 0v9.3a4.5 4.5 0 1 1-4 0z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="17" r="2.4" fill="#ff7f11"/><path d="M12 15V8" stroke="#ff7f11" stroke-width="1.8" stroke-linecap="round"/></svg>';
 /* ---------- 開催国の国旗（グランプリ名ごとに、適当な国を割り当てる） ---------- */
-const GP_COUNTRY = { 'ミナトベイ':'JP', 'ヴァルカ':'HU', 'ノースリッジ':'NL', 'サン・オルモ':'IT', 'カスケード':'AT', 'レッドメサ':'CO',
-  'ハーバーライン':'DE', 'ゼニス':'FR', 'アルトフェルト':'BE', 'コーラルコースト':'TH', 'シルバーレイク':'FI', 'カナリア':'ES' };
+const GP_COUNTRY = { '日本':'JP', 'ハンガリー':'HU', 'オランダ':'NL', 'イタリア':'IT', 'オーストリア':'AT', 'コロンビア':'CO',
+  'ドイツ':'DE', 'フランス':'FR', 'ベルギー':'BE', 'タイ':'TH', 'フィンランド':'FI', 'スペイン':'ES' };
 const FLAGS = {   // 横縞 h：[色, 比率]…、縦縞 v：[色]…
   JP: { jp: true, name:'日本' }, HU: { h: [['#ce2939',1],['#fff',1],['#477050',1]], name:'ハンガリー' }, NL: { h: [['#ae1c28',1],['#fff',1],['#21468b',1]], name:'オランダ' },
   IT: { v: ['#009246','#fff','#ce2b37'], name:'イタリア' }, AT: { h: [['#ed2939',1],['#fff',1],['#ed2939',1]], name:'オーストリア' }, CO: { h: [['#fcd116',2],['#003893',1],['#ce1126',1]], name:'コロンビア' },
@@ -9159,7 +9758,7 @@ function flagSvg(code, h = 14, cls = 'flag'){
   return `<svg class="${cls}" width="${h*1.5}" height="${h}" viewBox="0 0 30 20" role="img" aria-label="${f.name}"><title>${f.name}</title>${body}<rect width="30" height="20" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1"/></svg>`;
 }
 function gpFlag(name, h = 14){
-  const key = String(name || '').replace(/ GP$/, '');
+  const key = String(name || '').replace(/\s*GP$/, '');
   return flagSvg(GP_COUNTRY[key], h);
 }
 /* ---------- ドライバーの国籍 ---------- */
@@ -9196,7 +9795,10 @@ function ensureCourse(rd){
 /* ドライバーの腕前をマシンの能力に重ねる（コーナー・ブレーキ・タイヤの扱いに強く効く） */
 /* パーツの値とドライバーの6項目から、レースで使う能力（最高速度・加速・コーナリング・ブレーキ・タイヤ管理）と補正を作る */
 function machineFor(team, code){
-  const d = career.drivers[code], p = palOf(team), c = team.car, s = d.st, ab = d.ab || [];
+  const d = career.drivers[code], p = palOf(team), c = team.car, ab = d.ab || [];
+  // 緊急登板○×：リザーブが代役で走るときだけ、全能力を少し上下させる
+  const eK = code === team.reserve ? (d.rab === 'emg' ? RAB_EMG : d.rab === 'noemg' ? -RAB_EMG : 0) : 0;
+  const s = eK ? Object.fromEntries(Object.entries(d.st).map(([k, v]) => [k, clamp(v + eK, 1, 10)])) : d.st;
   const m = { id:'c_'+code, name:code, color:p[0], color2:p[2], team:team.id, ab: ab.slice() };
   m.speed = clamp(c.power + 0.35*(c.eff - c.df), 1, 11);
   m.accel = clamp(c.drive + (s.pace - 5.5)*0.15, 1, 11);
@@ -9218,6 +9820,7 @@ function machineFor(team, code){
   if(m.curbAgg > 0) m.mistK *= 1 + m.curbAgg*0.5;
   m.pitLv = facLv(team, 'pit');                                      // ピットクルー訓練施設
   m.qK *= 1 - facLv(team, 'sim')*0.0006;                             // シミュレーター：予選で少し速い
+  if(code !== team.reserve) m.qK *= 1 - resSupport(team)*RES_Q;        // リザーブのシミュレーター作業：レギュラーの予選が少し速い
   if(team.id === career.team) m.tyre = career.startTyre[code] || 'M';
   else { const r = Math.random(); m.tyre = r < 0.5 ? 'M' : r < 0.8 ? 'S' : 'H'; }
   return m;
@@ -9226,11 +9829,30 @@ function machineFor(team, code){
 function qualify(list){
   return list.map(m => ({ m, t: estLap(track, m) * (m.qK || 1) * (1 + (Math.random() - 0.5)*0.014*(m.vSpread ? m.vSpread/0.03 : 1)) })).sort((a,b) => a.t - b.t).map(x => x.m);
 }
-function goRace(){
+/* 予選へ進むとき、今戦の開発枠が残っていて（開発できるお金もあるなら）確認のポップアップを出す。枠は次戦に持ち越せない */
+function devLeftAsk(){
+  if(Q) return false;                                       // 予選の途中に戻るときは聞かない
+  const n = slotsLeft(); if(n <= 0) return false;
+  const t = myTeam(), costs = CAR_KEYS.filter(k => t.car[k] < 10).map(k => devCostFor(k, t.car[k]));
+  if(!costs.length || career.money < Math.min(...costs)) return false;   // 開発できるものがない・お金が足りないなら聞かない
+  $('#devModalMsg').innerHTML = `今戦の開発枠が <b class="num">${n}/${devSlots()}</b> 回残っています。使わなかった枠は次戦に持ち越せません。<br>開発せずに予選へ進みますか？`;
+  $('#devModal').classList.add('show');
+  setTimeout(() => { const b = $('#devModalDev'); if(b) b.focus(); }, 0);
+  return true;
+}
+{
+  const hide = () => $('#devModal').classList.remove('show');
+  $('#devModalDev').onclick = () => { hide(); hqTab = 'dev'; lsSet(HQ_TAB_KEY, hqTab); showHQ(); window.scrollTo(0, 0); };   // チーム本部のマシン開発タブを開く
+  $('#devModalGo').onclick = () => { hide(); goRace(true); };
+  $('#devModal').addEventListener('click', e => { if(e.target.id === 'devModal') hide(); });   // 外側を押すと閉じる（予選には進まない）
+  document.addEventListener('keydown', e => { if(e.key === 'Escape' && $('#devModal').classList.contains('show')) hide(); });
+}
+function goRace(force){
   if(!career || career.round >= career.calendar.length || career.fired) return;
   if(!career.sponsor && !(careerRace && careerRace.round === career.round && !careerRace.done)){ renderHQ('先にスポンサー契約を選んでください。'); return; }
   if(careerRace && careerRace.round === career.round && !careerRace.done){ showRaceView(); return; }   // 途中のレースに戻る
   { const pc = pendingContracts(); if(pc.length){ if(hqTab !== 'ov' && hqTab !== 'drv') hqTab = 'ov'; renderHQ('契約の手続きが残っています：' + pc.join('、') + '。先に決めてください。'); return; } }
+  if(!force && devLeftAsk()) return;                     // 開発枠が残っていれば確認する
   const rd = career.calendar[career.round];
   if(!ensureCourse(rd)){ renderHQ('コースを作れませんでした。もう一度押してください'); return; }
   if(race.state !== 'idle'){ race.state = 'idle'; setLights(0); $('#cd').style.display = 'none'; }
@@ -9282,7 +9904,7 @@ function recordRace(){
   const me = myTeam(), mine = rows.filter(r => r.team === career.team);
   const myPts = mine.reduce((a, r) => a + r.pts, 0), fins = mine.filter(r => r.pos).length;
   const myCars = order.filter(c => c.m.team === career.team);
-  const led = { spons: r1(me.spons*SPONS_K*(1 + myFac('hosp')*0.1)), fac: -facUpkeepSum(me), deal: sponsorPay(career.sponsor, myCars, order), prize: r1(myPts*PT_PRIZE + fins*FIN_PRIZE), sal: -r1(me.drivers.reduce((a, c) => a + payOf(c), 0) + (me.reserve ? payOf(me.reserve) : 0)),
+  const led = { spons: r1(me.spons*SPONS_K*(1 + myFac('hosp')*0.1) + (rabOf(me) === 'ad' && !career.drivers[me.reserve].inj ? RAB_AD : 0)),   /* 広告塔のリザーブ */ fac: -facUpkeepSum(me), deal: sponsorPay(career.sponsor, myCars, order), prize: r1(myPts*PT_PRIZE + fins*FIN_PRIZE), sal: -r1(me.drivers.reduce((a, c) => a + payOf(c), 0) + (me.reserve ? payOf(me.reserve) : 0)),
     sub: -r1(myCars.filter(c => !me.drivers.includes(c.m.name) && c.m.name !== me.reserve).reduce((a, c) => a + r1(career.drivers[c.m.name].sal*SUB_FEE_K), 0)), ops: -OPS_COST,
     train: -r1(me.drivers.reduce((a, c) => { const t = trainOf(c); return a + (t && TRAIN_LV[t.lv] ? TRAIN_LV[t.lv].cost : 0); }, 0)) };
   led.dist = DIST_PAY;                                             // 参戦分配金
@@ -9300,8 +9922,16 @@ function recordRace(){
   const devLog = [];
   career.teams.forEach(t => {
     if(t.id === career.team) return;
-    const n = Math.random() < (t.spons - 2.4)/4 ? 2 : 1;
-    for(let k=0; k<n; k++){ const key = CAR_KEYS[Math.floor(Math.random()*CAR_KEYS.length)]; const add = r1(0.15 + Math.random()*0.3); t.car[key] = r1(Math.min(10, t.car[key] + add)); }
+    const n = 2 + (Math.random() < (t.spons - 2.4)/4 ? 1 : 0) - (Math.random() < 0.5 ? 1 : 0);   // 1〜3項目（平均およそ2）。開発枠の導入に合わせて以前より少し多く
+    const pol = regAnnounced() ? AI_RES[career.reg.pol[t.id] || 'bal'] : null;     // 規則変更の前年：方針に応じて今季の開発と来季の研究を振り分ける
+    // 開発枠の追加購入：スポンサー収入が多いチームほど買いやすい（1戦に1枠まで）
+    const buy = Math.random() < clamp((t.spons - 2.4)/8, 0.05, 0.4) ? 1 : 0;
+    // 開発方針：チームごとに決めておく（下位ほど攻めやすい）。結果はプレイヤーと同じ確率で決まる
+    if(!t.devPol){ const r = Math.random(), lowK = clamp((6.5 - t.spons)/4, 0, 1); t.devPol = r < 0.2 + lowK*0.3 ? 'risk' : r < 0.75 ? 'norm' : 'safe'; }
+    for(let k=0; k<n + buy; k++){ const key = Math.random() < 0.5 ? CAR_KEYS.slice().sort((a, b) => t.car[a] - t.car[b])[0] : CAR_KEYS[Math.floor(Math.random()*CAR_KEYS.length)];
+      const res = rollDev(t.devPol, facLv(t, devFacKey(key)), 0.3*devStep(key, t.car[key])/0.4*(pol ? pol.dev : 1));   // 0.3：以前のAIの1回の伸びの平均
+      t.car[key] = r1(Math.min(10, t.car[key] + Math.max(0.1, r1(res.add)))); }
+    if(pol) career.reg.res[t.id] = r1((career.reg.res[t.id] || 0) + pol.pts*(0.7 + Math.random()*0.6)*clamp(0.85 + (t.spons - 2.8)*0.1, 0.6, 1.2));
   });
   // レースの経験で伸びる（全ドライバー）
   const growLog = {};
@@ -9335,6 +9965,11 @@ function recordRace(){
   Object.values(career.drivers).forEach(d => { if(d.inj > 0 && !raced.has(d.code)) d.inj--; });
   order.forEach(c => { if(c.out === 'crash' && Math.random() < RES_INJ_P){ const d = career.drivers[c.m.name]; if(d){ d.inj = Math.random() < 0.7 ? 1 : 2; injLog.push({ code: d.code, team: c.m.team, n: d.inj }); } } });
   // リザーブ：走らなかったときはシミュレーターでの作業で少し伸びる（施設のシミュレーターが高いほど）
+  // リザーブ×：リザーブとして3戦以上たつと、ときどき移籍・契約解除・更新拒否を要求してくる
+  { const r = me.reserve, d = r && career.drivers[r], now = career.season*100 + career.round;
+    if(d && d.rab === 'grumble' && !career.resDemand && !resSulking(me) && me.resSince != null && (Math.floor(me.resSince/100) !== career.season || career.round - me.resSince % 100 >= 3) && Math.random() < 0.18){
+      career.resDemand = { code: r, kind: ['move', 'release', 'renew'][Math.floor(Math.random()*3)], at: now };
+    } }
   { const r = me.reserve, d = r && career.drivers[r];
     if(d && d.st && !raced.has(r)){ const g = growLog[r] = growLog[r] || {}; const ks = shuffled(DSTATS.map(x => x[0])).slice(0, 2); ks.forEach(k => grow(d, k, 0.035*(1 + myFac('sim')*0.25), g, 0.5)); d.sal = salaryFor(d); } }
   career.last = { name: rd.name, round: career.round + 1, top: rows.slice(0, 3).map(r => r.code), mine, led,
@@ -9348,14 +9983,19 @@ function recordRace(){
 /* ---------- 開発・契約 ---------- */
 function upgrade(key){
   const t = myTeam(), v = t.car[key], cost = devCostFor(key, v);
-  if(v >= 10 || career.money < cost) return;
-  career.money = r1(career.money - cost); t.car[key] = r1(Math.min(10, v + DEV_STEP));
-  saveCareer(); renderHQ();
+  if(v >= 10 || career.money < cost || slotsLeft() <= 0) return;
+  career.money = r1(career.money - cost); useSlot();
+  const res = rollDev(devPol(), devFacKey(key) === 'sim' ? puFacLv(myTeam()) : myFac('wind'), devStep(key, v));
+  const nv = r1(Math.min(10, v + Math.max(0.1, res.add))); t.car[key] = nv;
+  const [, tn] = DEV_RES[res.tier];
+  career.devLast = { key, tier: res.tier, from: v, to: nv, s: career.season, r: career.round, t: Date.now() };   // 開発した行に結果を出す（次の開発か、次戦まで残す）
+  saveCareer(); renderHQ();   // 結果は開発した行のすぐ下に出す（上部のお知らせは出さない）
 }
-function confirmTwice(key){
+// cost：確定したときに出ていくお金（入ってくるならマイナス）。画面下の資金表示と確定ボタンに「残り」を出すのに使う
+function confirmTwice(key, cost = null){
   const now = performance.now();
   if(armed.key === key && now < armed.until){ armed = { key:'', until:0 }; return true; }
-  armed = { key, until: now + 4000 }; renderHQ();
+  armed = { key, until: now + 4000, cost }; renderHQ();
   setTimeout(() => { if(armed.key === key && performance.now() >= armed.until){ armed = { key:'', until:0 }; renderHQ(); } }, 4050);
   return false;
 }
@@ -9384,7 +10024,7 @@ function renew(code, yrs, free){
   const d = career.drivers[code], t = myTeam(); if(!d || !t.drivers.includes(code) || !d.con) return;
   const ask = free ? r1(askFor(code, 1)*1.25) : askFor(code, yrs), fee = free ? 0 : r1(ask*RENEW_K);
   if(career.money < fee) return;
-  if(!confirmTwice('renew' + code + yrs + (free ? 'f' : ''))) return;
+  if(!confirmTwice('renew' + code + yrs + (free ? 'f' : ''), fee)) return;
   career.money = r1(career.money - fee); d.con = { yrs: free ? 1 : yrs, sal: ask }; d.rival = false;
   saveCareer(); renderHQ(`${code}と${d.con.yrs}年契約を結びました（年俸 ${money(ask)}/戦${fee ? `・更改金 ${money(fee)}` : ''}）。`);
 }
@@ -9464,12 +10104,25 @@ const lineupOf = t => lineupAll()[t.id].map(x => x.code);
 function signReserve(code){
   const t = myTeam(), d = career.drivers[code], fee = r1(d.sal*SIGN_K*RES_K), csal = r1(Math.max(0.2, d.sal*RES_K));
   if(career.money < fee) return;
-  if(!confirmTwice('signr' + code)) return;
+  if(!confirmTwice('signr' + code, fee)) return;
   if(t.reserve){ const o = career.drivers[t.reserve]; delete o.con; career.fa.push(t.reserve); }
   t.reserve = code; t.resSince = career.season*100 + career.round; career.fa = career.fa.filter(c => c !== code);
   d.con = { yrs: signYrs, sal: csal }; d.rival = false;
   career.money = r1(career.money - fee);
   saveCareer(); renderHQ(`${code}（${d.name}）とリザーブ契約を結びました（年俸 ${money(csal)}/戦・契約金 ${money(fee)}）。`);
+}
+// リザーブ×の要求への返事（ok：のむ／ng：断る。断ると3戦はやる気が下がり、シミュレーター作業の効果が半分）
+function answerResDemand(ok){
+  const q = career.resDemand, t = myTeam(); if(!q) return;
+  career.resDemand = null;
+  if(q.code !== t.reserve){ saveCareer(); renderHQ(); return; }
+  if(ok){
+    if(q.kind === 'renew'){ const d = career.drivers[q.code]; if(d.con) d.con.yrs = Math.min(d.con.yrs, 1); saveCareer(); renderHQ(`${q.code}は今季限りでチームを離れます（契約は更新しません）。`); return; }
+    const c = t.reserve; delete career.drivers[c].con; career.fa.push(c); t.reserve = null; career.sub = null;
+    saveCareer(); renderHQ(q.kind === 'move' ? `${c}の移籍を認め、移籍市場に出しました。` : `${c}との契約を解除しました。`); return;
+  }
+  career.resSulk = { code: q.code, until: career.season*100 + career.round + 3 };
+  saveCareer(); renderHQ(`${q.code}の要求を断りました。しばらくやる気が下がり、シミュレーター作業の効果が半分になります。`);
 }
 function releaseReserve(){
   const t = myTeam(); if(!t.reserve) return;
@@ -9496,7 +10149,7 @@ function setSub(code){
 function sign(code, slot){
   const t = myTeam(), d = career.drivers[code], fee = r1(d.sal*SIGN_K), csal = r1(Math.max(0.2, d.sal*conMult(d.age, signYrs)));
   if(career.money < fee) return;
-  if(!confirmTwice('sign'+code+slot)) return;
+  if(!confirmTwice('sign'+code+slot, fee)) return;
   const out = t.drivers[slot];
   t.drivers[slot] = code; career.fa = career.fa.filter(c => c !== code).concat(out);
   d.con = { yrs: signYrs, sal: csal }; d.rival = false; delete career.drivers[out].con; career.drivers[out].rival = false;
@@ -9508,8 +10161,22 @@ function nextSeason(){
   const champ = driverTable()[0], cons = teamTable();
   recordSeasonStats();
   career.history.push({ season: career.season, champ: champ && champ.code, champTeam: cons[0] && cons[0].id, myPos: cons.findIndex(x => x.id === career.team) + 1 });
-  // 規則変更でマシンの差が少し縮まる
-  career.teams.forEach(t => CAR_KEYS.forEach(k => t.car[k] = r1(clamp(5.5 + (t.car[k] - 5.5)*0.8 + (Math.random() - 0.5)*0.6, 1, 10))));
+  // 規則変更でマシンの差が少し縮まる。大規則変更の年は、変わる部分が平均近くまで作り直しになる（先行研究の分だけ高く始められる）
+  ensureReg();
+  const wasAnn = regAnnounced(), myResPts = myRes();
+  const th = career.reg && career.season + 1 === career.reg.at ? REG_THEMES[career.reg.theme] : null;
+  career.teams.forEach(t => CAR_KEYS.forEach(k => { if(th && th.keys.includes(k)) return; t.car[k] = r1(clamp(5.5 + (t.car[k] - 5.5)*0.8 + (Math.random() - 0.5)*0.6, 1, 10)); }));
+  let regRep = null;
+  if(th){
+    regRep = { theme: career.reg.theme, teams: {} };
+    career.teams.forEach(t => {
+      const pts = career.reg.res[t.id] || 0, b = resBonus(pts, career.reg.theme)*(0.75 + Math.random()*0.5);    // 当たり外れ：±25%
+      th.keys.forEach(k => t.car[k] = r1(clamp(5.5 + (t.car[k] - 5.5)*REG_KEEP + b + (Math.random() - 0.5)*0.5, 1, 10)));
+      regRep.teams[t.id] = { pts: r1(pts), b: r1(b), avg: r1(th.keys.reduce((a, k) => a + t.car[k], 0)/th.keys.length) };
+    });
+    const S = career.season + 1;
+    career.reg = { at: S + (Math.random() < 0.5 ? 2 : 3), theme: pickTheme(), res: {}, pol: {}, cur: { season: S, theme: regRep.theme } };
+  }
   // ライバルも施設を強化する（スポンサー収入が多いチームほど上げやすい）
   career.teams.forEach(t => { if(t.id === career.team || !t.fac) return; if(Math.random() < 0.35 + (t.spons - 2.8)*0.1){ const cand = FACS.filter(f => f.k !== 'hosp' && f.k !== 'scout' && t.fac[f.k] < FAC_MAX); if(cand.length){ const f = cand[Math.floor(Math.random()*cand.length)]; t.fac[f.k]++; } } });
   // オフシーズン：1歳年を取り、年齢に応じて伸びる・衰える。引退と新人の加入
@@ -9545,17 +10212,22 @@ function nextSeason(){
   }));
   contractOffseason(rep);
   // オーナーの評価とシーズン賞金（選手権の最終順位で決まる）
-  const fpos = cons.findIndex(x => x.id === career.team) + 1, og = ownerGrade(career.owner.target, fpos);
+  const ease = wasAnn ? resEase(myResPts) : 0;                          // 来季への投資（先行研究）の分、目標をゆるめて評価する
+  const fpos = cons.findIndex(x => x.id === career.team) + 1;
+  let og = ownerGrade(career.owner.target, fpos);
+  if(ease && fpos > career.owner.target && fpos <= career.owner.target + ease) og = ownerGrade(career.owner.target, career.owner.target);   // ゆるめた範囲に入っていれば「達成」として扱う（大成功にはならない）
   const sprize = (11 - fpos)*SEASON_PRIZE;
   career.money = r1(career.money + og.bonus + sprize);
   career.owner.trust = clamp(career.owner.trust + og.trust, 0, 100);
-  rep.owner = { target: career.owner.target, pos: fpos, grade: og.g, cls: og.cls, bonus: og.bonus, trustD: og.trust, trust: career.owner.trust, prize: sprize };
+  rep.reg = regRep;
+  rep.owner = { ease, target: career.owner.target, pos: fpos, grade: og.g, cls: og.cls, bonus: og.bonus, trustD: og.trust, trust: career.owner.trust, prize: sprize };
   if(career.owner.trust <= 0) career.fired = true;
   Object.values(career.drivers).forEach(d => { d.inj = 0; }); career.sub = null;   // オフシーズンの間に負傷は治る
   { const me = myTeam(), r = me.reserve; if(r && career.drivers[r].retired){ me.reserve = null; } }
   career.offseason = rep;
   career.season++; career.round = 0; career.calendar = makeCalendar(); career.dpts = {}; career.cpts = {}; career.last = null;
   career.owner.target = ownerTarget(); career.sponsor = null; career.sponsorOffers = makeSponsorOffers();
+  if(regAnnounced()) assignRegPol();
   careerRace = null; saveCareer(); renderHQ();
 }
 function driverTable(){
@@ -9677,6 +10349,11 @@ function ownDef(dr = ownDraft){
   return { id: OWN_ID, name, short, col: dr.col, col2: dr.col2, logo: { sym: dr.sym, inv: !!dr.inv }, car: st.car, spons: st.spons, own: true, start: dr.start };
 }
 const saveOwnDraft = () => lsSet(OWN_LS, ownDraft);
+// オリジナルチームのドライバーの腕前（2人の平均）。マシンの強さの順の位置に入り、その位置の2人を引き継ぐ（newCareer と同じ決め方）
+function ownDrvSkill(st){
+  const defs = TEAM_DEFS.slice(0, -1); let k = defs.findIndex(d => d.car < st.car); if(k < 0) k = defs.length;
+  const P = rosterOf().pool; return (ovr(P[2*k]) + ovr(P[2*k + 1])) / 2;
+}
 /* チーム作成の画面（renderNew の中に出す） */
 function ownEditorHtml(){
   const d = ownDraft, def = ownDef();
@@ -9694,7 +10371,7 @@ function ownEditorHtml(){
       <div class="owRow"><label>サブカラー</label>${sw('col2', d.col2)}</div>
       <div class="owRow"><label>ロゴ</label><div class="owSyms" role="radiogroup">${Object.entries(OWN_SYM).map(([k, s]) => `<button type="button" role="radio" aria-checked="${k === d.sym}" data-ow-sym="${k}" class="${k === d.sym ? 'on' : ''}" title="${s.n}">${ownLogoSvg({ ...def, logo: { sym: k, inv: d.inv } }, 34)}<small>${s.n}</small></button>`).join('')}</div></div>
       <div class="owRow"><label></label><label class="owChk"><input type="checkbox" id="owInv" ${d.inv ? 'checked' : ''}> ロゴの地と図の色を入れ替える</label></div>
-      <div class="owRow"><label>スタート条件</label><div class="owStart" role="radiogroup">${Object.entries(OWN_START).map(([k, s]) => `<button type="button" role="radio" aria-checked="${k === d.start}" data-ow-start="${k}" class="${k === d.start ? 'on' : ''}"><b>${s.n}</b><small>マシン ${s.car.toFixed(1)} ・ スポンサー ${money(r1(s.spons*SPONS_K))}/戦 ・ 初期資金 ${money(r1(10 + s.spons*1.5 + s.bonus))}</small><span>${s.d}</span></button>`).join('')}</div></div>
+      <div class="owRow"><label>スタート条件</label><div class="owStart" role="radiogroup">${Object.entries(OWN_START).map(([k, s]) => `<button type="button" role="radio" aria-checked="${k === d.start}" data-ow-start="${k}" class="${k === d.start ? 'on' : ''}"><b>${s.n}</b><small class="owRk"><span>マシン ${gradeTag(s.car)}</span><span>ドライバー ${gradeTag(ownDrvSkill(s))}</span><span>スポンサー ${gradeTag(s.spons * 1.45)}</span><span>初期資金 ${money(r1(10 + s.spons*1.5 + s.bonus))}</span></small><span>${s.d}</span></button>`).join('')}</div></div>
       <p class="muted" style="margin:6px 0 0">グリッドは20台のまま、${esc(TEAM_DEFS[TEAM_DEFS.length - 1].name)}の枠を引き継いで参戦します。ドライバーは、スタート条件のマシンの強さに見合った2人が加わります。</p>
     </div>
   </div>`;
@@ -9743,7 +10420,7 @@ function renderNew(msg){
     <p class="hqIntro">あなたはチーム代表です。全${ROUNDS}戦のシーズンを戦い、資金をやりくりしてマシンを開発し、ドライバーと契約します。強豪チームは勝って当たり前、下位チームは少ない予算で這い上がる戦いになります。</p>
     <div class="pick" role="radiogroup" aria-label="チーム">${TEAM_DEFS.map((d, i) => {
       const tier = i < 3 ? '<span class="tier t1">強豪</span>' : i < 7 ? '<span class="tier">中堅</span>' : '<span class="tier">下位</span>';
-      return `<button type="button" role="radio" data-team="${d.id}" class="${d.id === pickTeam ? 'on' : ''}" aria-checked="${d.id === pickTeam}">${teamLogo(d, 32)}<b>${esc(d.name)}</b><small>${tier}マシン ${d.car.toFixed(1)} ・ スポンサー ${money(r1(d.spons*SPONS_K))}/戦</small></button>`;
+      return `<button type="button" role="radio" data-team="${d.id}" class="${d.id === pickTeam ? 'on' : ''}" aria-checked="${d.id === pickTeam}">${teamLogo(d, 32)}<b>${esc(d.name)}</b><small class="pkSt">${tier}<span>マシン ${gradeTag(d.car)}</span><span>ドライバー ${gradeTag((ovr(rosterOf().pool[2*i]) + ovr(rosterOf().pool[2*i+1])) / 2)}</span><span>スポンサー ${gradeTag(d.spons * 1.45)}</span></small></button>`;
     }).join('')}<button type="button" role="radio" data-team="${OWN_ID}" class="ownCard ${pickTeam === OWN_ID ? 'on' : ''}" aria-checked="${pickTeam === OWN_ID}">${ownLogoSvg(ownDef(), 32)}<b>${esc(ownDef().name)}</b><small><span class="tier t1">NEW</span>オリジナルチームを作る</small></button></div>
     ${pickTeam === OWN_ID ? ownEditorHtml() : ''}
     <div class="row" style="margin-top:14px;gap:10px">
@@ -9802,10 +10479,23 @@ function facHtml(){
     <div class="legend" style="margin-top:8px"><span><i style="background:var(--blue)"></i>自チームのレベル</span><span><em style="position:static;display:inline-block;width:10px;height:10px;border-radius:2px;box-shadow:inset 0 0 0 2px #e5323b;background:transparent"></em>ライバルの最高レベル</span></div>
   </div>`;
 }
+/* 画面下のバーに出す資金。2回押して確定する操作の1回目のあとは、確定したときの残りも並べる */
+function rbMoneyHtml(){
+  const live = armed.key && performance.now() < armed.until && armed.cost != null;
+  const after = live ? r1(career.money - armed.cost) : null;
+  return `<span class="rbMoney${live ? ' pend' : ''}${career.money < 0 ? ' neg' : ''}"><small>${live ? '確定すると' : '資金'}</small><b class="num">${money(career.money)}</b>${live ? `<i aria-hidden="true">→</i><b class="num aft${after < 0 ? ' neg' : ''}">${money(after)}</b>` : ''}</span>`;
+}
+// 「もう一度押して確定」のボタンに、確定したあとの残りを書き足す
+function addLeftToArmed(root){
+  if(!armed.key || armed.cost == null || !root) return;
+  const after = r1(career.money - armed.cost);
+  root.querySelectorAll('button').forEach(b => { if(b.textContent.includes('もう一度押して確定') && !b.querySelector('.left')) b.insertAdjacentHTML('beforeend', `<small class="left">${armed.cost >= 0 ? '残り' : '確定後'} ${money(after)}</small>`); });
+}
 function renderHQ(msg){
   const el = $('#hq');
   document.body.classList.toggle('career', !!career);
   if(!career || hqView === 'new'){ renderNew(msg); return; }
+  ensureReg();
   if(career.fired){
     el.innerHTML = `<div class="champ"><h2>解任されました</h2><p>オーナーの信頼を失い、${esc(myTeam().name)}の代表を解任されました（シーズン${career.season - 1}終了時）。</p><p>通算${career.history.length}シーズン。新しいチームで、もう一度挑戦できます。</p><button class="b go goRace" type="button" id="firedRestart">新しいキャリアを始める</button></div>`;
     $('#firedRestart').onclick = () => { try{ localStorage.removeItem(LS_CAREER); }catch(e){} career = null; careerRace = null; hqView = 'new'; renderHQ(); };
@@ -9903,7 +10593,9 @@ function renderHQ(msg){
     <div class="sec">
       <h2>オフシーズンの変化<span class="kick">SEASON ${career.season}</span></h2>
       <div class="lastRes">
-        ${off.owner ? `<div style="margin-bottom:6px">前シーズン：コンストラクターズ${off.owner.pos}位（目標${off.owner.target}位以内）→ <b class="${off.owner.cls}">${off.owner.grade}</b>。ボーナス ${off.owner.bonus >= 0 ? '+' : ''}${money(off.owner.bonus)}、シーズン賞金 +${money(off.owner.prize)}、信頼度 ${off.owner.trustD >= 0 ? '+' : ''}${off.owner.trustD}（${off.owner.trust}）</div>` : ''}
+        ${off.owner ? `<div style="margin-bottom:6px">前シーズン：コンストラクターズ${off.owner.pos}位（目標${off.owner.target}位以内${off.owner.ease ? `。先行研究の評価で${Math.min(10, off.owner.target + off.owner.ease)}位までを達成として扱う` : ''}）→ <b class="${off.owner.cls}">${off.owner.grade}</b>。ボーナス ${off.owner.bonus >= 0 ? '+' : ''}${money(off.owner.bonus)}、シーズン賞金 +${money(off.owner.prize)}、信頼度 ${off.owner.trustD >= 0 ? '+' : ''}${off.owner.trustD}（${off.owner.trust}）</div>` : ''}
+        ${off.reg ? (() => { const R = off.reg, th = REG_THEMES[R.theme], mine = R.teams[career.team] || { pts: 0, b: 0, avg: 0 }, rv = Object.entries(R.teams).filter(([id]) => id !== career.team).sort((a, b) => b[1].avg - a[1].avg)[0];
+          return `<div class="regBar now" style="margin-bottom:8px"><span class="kick">NEW REGULATIONS</span><span><b>${esc(th.n)}の大規則変更</b>。自チームの先行研究 ${mine.pts}回 → ${esc(th.n)}の項目は平均 <b>${mine.avg.toFixed(1)}</b> から（研究の効果 +${mine.b.toFixed(1)}）。${rv ? `ライバル最高は${esc((teamOf(rv[0]) || {}).name || '')}の${rv[1].avg.toFixed(1)}。` : ''}</span></div>`; })() : ''}
         ${me.drivers.map(c => `<div><b>${c}</b>（${career.drivers[c].age}歳）${growTxt(off.grow[c]) || '<span class="muted">変化なし</span>'}</div>`).join('')}
         ${off.retired.length ? `<div style="margin-top:6px">引退：${off.retired.map(c => `<b>${c}</b> ${esc(career.drivers[c].name)}（${career.drivers[c].age}歳）`).join('、')}</div>` : '<div class="muted" style="margin-top:6px">引退したドライバーはいません。</div>'}
         ${off.signed.filter(s => s.team === career.team).map(s => `<div class="warn" style="margin-top:6px">${s.out} の引退で、${s.in}（${esc(career.drivers[s.in].name)}）が加入しました。</div>`).join('')}
@@ -9924,7 +10616,7 @@ function renderHQ(msg){
       ${me.drivers.map(code => { const d = career.drivers[code]; return `<div class="drv"><span class="code">${code}</span><div style="min-width:0"><div class="nm">${natFlag(code, 12)}${esc(d.name)}${awkTag(d)}</div><div class="sub">${d.age}歳 ・ 総合 <b class="num">${pt100(ovr(d))}</b> ・ 年俸 ${money(payOf(code))}/戦${d.inj ? ` <span class="injTag">負傷 あと${d.inj}戦欠場</span>` : ''}</div><div class="sub conLine ${d.con && d.con.yrs <= 0 ? 'exp' : ''}">${conTxt(d)}${d.sal - payOf(code) >= 0.3 ? ` <span class="bargain" title="今の市場価値は年俸${money(d.sal)}/戦。契約が切れると、この額を求められます">市場価値 ${money(d.sal)}</span>` : ''}</div><div class="sub scout" title="スカウト評価：これから伸びる余地の目安（少しずれることがあります）">伸びしろ <span class="stars">${starTxt(scoutStars(d))}</span></div></div><div class="pts">${career.dpts[code] || 0}<small>PTS</small></div>
         <div class="dst">${DSTATS.map(([k, lab]) => `<span class="dl">${lab}</span><span class="skill"><i style="width:${d.st[k]*10}%"></i></span><span class="dv">${gradeTag(d.st[k], true)}${(() => { const v = career.last && career.last.grow && career.last.grow[code] && career.last.grow[code][k]; return v ? `<i class="gr">▲</i>` : ''; })()}</span>`).join('')}</div>
         <div class="train"><span class="tl">重点トレーニング</span><select data-tk="${code}" aria-label="${code}の重点トレーニングの項目"><option value="">なし</option>${DSTATS.map(([k, lab]) => `<option value="${k}" ${trainOf(code) && trainOf(code).k === k ? 'selected' : ''}>${lab}</option>`).join('')}</select><div class="seg2">${[1, 2].map(lv => `<button type="button" data-tl="${code}" data-lv="${lv}" class="${trainOf(code) && trainOf(code).lv === lv ? 'on' : ''}" ${trainOf(code) ? '' : 'disabled'}>${TRAIN_LV[lv].n} ${money(TRAIN_LV[lv].cost)}/戦</button>`).join('')}</div></div>
-        ${d.ab.length ? `<ul class="abList">${d.ab.map(id => `<li>${abChip(id, false)}<span>${esc(ABIL[id].d)}</span></li>`).join('')}</ul>` : '<p class="note" style="grid-column:1/-1;margin:2px 0 0">特殊能力なし</p>'}</div>`; }).join('')}
+        ${d.ab.length ? `<ul class="abList">${d.ab.map(id => `<li>${abChip(id, false)}<span>${esc(ABIL[id].d)}</span></li>`).join('')}</ul>` : '<p class="note" style="grid-column:1/-1;margin:2px 0 0">特殊能力なし</p>'}${d.rab ? `<ul class="abList rabOff"><li>${rabChip(d.rab)}<span>リザーブ特殊能力（レギュラーの間は効きません）</span></li></ul>` : ''}</div>`; }).join('')}
     </div>`;
   const reserveCard = (() => {
     const r = me.reserve, d = r && career.drivers[r];
@@ -9934,15 +10626,33 @@ function renderHQ(msg){
       <div class="drv"><span class="code">${r}</span><div style="min-width:0"><div class="nm">${natFlag(r, 12)}${esc(d.name)}${awkTag(d)}</div><div class="sub">${d.age}歳 ・ 総合 <b class="num">${pt100(ovr(d))}</b>${d.inj ? ` <span class="injTag">負傷 あと${d.inj}戦</span>` : ''}</div><div class="sub conLine">${conTxt(d)}</div><div class="sub scout">伸びしろ <span class="stars">${starTxt(scoutStars(d))}</span></div></div><div class="pts">${career.dpts[r] || 0}<small>PTS</small></div>
         <div class="dst">${DSTATS.map(([k, lab]) => `<span class="dl">${lab}</span><span class="skill"><i style="width:${d.st[k]*10}%"></i></span><span class="dv">${gradeTag(d.st[k], true)}${(() => { const v = career.last && career.last.grow && career.last.grow[r] && career.last.grow[r][k]; return v ? `<i class="gr">▲</i>` : ''; })()}</span>`).join('')}</div>
         <p class="note" style="grid-column:1/-1;margin:2px 0 0">シミュレーターでの作業で、毎戦2項目が少しずつ伸びます（施設のシミュレーター Lv${myFac('sim')}）。</p>
+        ${(() => { const S = resSupport(me); return `<p class="note resEff" style="grid-column:1/-1;margin:2px 0 0"><b>チームへの効果</b>：${S ? `PU・ブレーキ開発の失敗 さらに −${Math.round(resDevLv(me)*10)}%（シミュレーター施設 ${resDevLv(me).toFixed(1)}レベル分）・ レギュラーの予選タイム −${(S*RES_Q*100).toFixed(2)}%（強さ ${Math.round(S*100)}%：腕前とシミュレーターLvで決まります）` : 'いまは効果がありません（負傷中、または次戦でリザーブ自身が走るため）'}</p>`; })()}
+        ${d.rab ? `<ul class="abList"><li>${rabChip(d.rab)}<span>${esc(RABIL[d.rab].d)}${resSulking(me) ? '（いまは要求を断られて、やる気が下がっています）' : ''}</span></li></ul>` : ''}
+        ${(() => { const q = career.resDemand; if(!q || q.code !== r) return ''; const T = { move:['移籍を要求しています','出場できるチームへ移りたいと言っています。','移籍を認める'], release:['契約解除を要求しています','リザーブのままなら契約を解除してほしいと言っています。','契約を解除する'], renew:['契約を更新しないと言っています','今季限りでチームを離れたいと言っています。','更新しないことを認める'] }[q.kind];
+          return `<div class="resDemand" role="alert"><b>${r}が${T[0]}</b><span>${T[1]}断ると3戦のあいだやる気が下がり、シミュレーター作業の効果が半分になります。</span><div class="row"><button type="button" class="b sm" data-rdem="1">${T[2]}</button><button type="button" class="b sm" data-rdem="0">断る</button></div></div>`; })()}
         <div class="resActs"><span class="tl">次戦で起用</span>${me.drivers.map(c => `<button type="button" class="b sm ${subFor === c ? 'go' : ''}" data-subfor="${c}" ${d.inj || inProgress ? 'disabled' : ''}>${subFor === c ? `${c}の代わりに起用中` : `${c}の代わりに`}</button>`).join('')}${subFor ? '<button type="button" class="b sm ghost" data-subfor="">取り消し</button>' : ''}</div>
         <div class="resActs"><span class="tl">昇格（契約金なし）</span>${me.drivers.map((c, slot) => { const on = armed.key === 'promo' + slot; return `<button type="button" class="b sm ${on ? 'go' : ''}" data-promo="${slot}" ${inProgress || !canPromote(me) ? 'disabled' : ''}>${on ? 'もう一度押して確定' : `${c}と入れ替え`}</button>`; }).join('')}${canPromote(me) ? '' : '<span class="muted" style="font-size:11.5px">加入から2戦たつと昇格できます</span>'}<button type="button" class="b sm ghost ${armed.key === 'relres' ? 'go' : ''}" id="relRes" ${inProgress ? 'disabled' : ''}>${armed.key === 'relres' ? 'もう一度押して放出' : '放出'}</button></div>
       </div></div>`;
   })();
   const dev = `
     <div class="sec">
-      <h2>マシン開発<button type="button" class="qm" data-guide="machine" aria-label="遊び方を見る">?</button><span class="kick">1回 +${DEV_STEP}</span></h2>
-      ${PARTS.map(([pid, plab, items]) => `<div class="part"><div class="partHead"><b>${plab}</b>${pid === 'aero' ? `<span class="muted">直線の実効値 <b class="num">${(me.car.power + 0.35*(me.car.eff - me.car.df)).toFixed(1)}</b></span>` : ''}</div>${items.map(([k, lab]) => { const v = me.car[k], cost = devCostFor(k, v), can = career.money >= cost && v < 10, hot = (rd ? TYPE_KEYS[rd.type] : []).includes(k); return `<div class="devRow"><span class="lab">${lab}${hot ? '<span class="hotTag">次戦</span>' : ''}</span><div class="bar" title="ライバル最高 ${best[k].toFixed(1)}"><i style="width:${v*10}%"></i><em style="left:calc(${best[k]*10}% - 1px)"></em></div><span class="v">${v.toFixed(1)}</span><button class="b sm" type="button" data-up="${k}" ${can ? '' : 'disabled'}>${v >= 10 ? '上限' : money(cost)}</button><span class="dd">${esc(CAR_DESC[k])}</span></div>`; }).join('')}</div>`).join('')}
+      <h2>マシン開発<button type="button" class="qm" data-guide="machine" aria-label="遊び方を見る">?</button><span class="kick">今戦の開発枠 ${slotsLeft()}/${devSlots()}<span class="slotPips" aria-hidden="true">${Array.from({ length: devSlots() }, (_, i) => `<i class="${i < slotsUsed() ? 'used' : ''}"></i>`).join('')}</span></span></h2>
+      ${career.round < career.calendar.length ? (() => { const bought = slotBought(), cost = slotPrice(), on = armed.key === 'buyslot', poor = career.money < cost;
+        return `<div class="buySlot"><button type="button" class="b sm ${on ? 'go' : ''}" id="buySlot" ${bought || poor ? 'disabled' : ''}>${bought ? '今戦は追加済み' : on ? `もう一度押して確定（${money(cost)}）` : `開発枠を追加 ${money(cost)}`}</button><span class="muted">${bought ? '追加の枠は1戦に1つまでです。' : poor ? '資金が足りません。' : `1戦に1枠まで・今戦だけ有効。今季${slotBuysSeason()}回購入${slotBuysSeason() ? '（買うたびに値上がり）' : ''}${myFac('wind') ? `・風洞で−${myFac('wind')*6}%` : ''}`}</span></div>`; })() : ''}
+      <div class="devPol"><span class="dpLab">開発方針</span><div class="seg2" role="radiogroup" aria-label="開発方針">${Object.entries(DEV_POL).map(([k, P]) => `<button type="button" role="radio" data-dpol="${k}" class="${k === devPol() ? 'on' : ''}" aria-checked="${k === devPol()}" title="${esc(P.d)}">${P.n}</button>`).join('')}</div>
+        <span class="dpOdds">${(() => { const P = DEV_POL[devPol()], oa = devOdds(devPol(), myFac('wind')), op = devOdds(devPol(), puFacLv(me)), pc = v => Math.round(v*100) + '%';
+          const row = (lab, o) => `<span class="dpRow"><b>${lab}</b><i style="color:#d7263d">失敗 ${pc(o.fail)}</i><i style="color:#1a9a55">成功 ${pc(o.ok)}</i>${P.great > 0 ? `<i style="color:#c026d3">大成功 ${pc(o.great)}</i>` : ''}</span>`;
+          return row('空力', oa) + row(resSupport(me) ? 'PU・ブレーキ（リザーブ込み）' : 'PU・ブレーキ', op) + `<span class="dpNote">伸び：失敗 ×${P.k[0]}・成功 ×1${P.great > 0 ? `・大成功 ×${P.k[2]}` : ''}（失敗しても値は下がりません）</span>`; })()}</span></div>
+      ${regAnnounced() ? (() => { const R = career.reg, th = REG_THEMES[R.theme], pts = myRes(), b = resBonus(pts, R.theme), canR = slotsLeft() > 0 && career.money >= RES_COST && career.round < career.calendar.length;
+        const rum = Object.entries(R.pol || {}).filter(([, v]) => v === 'next').map(([id]) => (teamOf(id) || {}).name).filter(Boolean).slice(0, 2);   // 噂になるのは一部のチームだけ
+        return `<div class="regCard"><h3>来季の${esc(th.n)}規則に向けた先行研究</h3><div class="muted" style="font-size:12.5px">${esc(th.d)}（シーズン${R.at}から）。研究は今季だけでき、開発枠を1つ使います。研究するほど来季の初期値が平均より高くなりますが、伸びは少しずつ鈍り、当たり外れもあります。</div>
+          <div class="rcRow"><span>研究 <b class="num">${pts}</b>回</span><span class="rcMeter" title="効果の上限に対する割合"><i style="width:${Math.round(b/th.max*100)}%"></i></span><span>来季の見込み ${esc(th.n)}の各項目 <b class="num">+${b.toFixed(1)}</b><span class="muted">（上限+${th.max.toFixed(1)}・±25%）</span></span><button class="b sm go" type="button" id="resBtn" ${canR ? '' : 'disabled'}>先行研究 ${money(RES_COST)}</button></div>
+          <div class="rum">${rum.length ? `噂：${rum.map(esc).join('・')}は今季の開発を抑えて来季に集中しているらしい。` : '今のところ、来季に集中しているチームの噂はありません。'}</div></div>`; })()
+        : regFirstYear() ? `<div class="regCard" style="border-color:#1f9d5a;background:linear-gradient(180deg,rgba(31,157,90,.10),transparent)"><h3>新規則1年目（${esc(REG_THEMES[career.reg.cur.theme].n)}）</h3><div class="muted" style="font-size:12.5px">変わった部分の項目は、1回の開発で ×${REG_BOOST} 伸びます。次の大規則変更はシーズン${career.reg.at}の予定です（前のシーズンの開幕に予告）。</div></div>`
+        : `<p class="focus">次の大規則変更はシーズン${career.reg.at}の予定です（シーズン${career.reg.at - 1}の開幕に予告され、先行研究ができるようになります）。</p>`}
+      ${PARTS.map(([pid, plab, items]) => `<div class="part"><div class="partHead"><b>${plab}</b>${pid === 'aero' ? `<span class="muted">直線の実効値 <b class="num">${(me.car.power + 0.35*(me.car.eff - me.car.df)).toFixed(1)}</b></span>` : ''}</div>${items.map(([k, lab]) => { const v = me.car[k], cost = devCostFor(k, v), can = career.money >= cost && v < 10, hot = (rd ? TYPE_KEYS[rd.type] : []).includes(k); const dl = career.devLast, res = dl && dl.key === k && dl.s === career.season && dl.r === career.round ? dl : null; return `<div class="devRow${res && Date.now() - (dl.t || 0) < 1500 ? ' devFlash t' + res.tier : ''}"><span class="lab">${lab}${hot ? '<span class="hotTag">次戦</span>' : ''}</span><div class="bar" title="ライバル最高 ${best[k].toFixed(1)}"><i style="width:${v*10}%"></i><em style="left:calc(${best[k]*10}% - 1px)"></em></div><span class="v">${v.toFixed(1)}</span><button class="b sm" type="button" data-up="${k}" title="1回 +${r1(devStep(k, v)).toFixed(1)}（成功のとき）" ${can && slotsLeft() > 0 ? '' : 'disabled'}>${v >= 10 ? '上限' : money(cost)}</button>${res ? `<span class="devRes t${res.tier}" role="status"><b>${['失敗…', '成功', '大成功！'][res.tier]}</b><span class="num">${res.from.toFixed(1)} → ${res.to.toFixed(1)}</span><span class="num">（+${r1(res.to - res.from).toFixed(1)}）</span></span>` : ''}<span class="dd">${esc(CAR_DESC[k])}</span></div>`; }).join('')}</div>`).join('')}
       <div class="legend"><span><i></i>自チーム</span><span><em></em>ライバルの最高値</span></div>
+      <p class="focus">開発枠は1戦ごとに使える開発の回数です（前年のコンストラクターズ1〜3位：2回、4〜7位：3回、8〜10位：4回）。1回の伸び（成功のとき）は +0.4 で、値が8を超えると +0.3、9を超えると +0.2 に下がります。結果は失敗・成功・大成功のどれかになり、確率は開発方針と施設で変わります。</p>
       <p class="focus">タイヤの持ちはマシンでは変わりません。コンパウンドの性能（S：速いが減りやすい、M：中間、H：遅いが長持ち）と、ドライバーの「タイヤ」能力で決まります。</p>
       ${rd ? `<p class="focus"><span class="hotTag">次戦</span>の印は、次の${esc(COURSE_TYPES[rd.type].short)}コースで効きやすい項目です。</p>` : ''}
     </div>`;
@@ -9975,7 +10685,7 @@ function renderHQ(msg){
     <div class="sec">
       <h2>移籍市場<button type="button" class="qm" data-guide="market" aria-label="遊び方を見る">?</button><span class="kick">契約金 = 年俸×${SIGN_K}</span></h2>
       <div class="row" style="margin:0 0 6px;gap:8px"><span class="muted">契約年数</span><div class="seg2">${[1, 2, 3].map(y => `<button type="button" data-sy="${y}" class="${signYrs === y ? 'on' : ''}">${y}年</button>`).join('')}</div><span class="muted">若手は短い契約、ベテランは長い契約のほうが年俸が安くなります</span></div>
-      ${career.fa.map(code => { const d = career.drivers[code], fee = r1(d.sal*SIGN_K), csal = r1(Math.max(0.2, d.sal*conMult(d.age, signYrs))), can = career.money >= fee; return `<div class="fa"><span class="code" style="font:700 15px 'Chakra Petch',sans-serif">${code}</span><div style="min-width:0"><div style="font-size:13px">${natFlag(code, 12)}${esc(d.name)}${d.rookie ? ' <span class="newTag">新人</span>' : ''}${awkTag(d)}</div><div class="muted">${d.age}歳 ・ 伸びしろ <span class="stars">${starTxt(scoutStars(d))}</span></div><div class="muted">年俸 ${money(csal)}/戦（${signYrs}年契約） ・ 契約金 ${money(fee)}</div>${d.ab.length ? `<div class="abRow">${d.ab.map(id => abChip(id)).join('')}</div>` : ''}</div><div class="acts">${me.drivers.map((c, slot) => { const k = 'sign' + code + slot, on = armed.key === k; return `<button class="b sm ${on ? 'go' : ''}" type="button" data-sign="${code}" data-slot="${slot}" ${can && !inProgress ? '' : 'disabled'}>${on ? 'もう一度押して確定' : c + 'と交代'}</button>`; }).join('')}${(() => { const rf = r1(d.sal*SIGN_K*RES_K), on = armed.key === 'signr' + code; return `<button class="b sm ghost ${on ? 'go' : ''}" type="button" data-signr="${code}" title="リザーブとして契約（年俸 ${money(r1(Math.max(0.2, d.sal*RES_K)))}/戦・契約金 ${money(rf)}）" ${career.money >= rf && !inProgress ? '' : 'disabled'}>${on ? 'もう一度押して確定' : 'リザーブに'}</button>`; })()}</div><div class="gTbl" role="table" aria-label="${code}の能力"><span class="gh gt">総合</span>${DSTATS.map(([, lab]) => `<span class="gh">${lab}</span>`).join('')}<span class="gc gt">${gradeTag(ovr(d), myFac('scout') >= 4)}</span>${DSTATS.map(([k]) => `<span class="gc">${gradeTag(d.st[k], myFac('scout') >= 4)}</span>`).join('')}</div></div>`; }).join('')}
+      ${career.fa.map(code => { const d = career.drivers[code], fee = r1(d.sal*SIGN_K), csal = r1(Math.max(0.2, d.sal*conMult(d.age, signYrs))), can = career.money >= fee; return `<div class="fa"><span class="code" style="font:700 15px 'Chakra Petch',sans-serif">${code}</span><div style="min-width:0"><div style="font-size:13px">${natFlag(code, 12)}${esc(d.name)}${d.rookie ? ' <span class="newTag">新人</span>' : ''}${awkTag(d)}</div><div class="muted">${d.age}歳 ・ 伸びしろ <span class="stars">${starTxt(scoutStars(d))}</span></div><div class="muted">年俸 ${money(csal)}/戦（${signYrs}年契約） ・ 契約金 ${money(fee)}</div>${d.ab.length || d.rab ? `<div class="abRow">${d.ab.map(id => abChip(id)).join('')}${d.rab ? rabChip(d.rab) : ''}</div>` : ''}</div><div class="acts">${me.drivers.map((c, slot) => { const k = 'sign' + code + slot, on = armed.key === k; return `<button class="b sm ${on ? 'go' : ''}" type="button" data-sign="${code}" data-slot="${slot}" ${can && !inProgress ? '' : 'disabled'}>${on ? 'もう一度押して確定' : c + 'と交代'}</button>`; }).join('')}${(() => { const rf = r1(d.sal*SIGN_K*RES_K), on = armed.key === 'signr' + code; return `<button class="b sm ghost ${on ? 'go' : ''}" type="button" data-signr="${code}" title="リザーブとして契約（年俸 ${money(r1(Math.max(0.2, d.sal*RES_K)))}/戦・契約金 ${money(rf)}）" ${career.money >= rf && !inProgress ? '' : 'disabled'}>${on ? 'もう一度押して確定' : 'リザーブに'}</button>`; })()}</div><div class="gTbl" role="table" aria-label="${code}の能力"><span class="gh gt">総合</span>${DSTATS.map(([, lab]) => `<span class="gh">${lab}</span>`).join('')}<span class="gc gt">${gradeTag(ovr(d), myFac('scout') >= 4)}</span>${DSTATS.map(([k]) => `<span class="gc">${gradeTag(d.st[k], myFac('scout') >= 4)}</span>`).join('')}</div></div>`; }).join('')}
       <p class="note">${myFac('scout') >= 4 ? 'スカウト部門（Lv4以上）の調査で、能力の数値まで分かっています。' : '能力はG〜Sのランクで表示しています。正確な数値が分かるのは、自チームに加入してからです（スカウト部門をLv4にすると、移籍市場でも数値が分かります）。'}交代すると、外れたドライバーは移籍市場に移ります。レースの途中では交代できません。</p>
       <div class="gLegend" aria-label="ランクの区切り">${GRADES.map(([, g]) => `<span><span class="gd g${g}">${g}</span>${GRADE_RANGE[g]}</span>`).join('')}</div>
     </div>`;
@@ -9989,11 +10699,13 @@ function renderHQ(msg){
       </div>
     </div>
     ${(() => { const o = career.owner, ok = myPos <= o.target, tc = o.trust >= 60 ? '#1f9d5a' : o.trust >= 30 ? '#e0a800' : '#d7263d';
-      return `<div class="ownerBar"><span class="kick">OWNER</span><span>目標 コンストラクターズ <b>${o.target}位以内</b>${career.round > 0 && !seasonOver ? `（現在${myPos}位・<b class="${ok ? 'gainT' : 'lossT'}">${ok ? '達成ペース' : '目標未達'}</b>）` : ''}</span><span class="trust" title="オーナーの信頼度。シーズンの目標の達成度で増減し、0になると解任されます">信頼度 <span class="tmeter"><i style="width:${o.trust}%;background:${tc}"></i></span><b>${o.trust}</b></span></div>`; })()}
+      return `<div class="ownerBar"><span class="kick">OWNER</span><span>目標 コンストラクターズ <b>${o.target}位以内</b>${regAnnounced() ? `<span class="muted">（来季への投資：先行研究${RES_EASE[0]}回で${Math.min(10, o.target + 1)}位、${RES_EASE[1]}回で${Math.min(10, o.target + 2)}位までを達成として扱う${resEase(myRes()) ? `・現在 <b>${Math.min(10, o.target + resEase(myRes()))}位まで</b>` : ''}）</span>` : ''}${career.round > 0 && !seasonOver ? `（現在${myPos}位・<b class="${ok ? 'gainT' : 'lossT'}">${ok ? '達成ペース' : '目標未達'}</b>）` : ''}</span><span class="trust" title="オーナーの信頼度。シーズンの目標の達成度で増減し、0になると解任されます">信頼度 <span class="tmeter"><i style="width:${o.trust}%;background:${tc}"></i></span><b>${o.trust}</b></span></div>`; })()}
     ${sponsorCard}
     ${!guideSeen() && hqTab === 'ov' ? `<div class="guideHint"><span class="gq" aria-hidden="true">?</span><div><b>はじめてですか？</b><span>チーム本部・予選・レース中の操作を、約3分で読める「遊び方」にまとめています。</span></div><button type="button" class="b sm go" data-guide="start">遊び方を見る</button><button type="button" class="b sm ghost" id="guideDismiss">閉じる</button></div>` : ''}
     ${msg ? `<p class="warn">${esc(msg)}</p>` : ''}
     ${career.money < 0 ? '<p class="warn">資金がマイナスです。開発や契約はできません。ポイントを取って賞金を稼ぎましょう。</p>' : ''}
+    ${regAnnounced() ? `<div class="regBar"><span class="kick">REGULATIONS</span><span>来季（シーズン${career.reg.at}）に<b>${esc(REG_THEMES[career.reg.theme].n)}の大規則変更</b>。マシン開発タブで先行研究ができます（今季 ${myRes()}回）。</span></div>`
+      : regFirstYear() ? `<div class="regBar now"><span class="kick">NEW REGULATIONS</span><span>新規則1年目（${esc(REG_THEMES[career.reg.cur.theme].n)}）。変わった部分の開発がよく伸びます（×${REG_BOOST}）。</span></div>` : ''}
     ${(() => { const pend = pendingContracts().length;
       return `<nav class="hqTabs" role="tablist" aria-label="チーム本部の表示">${HQ_TABS.map(([k, l]) => `<button type="button" role="tab" data-hqt="${k}" class="${hqTab === k ? 'on' : ''}" aria-selected="${hqTab === k}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${HQ_TAB_ICO[k]}"/></svg><span>${l}</span>${k === 'drv' && pend ? '<i class="tDot" title="契約の手続きが残っています"></i>' : ''}</button>`).join('')}</nav>`; })()}
     ${hqTab === 'ov' ? `<div class="hqGrid">
@@ -10012,10 +10724,13 @@ function renderHQ(msg){
     <div class="row" style="justify-content:flex-end">
       <button class="b sm ${armed.key === 'reset' ? 'go' : 'ghost'}" type="button" id="resetCareer">${armed.key === 'reset' ? 'もう一度押すとデータを消してやり直します' : 'キャリアを最初からやり直す'}</button>
     </div>
-    ${rd ? `<div class="raceBar ${hqTab === 'ov' ? 'onOv' : ''}"><div class="rbIn"><span class="rbInfo">${gpFlag(rd.name, 12)}<b>${esc(rd.name)}</b><small>ROUND ${career.round + 1}/${career.calendar.length}</small></span><button class="b go" type="button" id="goRaceBar">${inProgress ? 'レースに戻る' : Q ? '予選に戻る' : '予選へ'}</button></div></div>` : ''}`;
+    ${rd ? `<div class="raceBar ${hqTab === 'ov' ? 'onOv' : ''}"><div class="rbIn"><span class="rbInfo">${gpFlag(rd.name, 12)}<b>${esc(rd.name)}</b><small>ROUND ${career.round + 1}/${career.calendar.length}</small></span>${rbMoneyHtml()}<button class="b go" type="button" id="goRaceBar">${inProgress ? 'レースに戻る' : Q ? '予選に戻る' : '予選へ'}</button></div></div>` : ''}`;
   const mt = $('#miniTrack'); if(mt && rd) requestAnimationFrame(() => drawMini(mt, rd));
   el.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { career.startTyre[b.dataset.st] = b.dataset.c; saveCareer(); renderHQ(); });
   el.querySelectorAll('[data-up]').forEach(b => b.onclick = () => upgrade(b.dataset.up));
+  { const bs = el.querySelector('#buySlot'); if(bs) bs.onclick = buySlot; }
+  el.querySelectorAll('[data-dpol]').forEach(b => b.onclick = () => { career.devPol = b.dataset.dpol; saveCareer(); renderHQ(); });
+  { const rb = $('#resBtn'); if(rb) rb.onclick = research; }
   el.querySelectorAll('[data-fac]').forEach(b => b.onclick = () => upgradeFac(b.dataset.fac));
   el.querySelectorAll('[data-facsell]').forEach(b => b.onclick = () => sellFac(b.dataset.facsell));
   const lb = $('#loanBtn'); if(lb) lb.onclick = borrow;
@@ -10032,6 +10747,7 @@ function renderHQ(msg){
   el.querySelectorAll('[data-subfor]').forEach(b => b.onclick = () => setSub(b.dataset.subfor));
   el.querySelectorAll('[data-promo]').forEach(b => b.onclick = () => promoteReserve(+b.dataset.promo));
   { const x = $('#relRes'); if(x) x.onclick = releaseReserve; }
+  el.querySelectorAll('[data-rdem]').forEach(b => b.onclick = () => answerResDemand(b.dataset.rdem === '1'));
   el.querySelectorAll('[data-renew]').forEach(b => b.onclick = () => renew(b.dataset.renew, +b.dataset.yrs, !!b.dataset.free));
   el.querySelectorAll('[data-poach]').forEach(b => b.onclick = () => acceptPoach(+b.dataset.poach));
   el.querySelectorAll('[data-refuse]').forEach(b => b.onclick = () => refusePoach(+b.dataset.refuse));
@@ -10174,7 +10890,12 @@ function syncDock(){
   $('#dkUnfold').onclick = () => setFold(false);
   $('#dkStart').onclick = $('#dkStart2').onclick = () => { sndInit(); mainAction(); };
   /* レース中のリスタート（グリッドに戻す）ボタンは削除 */
-  document.querySelectorAll('#dkSpeed button').forEach(b => b.onclick = () => setSpeed(+b.dataset.ts));
+  document.querySelectorAll('#dkSpeed button').forEach(b => b.onclick = () => {
+    if(document.body.classList.contains('career') && document.body.classList.contains('phoneRace')){   // スマホ：押すたびに ×1→×2→×4→×8→×1
+      const L = [1, 2, 4, 8]; setSpeed(L[(L.indexOf(race.timeScale) + 1) % L.length]);
+    } else setSpeed(+b.dataset.ts);
+    syncDock();
+  });
   document.querySelectorAll('#dkMode button').forEach(b => b.onclick = () => { const s = document.querySelector(`#pwMode button[data-m="${b.dataset.m}"]`); if(s) s.click(); });
   document.querySelectorAll('#dkPace button').forEach(b => b.onclick = () => { const s = document.querySelector(`#pwPace button[data-p="${b.dataset.p}"]`); if(s) s.click(); });
   document.querySelectorAll('#dkTy button[data-c]').forEach(b => b.onclick = () => { const s = document.querySelector(`#pwTyres button[data-c="${b.dataset.c}"]`); if(s) s.click(); });
@@ -10186,6 +10907,15 @@ function syncDock(){
   tt.addEventListener('click', e => { const b = e.target.closest('.tcPace button'); if(!b) return; e.stopPropagation(); const el = b.closest('.tc'); if(!b.disabled && el) setPaceFor(machines[+el.dataset.mi], b.dataset.p); });
   const pickCard = e => { if(e.target.closest('.tcPace')) return; const el = e.target.closest('.tc'); if(!el) return; e.stopPropagation(); const i = +el.dataset.mi; if(!machines[i]) return; if(machines[i] !== MY) setMy(i); setCam('car', MY); dockKey = ''; syncTel(); /* 担当を切り替えたとき、すでに担当のときも、カメラはそのマシンへ（全体カメラのときも寄る） */ };
   tt.addEventListener('click', pickCard);
+  // スマホ：担当マシンのカードをもう一度押すと、ペースのボタンを開く／閉じる
+  let wasMine = false;
+  tt.addEventListener('pointerdown', e => { const el = e.target.closest('.tc'); wasMine = !!(el && machines[+el.dataset.mi] === MY); }, true);
+  tt.addEventListener('click', e => {
+    if(!document.body.classList.contains('phoneRace') || e.target.closest('.tcPace')) return;
+    const el = e.target.closest('.tc'); if(!el) return;
+    const open = wasMine ? !el.classList.contains('open') : true;
+    tt.querySelectorAll('.tc').forEach(x => x.classList.toggle('open', x === el && open));
+  });
   tt.addEventListener('pointerdown', e => e.stopPropagation());
   tt.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); pickCard(e); } });
 }
@@ -10204,8 +10934,18 @@ function syncTel(){
   const box = $('#teamTel'); if(!box) return;
   const st = $('#stage');
   const show = !!(careerRace && career && mode === 'race' && race.cars.length && !document.querySelector('main').hidden);
-  if(!show){ if(!box.hidden){ box.hidden = true; st.style.setProperty('--telH', '0px'); } return; }
+  if(!show){ camCover = 0; if(!box.hidden){ box.hidden = true; st.style.setProperty('--telH', '0px'); } return; }
   const dk = $('#dock'); if(dk) st.style.setProperty('--dockH', dk.offsetHeight + 'px');
+  // カメラを上げる量の元：追従カメラの画面（中継レイアウトでは下の画面）の下側に、パネルがどこまでかぶっているか
+  {
+    const fc = cv2.offsetParent && cv2.clientHeight ? cv2 : cv, R = fc.getBoundingClientRect();
+    // 画面の下端から積み重なっているパネルだけを数える（下端から離れて浮いているものは数えない）
+    const rs = [dk, box].filter(el => el && !el.hidden && el.offsetParent).map(el => el.getBoundingClientRect())
+      .filter(r => r.right > R.left && r.left < R.right && r.bottom > R.top && r.top < R.bottom).sort((a, b) => b.bottom - a.bottom);
+    let top = R.bottom;
+    for(const r of rs) if(r.bottom >= top - 40) top = Math.min(top, r.top);
+    camCover = Math.max(0, R.bottom - top);
+  }
   const order = ranking();
   // 並び順はチームのドライバー順で固定（担当を切り替えても位置は変えず、枠の色だけを移す）
   const slot = c => myTeam().drivers.indexOf(c.m.name);
@@ -10227,7 +10967,7 @@ function syncTel(){
     const pos = order.indexOf(c) + 1;
     const stintLap = c.myLog ? c.myLog[c.myLog.length - 1].lap : 1, age = Math.max(0, c.laps.length + 1 - stintLap);
     const tyre = clamp(1 - c.wear, 0, 1), batt = clamp(c.ers ?? 1, 0, 1);
-    set(el.querySelector('.tag'), 'innerHTML', c.out ? '<span class="pp">OUT</span>' : c.finish !== null ? `<span class="pp">P${pos} FIN</span>` : `${c.inPit ? '<span class="pit">PIT</span>' : ''}<span class="pp">P${pos}</span>`);
+    set(el.querySelector('.tag'), 'innerHTML', c.out ? '<span class="pp">OUT</span>' : c.finish !== null ? `<span class="pp">P${pos} FIN</span>` : `${c.inPit ? (c.stackStart > race.t ? '<span class="pit stk">STACK</span>' : '<span class="pit">PIT</span>') : ''}<span class="pp">P${pos}</span>`);
     set(el.querySelector('.t1'), 'innerHTML', `<span class="k"><span class="tring" style="border-color:${TYRES[c.comp].color}"></span>${c.comp}<small style="color:#aab0b8">${age}周</small></span><span class="tcBar"><i style="width:${Math.round(tyre*100)}%;background:${levelCol(tyre)}"></i></span><span class="v">${Math.round(tyre*100)}<small>%</small></span>`);
     set(el.querySelector('.t2'), 'innerHTML', `<span class="k">${BATT_ICO}電池</span><span class="tcBar"><i style="width:${Math.round(batt*100)}%;background:${c.boost || c.ot ? '#5fd6ff' : levelCol(batt)}"></i></span><span class="v">${Math.round(batt*100)}<small>%</small></span>`);
     // セクターごとのタイムの色：紫＝全体のベスト、緑＝自己ベスト、黄＝自己ベストより遅い。走行中のセクターは明るいグレー
@@ -10361,20 +11101,20 @@ function sceneBuilding(x, y, w, h, a, roof, rnd){
 /* ---------- グランプリごとの景色のテーマ ----------
    グランプリ名（開催国）から、海岸・港・湖・川・砂漠・ブドウ畑・チューリップ畑などを決める */
 const GP_THEME = {
-  'ミナトベイ':      { sea: true, harbor: true },                                        // 日本：湾と港
-  'ヴァルカ':        { river: true },                                                     // ハンガリー：大きな川
-  'ノースリッジ':    { tulip: true, windmill: true },                                     // オランダ：チューリップ畑と風車
-  'サン・オルモ':    { vine: true, cypress: true },                                       // イタリア：ブドウ畑と糸杉
-  'カスケード':      { river: true, forestPlus: true },                                   // オーストリア：森と渓流
-  'レッドメサ':      { desert: true },                                                    // コロンビア：赤い岩山の乾いた土地
-  'ハーバーライン':  { sea: true, harbor: true, cranes: true },                           // ドイツ：港湾とクレーン
-  'ゼニス':          { lavender: true, vine: true },                                      // フランス：ラベンダーとブドウ畑
-  'アルトフェルト':  { forestPlus: true },                                                // ベルギー：森と畑
-  'コーラルコースト':{ sea: true, beach: true, palm: true, tropical: true },             // タイ：サンゴ礁の海とヤシ
-  'シルバーレイク':  { bigLake: true, forestPlus: true },                                 // フィンランド：大きな湖と森
-  'カナリア':        { sea: true, beach: true, palm: true, dry: true }                    // スペイン：乾いた海岸とヤシ
+  '日本':      { sea: true, harbor: true },                                        // 日本：湾と港
+  'ハンガリー':        { river: true },                                                     // ハンガリー：大きな川
+  'オランダ':    { tulip: true, windmill: true },                                     // オランダ：チューリップ畑と風車
+  'イタリア':    { vine: true, cypress: true },                                       // イタリア：ブドウ畑と糸杉
+  'オーストリア':      { river: true, forestPlus: true },                                   // オーストリア：森と渓流
+  'コロンビア':      { desert: true },                                                    // コロンビア：赤い岩山の乾いた土地
+  'ドイツ':  { sea: true, harbor: true, cranes: true },                           // ドイツ：港湾とクレーン
+  'フランス':          { lavender: true, vine: true },                                      // フランス：ラベンダーとブドウ畑
+  'ベルギー':  { forestPlus: true },                                                // ベルギー：森と畑
+  'タイ':{ sea: true, beach: true, palm: true, tropical: true },             // タイ：サンゴ礁の海とヤシ
+  'フィンランド':  { bigLake: true, forestPlus: true },                                 // フィンランド：大きな湖と森
+  'スペイン':        { sea: true, beach: true, palm: true, dry: true }                    // スペイン：乾いた海岸とヤシ
 };
-function gpTheme(name){ return GP_THEME[String(name || '').replace(/ GP$/, '')] || {}; }
+function gpTheme(name){ return GP_THEME[String(name || '').replace(/\s*GP$/, '')] || {}; }
 /* テーマの小物 */
 function drawWindmill(g, x, y, s, a){
   g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.arc(x + 3, y + 4, 7*s, 0, 7); g.fill();
@@ -11749,7 +12489,7 @@ function drawBoards(T){
         ctx.save(); ctx.translate(x, y); ctx.rotate(Math.cos(q.a) < 0 ? q.a + Math.PI : q.a);   // 文字が逆さにならない向き
         ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillRect(-17 + 1, -2.2 + 1.5, 34, 4.4);
         ctx.fillStyle = bg; ctx.fillRect(-17, -2.2, 34, 4.4);
-        ctx.fillStyle = fg; ctx.font = '700 3.4px "Zen Kaku Gothic New",sans-serif';
+        ctx.fillStyle = fg; ctx.font = '700 3.4px "M PLUS 1p",sans-serif';
         if(im && im.complete && im.naturalWidth){ ctx.drawImage(im, -17, -2.2, 4.4, 4.4); ctx.fillText(name, 2.4, 0.2, 27.6); }   // 左端にスポンサーのマーク
         else ctx.fillText(name, 0, 0.2, 32);
         ctx.restore();
@@ -12029,8 +12769,43 @@ function mmGeom(T, wMax, hMax){
   const w = Math.round((x1 - x0)*k + pad*2), h = Math.round((y1 - y0)*k + pad*2);
   return (T.mm = { wMax, hMax, k, x0, y0, pad, w, h });
 }
+/* スマホのミニマップの下の順位表（POS・チームの色・略号・前の車との差・タイヤ）。0.3秒ごとに書き換える */
+let mtAt = 0;
+const MT_FOLD_KEY = 'circuitMaker.towerFold.v1';
+{
+  const el = $('#miniTower'), hd = $('#mtHead');
+  const setFold = f => { el.classList.toggle('fold', f); hd.setAttribute('aria-expanded', f ? 'false' : 'true'); hd.title = f ? '順位表を開く' : '順位表を畳む'; lsSet(MT_FOLD_KEY, f); $('#stage').style.setProperty('--mtW', el.hidden ? '0px' : el.offsetWidth + 'px'); };
+  setFold(lsGet(MT_FOLD_KEY, false) === true);
+  hd.addEventListener('click', e => { e.stopPropagation(); setFold(!el.classList.contains('fold')); mtAt = 0; });
+  ['pointerdown','pointerup'].forEach(ev => hd.addEventListener(ev, e => e.stopPropagation()));   // コースのタップ（車の選択）にしない
+}
+function drawMiniTower(show){
+  const el = $('#miniTower'); if(!el) return;
+  show = show && document.body.classList.contains('phoneRace');
+  if(el.hidden === show){ el.hidden = !show; $('#stage').style.setProperty('--mtW', show ? el.offsetWidth + 'px' : '0px'); }
+  if(!show) return;
+  const now = performance.now(); if(now - mtAt < 300) return; mtAt = now;
+  $('#stage').style.setProperty('--mtW', el.offsetWidth + 'px');   // チームラジオの吹き出しを、順位表の右側に出すため
+  const order = ranking(), n = order.length;
+  // 使える高さ：順位表の上端から、自チームのカード（なければ下の操作パネル）の上端まで
+  const st = $('#stage').getBoundingClientRect(), top = $('#mtRows').getBoundingClientRect().top || el.getBoundingClientRect().top;
+  const lim = [$('#teamTel'), $('#dock')].filter(x => x && !x.hidden && x.offsetParent).map(x => x.getBoundingClientRect().top);
+  const bottom = Math.min(st.bottom - 8, ...lim) - 6;
+  const MT_K = 0.85;                                         // 順位表の大きさ（空いている高さいっぱいの85%）
+  const rowH = Math.round(clamp(Math.floor((bottom - top - 6)/Math.max(1, n)), 8, 15)*MT_K*10)/10;
+  el.style.setProperty('--mtH', rowH + 'px'); el.style.setProperty('--mtF', Math.max(6, Math.round(rowH*0.74*10)/10) + 'px');
+  const me = myCar();
+  if(el.classList.contains('fold')) return;                    // 畳んでいるときは書き換えない
+  $('#mtRows').innerHTML = order.map((c, i) => {
+    const gap = c.out ? 'OUT' : c.finish !== null && i === 0 ? 'FIN' : c.inPit ? 'PIT' : i === 0 ? 'INT' : String(intCache.get(c) ?? '—').replace('LEADER', '—');
+    const mine = me && (c === me || c.pitTeam === me.pitTeam);
+    return `<div class="mtR${i === 0 ? ' mtP1' : ''}${mine ? ' mine' : ''}${c.out ? ' out' : ''}${c.inPit && !c.out ? ' pit' : ''}"><span class="mtP">${c.out ? '—' : i + 1}</span><span class="mtC" style="background:${c.m.color}"></span><span>${esc(c.m.name)}</span><span class="mtG">${gap}</span><span class="mtT" style="color:${c.out ? '#7d838b' : TYRES[c.comp].color}">${c.out ? '' : c.comp}</span></div>`;
+  }).join('');
+}
 function drawMiniMap(){
   const cvm = $('#miniMap'); if(!cvm) return;
+  if(document.body.classList.contains('watch') && !(careerRace && mode === 'race' && document.body.classList.contains('phoneRace'))) document.body.classList.remove('watch');
+  drawMiniTower(!!(careerRace && track && mode === 'race' && race.cars.length && !document.querySelector('main').hidden));
   const show = !!(careerRace && track && mode === 'race' && race.cars.length && !document.querySelector('main').hidden);
   if(cvm.hidden === show) cvm.hidden = !show;
   if(!show) return;
@@ -12272,6 +13047,7 @@ function makeRealPoints(type){
     return makeRealPoints(type) || _oldMake(type);
   };
 }
+{ const _renderHQ = renderHQ; renderHQ = function(msg){ _renderHQ(msg); addLeftToArmed($('#hq')); }; }   // 確定待ちのボタンに残りの資金を書き足す
 /* ---------- レース後のニュース ----------
    結果が決まったあとに、そのレースの出来事（優勝・事故・旗・自チーム・選手権など）から見出しを作る。
    career.last.news に保存して、結果画面とチーム本部の「前戦の結果」に出す。
@@ -12366,6 +13142,13 @@ function makeNews(){
   }
   (L.awk || []).forEach(x => { const t = teamOf(x.team), mineA = x.team === me;
     add('覚醒', 'awk', mineA ? 96 : 70, `${cn(x.code)}が覚醒`, `${t ? t.name + 'の' : ''}${x.code}が${x.why ? x.why + 'をきっかけに' : 'レースの中で何かをつかみ、'}一皮むけた。全ての能力が上がり、別人のような走りを見せそうだ。`); });
+  if(regAnnounced()){
+    const th = REG_THEMES[career.reg.theme];
+    if(L.round === 1) add('規則', 'good', 85, `来季、${th.n}の大規則変更が決定`, `シーズン${career.reg.at}から${th.n}の規則が大きく変わる。各チームは今季の戦いと来季の先行研究の両立を迫られる。`);
+    if(L.round === 2 || L.round === 4){ const nx = Object.entries(career.reg.pol || {}).filter(([, v]) => v === 'next').map(([id]) => teamOf(id)).filter(Boolean); const t = nx[Math.floor(Math.random()*nx.length)];
+      if(t) add('噂', '', 58, `${t.name}、来季に照準か`, `${t.name}は今季の開発を抑え、来季の${th.n}規則に向けた研究に力を入れているとの噂がある。`); }
+  }
+  if(regFirstYear() && L.round === 1) add('規則', 'good', 85, `新規則の初戦、${career.reg.cur.theme ? REG_THEMES[career.reg.cur.theme].n : ''}の新時代が開幕`, `先行研究の差がどこまで出たのか。変わった部分の開発はまだ伸びしろが大きい。`);
   N.sort((a, b) => b.w - a.w);
   return N.slice(0, 9).map(({ tag, cls, h, b }) => ({ tag, cls, h, b }));
 }
