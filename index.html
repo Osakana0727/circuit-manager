@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<!-- サーキットマネージャー ver 1.2.1 -->
+<!-- サーキットマネージャー ver 1.3.0 -->
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="version" content="1.2.1">
+<meta name="version" content="1.3.0">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>サーキットマネージャー</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1676,6 +1676,50 @@ body.career.pcRace .tc.pre .tcStart{grid-column:1}
 .tcStart .tsShort{display:none}
 .tcStart .tsSeg.two{grid-template-columns:repeat(2,1fr)}
 .facCard.ren{box-shadow:inset 0 0 0 2px #e5323b}
+/* ===== ホームGP ===== */
+.facCard.homeCard{grid-column:1/-1}
+.facCard.homeCard.open{box-shadow:inset 0 0 0 2px var(--signal)}
+.homeTag{flex:none;margin-left:auto;font:700 10.5px "Chakra Petch",sans-serif;letter-spacing:.08em;padding:2px 7px;border-radius:5px;background:#1b1f25;color:var(--signal)}
+.homeRow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:12.5px}
+.homeRow .hLab{flex:none;width:6.5em;font-size:11.5px;font-weight:700;color:var(--muted)}
+.homeRow .seg2{flex-wrap:wrap}
+.homeRow .seg2 button small{display:block;font-size:10.5px;opacity:.75}
+.homeRow input{flex:1 1 160px;min-width:0;max-width:280px;min-height:32px;padding:3px 9px;border-radius:7px;border:1px solid var(--line);background:var(--btn);color:var(--text);font:inherit;font-size:14px}
+.homeJudge{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:color-mix(in srgb,var(--muted) 8%,transparent)}
+.homeJudge .hjT{display:flex;flex-direction:column;gap:2px;flex:1 1 180px;min-width:0}
+.homeJudge .hjT b{font-size:14.5px}
+.homeJudge .hjT small{font-size:11px;color:var(--muted)}
+.homeMap{flex:none;border-radius:8px;background:#5f9748;display:block}
+.homeStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.homeStats div{display:flex;flex-direction:column;padding:6px 8px;border-radius:8px;background:color-mix(in srgb,var(--muted) 10%,transparent)}
+.homeStats small{font-size:10.5px;color:var(--muted)}
+.homeStats b{font:700 17px "Chakra Petch",sans-serif}
+.homeBar{height:7px;border-radius:4px;background:color-mix(in srgb,var(--muted) 22%,transparent);overflow:hidden}
+.homeBar i{display:block;height:100%;background:var(--signal)}
+.homeTot{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:9px 12px;border-radius:10px;background:#1b1f25;color:#f1f3f5}
+.homeTot .hT{display:flex;flex-direction:column}
+.homeTot .hT small{font-size:10.5px;color:#a7adb4}
+.homeTot .hT b{font:700 22px "Chakra Petch",sans-serif;color:var(--signal)}
+.homeTot .hN{font-size:11.5px;color:#c9ced3;display:flex;flex-direction:column}
+.homeTot .facBtns{margin-left:auto}
+.ch.home{border-color:var(--signal)}
+.ch .chHome{position:absolute;top:3px;right:4px;font:700 9px "Chakra Petch",sans-serif;letter-spacing:.06em;padding:0 4px;border-radius:4px;background:var(--signal);color:#15171a}
+.homeEdBox{border:2px solid var(--signal)!important}
+.homeEdBox .hjRes{display:flex;flex-direction:column;gap:2px}
+.homeEdBox .hjRes b{font-size:15px}
+.homeEdBox .hjRes small{font-size:11.5px;color:var(--muted)}
+.homeEdBox .hjCost{margin-top:6px;font-size:12.5px}
+.homeEdBox .acts{margin-top:8px}
+body.homeEd #toRace{display:none!important}
+body.homeEd:not(.homeTrial) #dock{display:none!important}
+.homeTrialBar{position:absolute;left:50%;top:58px;transform:translateX(-50%);z-index:6;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;max-width:calc(100% - 20px);padding:7px 10px;border-radius:10px;background:rgba(20,22,26,.88);color:#f1f3f5;font-size:12px;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.homeTrialBar .htK{font:700 10.5px "Chakra Petch",sans-serif;letter-spacing:.08em;color:var(--signal)}
+.homeTrialBar .htC{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
+.homeTrialBar .htC b{font:700 13px "Chakra Petch",sans-serif}
+.homeTrialBar .htC .num{font-family:"Chakra Petch",sans-serif}
+.homeTrialBar small{color:#a7adb4;font-size:10.5px}
+.homeTrialBar .b{min-height:30px}
+@media (min-width:900px){ .homeTrialBar{left:10px;top:auto;bottom:10px;transform:none;flex-direction:column;align-items:flex-start;max-width:400px} }
 .facRen{display:flex;flex-direction:column;gap:6px;margin:4px 0 6px;padding:8px;border-radius:8px;background:rgba(229,50,59,.1);font-size:12px;line-height:1.5}
 .facRen b{color:#e5323b}
 .facRen .facBtns{display:flex;flex-wrap:wrap;gap:6px}
@@ -2368,7 +2412,7 @@ body.phoneRace .wxPg{grid-template-columns:repeat(8,1fr)}
 </head>
 <body>
 <header>
-  <h1 id="appTitle" style="user-select:none">サーキットマネージャー<small class="appVer">ver 1.2.1</small></h1>
+  <h1 id="appTitle" style="user-select:none">サーキットマネージャー<small class="appVer">ver 1.3.0</small></h1>
   <div class="hdrTools">
   <button class="b sm" id="soundBtn" hidden aria-pressed="true" title="効果音のオン・オフ"></button>
   <label class="volWrap" id="volWrap" hidden title="音量"><span class="volLab">音量</span><input type="range" id="volume" min="0" max="150" step="5" aria-label="音量"><span class="num volV" id="volV"></span></label>
@@ -2391,6 +2435,7 @@ body.phoneRace .wxPg{grid-template-columns:repeat(8,1fr)}
   <div class="stage" id="stage">
     <canvas id="cv"></canvas>
     <div class="hud"><div class="hint" id="hint"></div><div class="flagchip" id="flag"></div></div>
+    <div class="homeTrialBar" id="homeTrialBar" hidden></div>
     <div class="edtools" id="edtools" role="toolbar" aria-label="編集">
       <button id="undo" title="元に戻す（Ctrl+Z）" aria-label="元に戻す"><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
       <button id="redo" title="やり直す（Ctrl+Shift+Z）" aria-label="やり直す"><svg viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button>
@@ -2462,6 +2507,7 @@ body.phoneRace .wxPg{grid-template-columns:repeat(8,1fr)}
   <div class="panel" id="sidePanel">
     <!-- ===== コース作成パネル ===== -->
     <div id="editPanel" class="panel">
+      <div class="sec homeEdBox" id="homeEdBox" hidden></div>
       <div class="sec">
         <h2>描き方</h2>
         <div class="seg" role="radiogroup" aria-label="描き方">
@@ -4194,6 +4240,7 @@ function drawStatic(){
   ctx.fillStyle = '#5f9748'; ctx.fillRect(0,0,W,H);
   ctx.fillStyle = 'rgba(255,255,255,.035)';
   for(let x=0;x<W;x+=50) ctx.fillRect(x,0,25,H);
+  if(homeEd && !homeTrial){ drawEdSimple(); return; }       // ホームGPのコース作り：完成するまで景色・ピット・観客席などは描かない（軽くする）
   if(track && career) drawScenery(track);   // コースのタイプ別の景色（マネージャー）
 
   if(openPath){
@@ -4727,10 +4774,10 @@ function drawBanks(T){
           const [x0,y0] = at(i0, d), [x1,y1] = at(i1, d), x = x0 + (x1 - x0)*t, y = y0 + (y1 - y0)*t;
           if(rnd() < 0.03){                                   // パラソル
             ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.beginPath(); ctx.arc(x + 0.6, y + 0.8, 2.2, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = CROWD[Math.floor(rnd()*CROWD.length)]; ctx.beginPath(); ctx.arc(x, y, 2.2, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = crowdPick(rnd, CROWD); ctx.beginPath(); ctx.arc(x, y, 2.2, 0, Math.PI*2); ctx.fill();
             continue;
           }
-          ctx.fillStyle = CROWD[Math.floor(rnd()*CROWD.length)];
+          ctx.fillStyle = crowdPick(rnd, CROWD);
           ctx.beginPath(); ctx.arc(x, y, 0.95, 0, Math.PI*2); ctx.fill();
         }
       }
@@ -4901,7 +4948,7 @@ function drawGrandstand(T, over){
           const t = (n + 0.2 + rnd()*0.6)/2, i0 = run[k], i1 = run[k+1];
           const d = d0 + 2.6 + r*3.3;
           const [x0,y0] = at(i0,d), [x1,y1] = at(i1,d);
-          ctx.fillStyle = CROWD[Math.floor(rnd()*CROWD.length)];
+          ctx.fillStyle = crowdPick(rnd, CROWD);
           ctx.beginPath(); ctx.arc(x0 + (x1-x0)*t, y0 + (y1-y0)*t, 0.95, 0, Math.PI*2); ctx.fill();
         }
       }
@@ -5063,15 +5110,51 @@ function sgNeon(T, k, rnd, wet){
   }
   g.restore();
 }
+// ホームGPのコース作り用の簡単な描き方：芝生の上に道（白い縁と舗装）とスタートラインだけ
+function drawEdSimple(){
+  const P = track ? track.pts : openPath; if(!P || !P.length) return;
+  const w = track ? track.width : course.width;
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(P[0].x, P[0].y); for(const q of P) ctx.lineTo(q.x, q.y); if(track) ctx.closePath();
+  ctx.strokeStyle = '#f2f2f2'; ctx.lineWidth = w + 4; ctx.stroke();
+  ctx.strokeStyle = '#3a3e45'; ctx.lineWidth = w; ctx.stroke();
+  if(!track) return;
+  // スタートライン（市松模様）
+  const p = track.pts[track.startIdx], sq = 5, cnt = Math.ceil(w/sq);
+  ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a);
+  for(let r = 0; r < 2; r++) for(let c = 0; c < cnt; c++){ ctx.fillStyle = (r + c) % 2 ? '#161616' : '#ffffff'; const y = -w/2 + c*sq; ctx.fillRect(-sq + r*sq, y, sq, Math.min(sq, w/2 - y)); }
+  ctx.restore();
+  // スターティンググリッドの枠（レースと同じ台数ぶん）
+  ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 1.2; ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
+  for(const sl of gridSlots(track, Math.max(machines.length, career ? career.teams.length*2 : 0, 2))){
+    ctx.save(); ctx.translate(sl.x, sl.y); ctx.rotate(sl.a);
+    const f = 11.5, bk = 6, hw = 7; ctx.beginPath(); ctx.moveTo(f - bk, -hw); ctx.lineTo(f, -hw); ctx.lineTo(f, hw); ctx.lineTo(f - bk, hw); ctx.stroke();
+    ctx.restore();
+  }
+  ctx.restore();
+  // 走る向き
+  ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.fillStyle = '#ffc400';
+  ctx.beginPath(); ctx.moveTo(34, 0); ctx.lineTo(18, -9); ctx.lineTo(18, 9); ctx.closePath(); ctx.fill(); ctx.restore();
+}
+// いまのスタート位置に、グリッドがほぼ直線の上に並ぶか（gridStartPos と同じ基準）
+function homeStartOk(t){
+  const need = Math.ceil(175/t.sp), after = Math.ceil(40/t.sp);
+  for(let o = -need; o <= after; o++){
+    const q = t.pts[((t.startIdx + o) % t.N + t.N) % t.N];
+    if(q.r < 400 || t.crossings.some(cc => Math.hypot(cc.x - q.x, cc.y - q.y) < 110)) return false;
+  }
+  return true;
+}
 function ensureBg(){
   if(!bgDirty) return;
   // ズームしても背景がぼやけないよう、背景は画面より高い解像度で描いておく（大きくなりすぎない範囲で）
   // 背景はマップ全体ぶん。広いマップでは同じ上限（4096px）に収めるため、そのぶん倍率が下がる
   const bw = cv.width*W/VW, bh = cv.width*H/VW;
   bgK = clamp(Math.min(CAM_ZMAX, 4096/Math.max(1, bw), 4096/Math.max(1, bh)), worldFitZ(), CAM_ZMAX);
+  if(homeEd && !homeTrial) bgK = Math.min(bgK, Math.max(worldFitZ(), 1.5));   // コース作り中は背景の解像度も控えめに
   bg.width = Math.round(bw*bgK); bg.height = Math.round(bh*bgK);
   const m = ctx; ctx = bgCtx; drawStatic(); ctx = m;
-  if(track && isNightCourse()) applyNight();          // ナイトレース
+  if(track && !(homeEd && !homeTrial) && isNightCourse()) applyNight();          // ナイトレース
   bgDirty = false;
 }
 function draw(){
@@ -6766,6 +6849,7 @@ function updateEditUI(){
       + `<div class="st warnSt">${P < 3 ? '点を3つ以上置くとコースを閉じられます' : 'まだ閉じていません。最初の点（黄色の輪）をタップして1周にしてください'}</div>`;
   }
   $('#lenInfo').innerHTML = html;
+  if(homeEd){ $('#tabRace').classList.remove('ready'); if(dragIdx < 0 && !drawing) homeEdUI(); }
   updateHint();
 }
 // コース作成中は左上に説明文を出さない（操作の説明はパネル側に表示する）
@@ -7422,10 +7506,12 @@ function pwLap(c, lt, noTime){
       pos === 1 && [['eng', `最高のスタート！トップに立ったぞ`], ['drv', '蹴り出しが完璧だった！']],
       pos > 1 && pos <= 3 && [['eng', `${d}つ上げて表彰台圏内、P${pos}！`], ['drv', 'このまま行こう']],
       d >= 5 && [['eng', `1周で${d}台抜き！すごいスタートだ`], ['drv', '隙間が全部見えた']],
+      HOME_CROWD && [['drv', 'スタンドがチームカラー一色だ！最高の景色だよ'], ['eng', `ホームの声援だ。P${pos}、ここから見せよう`]],
       race.wet > 0.3 && [['eng', `雨のスタートでよく上げた、P${pos}`], ['drv', '水しぶきの中、勘で行ったよ']] ] });
     else if(d <= -2) pwEvt('start', [[['eng', `P${pos}。落ち着いて、レースは長い`], ['drv', '＊＊＊＊＊、囲まれて行き場がなかった']], [['eng', `${-d}つ落とした。まだ${remain}周ある、取り返そう`]]], { pri: true, cd: 999,
       per: { hot: [[['drv', '＊＊＊＊＊！誰だよ、当ててきたのは！'], ['eng', `P${pos}。怒りはペースにぶつけて`]]], calm: [[['eng', `P${pos}。${-d}つ落とした`], ['drv', '問題ない。ペースはある']]], young: [[['drv', 'ごめん、スタートで失敗した'], ['eng', `大丈夫、まだ${remain}周ある`]]] } });
     else pwEvt('start', [[['eng', `まずまずのスタート。P${pos}`], ['drv', '了解、ここから行く']]], { pri: true, cd: 999, ctx: [
+      HOME_CROWD && [['eng', `ホームGP、まずはP${pos}。地元のファンが見てるぞ`], ['drv', '聞こえてる。スタンドの声がすごい']],
       pos === 1 && c.grid === 1 && [['eng', 'ポールからトップをキープ。完璧だ'], ['drv', 'ここからは自分のペースで行く']],
       pos <= 3 && pos > 1 && [['eng', `表彰台圏をキープ、P${pos}`], ['drv', '前を追う']],
       race.wet > 0.3 && [['eng', `雨の1周目、無事に終えた。P${pos}`], ['drv', '前が全然見えなかった']] ] });
@@ -7597,6 +7683,8 @@ function pwFinish(c){
   else if(d >= 5) sets = [[['eng', `${c.grid}番手から${pos}位、見事なレースだった`], ['drv', '楽しかった！追い上げは最高だね']]];
   else if(pos <= Math.min(10, n - 1)) sets = [[['eng', `P${pos}、ポイント獲得だ。よくやった`], ['drv', '悪くない。次はもっと上を']], [['eng', `P${pos}でフィニッシュ。堅実なレースだった`]]];
   else sets = [[['eng', `P${pos}。今日は厳しかった`], ['drv', '……＊＊＊＊＊。ペースが全然足りなかった']], [['eng', `P${pos}でチェッカー。次に向けて見直そう`], ['drv', '＊＊＊＊＊……何もできなかった']]];
+  if(HOME_CROWD && pos === 1) sets = [[['eng', 'P1！ホームで優勝だ！スタンドが総立ちだぞ！'], ['drv', '地元のみんな、ありがとう！一生忘れない！']]];
+  else if(HOME_CROWD && pos <= 3) sets = [[['eng', `P${pos}、ホームで表彰台だ！`], ['drv', '地元のファンの前で表彰台。最高の気分だよ']]];
   if(c.penPost && !c.penTyre) sets = [[['eng', `チェッカー。ただ、ペナルティで${c.penPost.toFixed(1)}秒加算されてP${pos}だ`], ['drv', '……あの接触か。次は気をつける']]];
   if(c.penTyre) sets = [[['eng', `チェッカー……でもタイヤ規定で${c.penTyre}秒加算、P${pos}だ。すまない`], ['drv', '＊＊＊＊＊！なんでだよ！']], [['eng', `タイヤ規定違反で${c.penTyre}秒加算。結果はP${pos}`], ['drv', '……＊＊＊＊＊。規定のこと、もっと早く言ってよ']]];
   pwEvt('finish', sets, { pri: true, force: true, cd: 999, toast: true });
@@ -9781,6 +9869,7 @@ function noPassSpeed(k){
 let LOOK_A = 22, LOOK_B = 0.16;
 const CELEB_D = 420, CELEB_GAP = 1.0, CELEB_WAVE = 260;   // ウイニングウィーブ：チェッカーまでの距離／2位との差（秒）／蛇行1往復の長さ
 function stepCar(c, dt){
+  if(homeTrial){ c.wear = 0; c.pitReq = false; c.userBox = false; }   // ホームGPの試走：タイヤは減らさず、ピットにも入らない
   const T = track, N = T.N, half = T.width/2;
   if(c.out){                                  // リタイア車は路肩で停止
     if(c.wreck && !c.gone) stepWreck(c, dt, T);             // クラッシュした車：跳ね返ったり滑ったりして止まる
@@ -11889,7 +11978,7 @@ function updateRaceHint(){
   const lap = leader ? Math.min(leader.laps.length+1, race.laps) : 1;
   const me = pw.drive ? myCar() : null;
   const dv = !me || race.state !== 'racing' ? '' : (me.autoWhy ? ` · 自動走行（${me.autoWhy}）` : (me.wrongT > 1 ? ' · 逆走中！' : ''));
-  const ht = race.state === 'finished' ? 'レース終了' : `LAP ${lap}/${race.laps}` + (race.paused ? ' · 一時停止中' : '') + dv;
+  const ht = race.state === 'finished' ? 'レース終了' : homeTrial ? `試走 ${leader ? leader.laps.length + 1 : 1}周目` : `LAP ${lap}/${race.laps}` + (race.paused ? ' · 一時停止中' : '') + dv;
   if(h.textContent !== ht){ h.textContent = ht; fixOverlays(); }
 }
 function setSetupLocked(lock){
@@ -12153,6 +12242,7 @@ function loop(now){
   if(stepCam(realDt, DIR.cut)) dirty = true;
   DIR.cut = false;
   if(mode === 'race') updateCtl();                     // ボタンの表示（状態が変わったときだけ書き換える）
+  if(homeTrial) homeTrialTick();
   sndEngine(realDt);
   updateSpeedBox();
   updatePitWall();
@@ -12550,7 +12640,9 @@ function guideHtml(){
     <p><b>新規則1年目</b>：変わった部分の開発は、1回あたり ×${REG_BOOST} 伸びます。</p>
     ${sub('fac', '施設')}
     <p>強化するとすぐに効きます（工期なし）。強化の費用は ${M(facCost(1))}（Lv1）〜 ${M(facCost(FAC_MAX))}（Lv${FAC_MAX}）。レベルごとに毎戦の維持費がかかり、高いレベルほど急に高くなります（Lv1 ${M(facUpkeep(1))}〜Lv5 ${M(facUpkeep(5))}/戦）。Lv4以上の施設は、シーズンの切り替えで「来季、改修が必要」と予告されることがあり（Lv4 25%・Lv5 40%）、予告された施設は次のシーズンの初めに改修する（強化費の半分）か、改修せずに1レベル下げるかを選びます。チームによって最初のレベルが違い、ライバルもシーズンの終わりに強化します。</p>
-    ${tbl(['施設', 'Lv1', `Lv${FAC_MAX}`], FACS.map(f => [`<b>${f.n}</b><br><small>${esc(f.d)}</small>`, esc(f.eff(1)), esc(f.eff(FAC_MAX))]))}`)}
+    ${tbl(['施設', 'Lv1', `Lv${FAC_MAX}`], FACS.map(f => [`<b>${f.n}</b><br><small>${esc(f.d)}</small>`, esc(f.eff(1)), esc(f.eff(FAC_MAX))]))}
+    <p><b>ホームGP</b>：施設タブで自チームのサーキットを計画して建設費（$90M〜$180M。コースのタイプと観客席の規模で変わる）を払うと、今季の終わりに完成し、来季から毎シーズン、選んだラウンドがホームGPになります。コースは自動で作るか、コース作成の画面で自分で作れます（自分で作ったコースのタイプは、直線の割合とコーナーの形から自動で判定）。開催費は毎シーズン $5M。ホームGPでは観客席の多くがチームカラーになり、レース後に地元スポンサーのボーナス（$3〜5M）とドライバーのチーム愛 +3 が入ります。マシンの速さには影響しません。</p>
+  `)}
   ${sec('quali', '予選', `
     <p>Q1（全車）→ Q2 → Q3（上位10台）のノックアウト方式で、Q1とQ2ではそれぞれ下位${qCut(20)}台が脱落します。各車2回アタックし、良いほうのタイムが残ります。</p>
     <ul><li>タイヤは全車が、各セッションでいちばん速いもの（路面温度や雨も考えたもの）を自動で履きます。ドライではほぼソフトです（1周だけなので、路面が熱くてもソフトの速さが勝ちます）。雨のセッションでは雨用タイヤ（I・W）になります。</li>
@@ -13810,13 +13902,13 @@ if(career){ Object.values(career.drivers).forEach(d => { if(d.st && d.age == nul
 if(career){ Object.values(career.drivers).forEach(d => { if(d.st && !d.rabRolled) rollRab(d); }); lsSet(LS_CAREER, career); }
 // 保存済みのキャリア：今季の市街地が2戦以上あれば、2戦目以降のまだ走っていないラウンドを別のタイプに作り直す（市街地は1シーズンに1戦まで）
 if(career && career.calendar){ let seen = 0, ch = false;
-  career.calendar.forEach((rd, i) => { if(rd.type !== 'street') return; seen++;
+  career.calendar.forEach((rd, i) => { if(rd.type !== 'street' || rd.home) return; seen++;
     if(seen > 1 && !rd.res && i > career.round){ rd.type = ['power','flow','stopgo'][Math.floor(Math.random()*3)]; rd.points = null; ch = true; } });
   if(ch) lsSet(LS_CAREER, career); }
 // 保存済みのキャリア：まだ走っていないシンガポールGPは、市街地（海沿い）のコースにする
 if(career && career.calendar){ let ch = false;
-  career.calendar.forEach((rd, i) => { if(!/^シンガポール/.test(rd.name) || rd.res || i < career.round || (rd.type === 'street' && rd.bay)) return;
-    if(rd.type !== 'street'){ const o = career.calendar.find((x, j) => x.type === 'street' && !x.res && j >= career.round && x !== rd); if(o){ o.type = rd.type; o.points = null; } rd.type = 'street'; }
+  career.calendar.forEach((rd, i) => { if(rd.home || !/^シンガポール/.test(rd.name) || rd.res || i < career.round || (rd.type === 'street' && rd.bay)) return;
+    if(rd.type !== 'street'){ const o = career.calendar.find((x, j) => x.type === 'street' && !x.home && !x.res && j >= career.round && x !== rd); if(o){ o.type = rd.type; o.points = null; } rd.type = 'street'; }
     rd.points = null; ch = true; });
   if(ch) lsSet(LS_CAREER, career); }
 if(career){ const t = career.teams.find(x => x.id === 'for' && x.name === 'フォレスト・エンジニアリング'); if(t){ t.name = 'フォレスト eng.'; lsSet(LS_CAREER, career); } }   // 保存済みのキャリアのチーム名も新しい名前に   // 保存済みのキャリアにもリザーブ特殊能力を1回だけ抽選
@@ -13832,10 +13924,10 @@ function ensureOwnerSponsor(){
   lsSet(LS_CAREER, career);
 }
 /* コースを長くした版より前に作った、まだ走っていないラウンドのコースは作り直す（次に表示するときに新しい広さで生成） */
-if(career){ career.calendar.forEach((rd, i) => { if(/^日本/.test(rd.name || '') && !rd.jp && !rd.res && i >= career.round) rd.points = null; }); }
-if(career){ career.calendar.forEach((rd, i) => { if(/^アメリカ/.test(rd.name || '') && !rd.us && !rd.res && i >= career.round) rd.points = null; }); }   // アメリカGPはCOTA風のコースで作り直す（まだ走っていなければ）   // 日本GPは8の字のコースで作り直す（まだ走っていなければ）
-if(career){ career.calendar.forEach((rd, i) => { if(rd.cross){ if(i >= career.round && !rd.res) rd.points = null; delete rd.cross; } }); }   // 立体交差の日本GP（廃止）で作ったコースは、まだ走っていなければ通常の方法で作り直す
-if(career){ career.calendar.forEach((rd, i) => { if(i >= career.round && !rd.res && rd.points && (rd.size !== courseSizeFor(rd) || (rd.gen !== 2 && rd.type !== 'street') || (rd.type === 'street' && !rd.city))){ rd.points = null; } }); lsSet(LS_CAREER, career); }   // 新しい生成方式（gen 2）より前に作った、まだ走っていないコースも作り直す
+if(career){ career.calendar.forEach((rd, i) => { if(/^日本/.test(rd.name || '') && !rd.home && !rd.jp && !rd.res && i >= career.round) rd.points = null; }); }
+if(career){ career.calendar.forEach((rd, i) => { if(/^アメリカ/.test(rd.name || '') && !rd.home && !rd.us && !rd.res && i >= career.round) rd.points = null; }); }   // アメリカGPはCOTA風のコースで作り直す（まだ走っていなければ）   // 日本GPは8の字のコースで作り直す（まだ走っていなければ）
+if(career){ career.calendar.forEach((rd, i) => { if(rd.cross && !rd.home){ if(i >= career.round && !rd.res) rd.points = null; delete rd.cross; } }); }   // 立体交差の日本GP（廃止）で作ったコースは、まだ走っていなければ通常の方法で作り直す
+if(career){ career.calendar.forEach((rd, i) => { if(i >= career.round && !rd.res && !rd.home && rd.points && (rd.size !== courseSizeFor(rd) || (rd.gen !== 2 && rd.type !== 'street') || (rd.type === 'street' && !rd.city))){ rd.points = null; } }); lsSet(LS_CAREER, career); }   // 新しい生成方式（gen 2）より前に作った、まだ走っていないコースも作り直す
 /* 以前の形式（マシン5項目・ドライバーは腕前1つ）のキャリアを新しい形式に移す */
 if(career && career.v !== 2){
   career.teams.forEach(t => {
@@ -14079,6 +14171,7 @@ function flagSvg(code, h = 14, cls = 'flag'){
 }
 function gpFlag(name, h = 14){
   const key = String(name || '').replace(/\s*GP$/, '');
+  if(!GP_COUNTRY[key] && career && career.home && career.home.name === name) return teamLogo(myTeam(), h);   // ホームGP：国旗の代わりにチームのロゴ
   return flagSvg(GP_COUNTRY[key], h);
 }
 /* ---------- ドライバーの国籍 ---------- */
@@ -14180,6 +14273,7 @@ function devLeftAsk(){
   document.addEventListener('keydown', e => { if(e.key === 'Escape' && $('#devModal').classList.contains('show')) hide(); });
 }
 function goRace(force){
+  if(homeEd) homeEdLeave(false);
   if(!career || career.round >= career.calendar.length || career.fired) return;
   if(!career.sponsor && !(careerRace && careerRace.round === career.round && !careerRace.done)){ renderHQ('先にスポンサー契約を選んでください。'); return; }
   if(careerRace && careerRace.round === career.round && !careerRace.done){ showRaceView(); return; }   // 途中のレースに戻る
@@ -14189,6 +14283,7 @@ function goRace(force){
   const rd = career.calendar[career.round];
   if(!ensureCourse(rd)){ renderHQ('コースを作れませんでした。もう一度押してください'); return; }
   if(race.state !== 'idle'){ race.state = 'idle'; setLights(0); $('#cd').style.display = 'none'; }
+  HOME_CROWD = rd.home ? (p => [p[0], p[0], p[2] || p[0]])(palOf(myTeam())) : null;   // ホームGP：観客席の多くがチームカラー
   loadCourse({ name: rd.name, points: rd.points, startPos: rd.startPos, closed: true, size: rd.size || 'S', type: rd.type, city: rd.city });
   if(!track){ renderHQ('コースを作れませんでした。'); return; }
   evAuto();                                                 // 返事をしていない出来事は★の選択肢で処理
@@ -14219,6 +14314,7 @@ function showRaceView(){
   window.scrollTo({ top: 0 });
 }
 function showHQ(){
+  if(homeEd) homeEdLeave(false);
   if(race.state === 'racing' && !race.paused){ race.paused = true; ctlKey = ''; }   // 本部にいる間はレースを止めておく
   if(race.state === 'countdown'){ race.state = 'idle'; setLights(0); $('#cd').style.display = 'none'; setSetupLocked(false); }
   document.querySelector('main').hidden = true; $('#quali').hidden = true; $('#hq').hidden = false; document.body.classList.remove('phoneRace');
@@ -14253,11 +14349,15 @@ function recordRace(){
   led.goal = r1(goalRes.filter(g => g.ok).reduce((a, g) => a + g.pay, 0));
   const ln = career.loan; led.loan = ln && ln.bal > 0 ? -Math.min(ln.bal, LOAN.pay) : 0;   // 借入の返済
   if(ln && ln.bal > 0) ln.bal = r1(ln.bal + led.loan);
-  led.net = r1(led.spons + (led.sreq || 0) + (led.resApp || 0) + led.deal + led.prize + led.sal + led.ops + led.train + (led.fac || 0) + led.dist + led.goal + led.loan + (led.sub || 0) + (led.pu || 0));
+  led.home = rd.home && career.home ? HOME_BONUS[career.home.seat || 0] : 0;   // ホームGP：地元スポンサーのボーナス
+  led.net = r1(led.spons + (led.sreq || 0) + (led.resApp || 0) + led.deal + led.prize + led.sal + led.ops + led.train + (led.fac || 0) + led.dist + led.goal + led.loan + (led.sub || 0) + (led.pu || 0) + led.home);
   career.money = r1(career.money + led.net);
   ensureStats();
   const preSt = {}; order.forEach(c => { const s = statD(c.m.name); preSt[c.m.name] = { wins: s.wins, pod: s.podiums, best: s.bestPos, starts: s.starts }; });   // 覚醒の判定用（このレースより前の成績）
   recordStats(order, rows, rd);
+  if(rd.home && career.home){ const H = career.home, bp = Math.min(...mine.map(r => r.pos || 99));
+    H.races = (H.races || 0) + 1; if(bp < 99) H.best = Math.min(H.best || 99, bp); if(bp === 1) H.wins = (H.wins || 0) + 1;
+    me.drivers.forEach(c => loveAdd(career.drivers[c], HOME_LOVE)); }   // 地元の声援で、ドライバーのチーム愛が上がる
   rd.res = { winner: rows[0] && rows[0].pos ? rows[0].code : null, winTeam: rows[0] ? rows[0].team : null, my: mine.map(r => ({ code: r.code, pos: r.pos, pts: r.pts })) };
   // PU：このレースでワークスが使った仕様を、次戦からカスタマーにも届ける（1戦遅れ）
   puLagUpdate(); syncPU();
@@ -14902,7 +15002,7 @@ function openIncome(){
   const sg = v => (v >= 0 ? '+' : '') + money(r1(v));
   const row = (a, b, cls = '', note = '') => `<tr class="${cls}"><td>${a}${note ? `<small>${note}</small>` : ''}</td><td>${b}</td></tr>`;
   const sp = career.sponsor, L = career.last && career.last.led, pd = career.last && career.last.pop ? career.last.pop.d : 0;
-  const inc = L ? [['基本スポンサー収入', L.spons], ['スポンサーの依頼による上乗せ・減額', L.sreq], ['スポンサー契約', L.deal], ['スポンサー目標ボーナス', L.goal], ['賞金（ポイント・完走）', L.prize], ['参戦分配金', L.dist], ['PUの供給料（受け取り）', L.pu > 0 ? L.pu : 0]].filter(x => x[1]) : [];
+  const inc = L ? [['基本スポンサー収入', L.spons], ['スポンサーの依頼による上乗せ・減額', L.sreq], ['スポンサー契約', L.deal], ['スポンサー目標ボーナス', L.goal], ['賞金（ポイント・完走）', L.prize], ['参戦分配金', L.dist], ['ホームGP：地元スポンサーのボーナス', L.home], ['PUの供給料（受け取り）', L.pu > 0 ? L.pu : 0]].filter(x => x[1]) : [];
   $('#incBody').innerHTML = `
     <h4>基本スポンサー収入（毎戦）</h4>
     <table class="ledger">
@@ -15007,7 +15107,10 @@ function nextSeason(){
   career.offseason = rep;
   puOffseason();                                                    // PU：自社PUの開始・カスタマーの乗り換え・供給元の選び直し
   syncPU();                                                         // 規則変更などで変わったメーカーのPUを、カスタマーにも
+  const homeOpened = !!(career.home && career.home.stage === 'build');      // 建設中のホームサーキットは、シーズンの終わりに完成する
+  if(homeOpened) career.home.stage = 'open';
   career.season++; career.round = 0; career.calendar = makeCalendar(); career.dpts = {}; career.cpts = {}; career.last = null;
+  if(career.home && career.home.stage === 'open'){ const i = homeInsert(career.calendar); career.money = r1(career.money - HOME_FEE); rep.home = { opened: homeOpened, round: i + 1, fee: HOME_FEE }; }
   career.owner.target = ownerTarget(); career.sponsor = null; career.sponsorOffers = makeSponsorOffers();
   const shift = ownerPersShift(subRes.length > 0 && subRes.every(x => !x.ok));   // オーナーの方針転換（性格が変わることがある）
   if(shift) rep.owner.pers = shift;
@@ -15422,9 +15525,253 @@ function facHtml(){
         <div class="facEff"><span class="muted">今</span>${lv ? f.eff(lv) : '効果なし'}</div>
         ${max ? '' : `<div class="facEff nx"><span class="muted">Lv${lv + 1}</span>${f.eff(lv + 1)}</div>`}
         <div class="facFoot"><span class="muted">維持費 ${money(facUpkeep(lv))}/戦${max ? '' : ` → ${money(facUpkeep(lv + 1))}`}</span><span class="facBtns">${lv > 0 && !ren ? `<button class="b sm ghost" type="button" data-facsell="${f.k}" title="1段階下げて、建設費の半分を受け取る">${armed.key === 'facsell' + f.k ? 'もう一度押して売却' : `売却 +${money(r1(facCost(lv)*0.5))}`}</button>` : ''}<button class="b sm ${can ? 'go' : ''}" type="button" data-fac="${f.k}" ${can ? '' : 'disabled'}>${max ? '最大' : armed.key === 'fac' + f.k ? 'もう一度押して確定' : `強化 ${money(cost)}`}</button></span></div>
-      </div>`; }).join('')}${puFacCard(me)}</div>
+      </div>`; }).join('')}${puFacCard(me)}${homeCard(me)}</div>
     <div class="legend" style="margin-top:8px"><span><i style="background:var(--blue)"></i>自チームのレベル</span><span><em style="position:static;display:inline-block;width:10px;height:10px;border-radius:2px;box-shadow:inset 0 0 0 2px #e5323b;background:transparent"></em>ライバルの最高レベル</span></div>
   </div>`;
+}
+/* ---------- ホームGP（自チームのサーキット） ----------
+   ・施設タブで計画して建設費を払うと、今季の終わりに完成し、来季から毎シーズン1戦（選んだラウンド）がホームGPになる
+   ・コースは自動で作るか、コース作成の画面で自分で作る。自分で作ったコースのタイプは、直線の割合とコーナーの形から自動で判定する
+   ・建設費：タイプ（超高速$110M・テクニカル$100M・低速$90M・市街地$130M）＋観客席（標準+0・大型+20・巨大+50）
+   ・開催費：毎シーズンの開幕に$5M。ホームGPのレース後に地元スポンサーのボーナス（観客席で$3〜5M）と、ドライバーのチーム愛+3
+   ・マシンの速さには影響しない。観客席の多くがチームカラーになり、無線にホームの台詞が入る */
+var HOME_BASE = { power: 110, flow: 100, stopgo: 90, street: 130 }, HOME_SEAT = [0, 20, 50], HOME_BONUS = [3, 4, 5], HOME_FEE = 5, HOME_LOVE = 3;
+var HOME_SEAT_N = ['標準', '大型スタンド', '巨大スタジアム'], HOME_TYPES = ['power', 'flow', 'stopgo', 'street'];
+var HOME_CROWD = null;                                   // ホームGPのレース中だけ、観客の色（チームカラー）を入れる
+var homeEd = null;                                       // コース作成の画面でホームGPのコースを作っている間 { kind: 'plan' | 'build' }
+// 観客の色：ホームGPでは6割をチームカラーにする（乱数を引く回数は変えない）
+function crowdPick(rnd, A){
+  const v = rnd();
+  if(!HOME_CROWD) return A[Math.floor(v*A.length)];
+  return v < 0.6 ? HOME_CROWD[Math.min(HOME_CROWD.length - 1, Math.floor(v/0.6*HOME_CROWD.length))] : A[Math.min(A.length - 1, Math.floor((v - 0.6)/0.4*A.length))];
+}
+/* コースのタイプを判定する（ランダム生成の4タイプの特徴から）
+   市街地：直角に近い低速コーナーが多く（6か所以上・コーナーの45%以上）、直線も長い（40%以上）
+   超高速：直線が40%以上で、低速コーナーが多すぎない／低速：低速コーナーが5か所以上でコーナーの半分以上／それ以外はテクニカル */
+function judgeCourse(t){
+  const pf = cornerProfile(t), ap = cornerApexes(t), N = t.N, w = Math.ceil(30/t.sp);
+  let ra = 0;
+  for(const i of ap){ const a = Math.abs(wrapAng(t.pts[(i + w) % N].a - t.pts[(i - w + N) % N].a)); if(a > 1.2 && a < 1.95 && t.pts[i].r < 70) ra++; }
+  const n = Math.max(1, pf.n), sl = pf.slow/n;
+  const type = ra >= 6 && ra/n >= 0.45 && pf.straight >= 0.40 ? 'street' : pf.straight >= 0.40 && sl <= 0.65 && pf.slow <= 6 ? 'power' : pf.slow >= 5 && sl >= 0.5 ? 'stopgo' : 'flow';
+  return { type, st: Math.round(pf.straight*100), slow: pf.slow, ra, n: pf.n };
+}
+const homeJudgeTxt = j => `直線 ${j.st}% ・ 低速コーナー ${j.slow} ・ 直角のコーナー ${j.ra}（コーナー ${j.n}）`;
+// レースに使えるコースか（使えないときは理由）
+function homeCheck(t){
+  if(!t) return 'コースが1周につながっていません';
+  const need = Math.round(1400*MAP_SIZES[mapSize]);
+  if(t.len < need) return `コースが短すぎます（全長 ${Math.round(t.len)}。${need} 以上にしてください）`;
+  if(gridStartPos(t) === null) return 'スタートのグリッドを置ける長い直線が必要です';
+  if(!homeStartOk(t)) return 'スタート位置を長い直線の上にしてください（グリッドがコーナーにかかっています）';
+  if(trackSelfOverlap(t, judgeCourse(t).type === 'street' ? 1.6 : 1)) return 'コース同士が近すぎる所があります（立体交差のほかは離してください）';
+  return '';
+}
+const homeCostOf = (type, seat) => type ? HOME_BASE[type] + HOME_SEAT[seat || 0] : null;
+// 計画中の建設費（自分で作る場合は、コースを決めるまで分からない）
+function homePlanCost(P){ return homeCostOf(P.mode === 'self' ? (P.judge && P.course ? P.judge.type : null) : P.type, P.seat); }
+// カレンダーのラウンドをホームGPに入れ替える（戻り値：入れたラウンドの番号 0〜）
+function homeInsert(cal){
+  const H = career.home, i = clamp(H.round || 0, 0, cal.length - 1), r = Math.random();
+  const rd = { name: H.name, type: H.type, weather: r < 0.62 ? 'dry' : r < 0.85 ? 'mixed' : 'wet', points: H.course.points.map(p => ({ x: p.x, y: p.y })), startPos: H.course.startPos, size: H.course.size, city: H.course.city || null, gen: 2, home: 1, res: null };
+  ensureForecast(rd);
+  cal[i] = rd;
+  return i;
+}
+// 自動でコースを作る（ホームGPの名前では国別の特別なコースを作らない）
+function homeAutoCourse(type){
+  const prev = mapSize, sz = type === 'street' ? 'L' : 'M';
+  setMapSize(sz);
+  let r = null;
+  try{ for(let k = 0; k < 10 && !r; k++) r = makeRandomPoints(type); } finally { setMapSize(prev); }
+  if(!r) return null;
+  return { points: r.pts.map(p => ({ x: Math.round(p.x), y: Math.round(p.y) })), startPos: r.startPos, size: sz, city: r.city || null };
+}
+// 小さなコースの絵（施設タブ用）
+const homeSvgCache = new WeakMap();
+function homeSvg(c, w = 132, h = 78){
+  if(!c || !c.points || c.points.length < 3) return '';
+  let d = homeSvgCache.get(c.points);
+  if(!d){
+    const T = buildTrack({ points: c.points, width: 30, startPos: 0 }), pts = T ? T.pts.filter((_, i) => i % 3 === 0) : c.points;
+    const xs = pts.map(p => p.x), ys = pts.map(p => p.y), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const k = Math.min((w - 14)/(x1 - x0 || 1), (h - 14)/(y1 - y0 || 1)), ox = (w - (x1 - x0)*k)/2, oy = (h - (y1 - y0)*k)/2;
+    d = pts.map((p, i) => (i ? 'L' : 'M') + ((p.x - x0)*k + ox).toFixed(1) + ' ' + ((p.y - y0)*k + oy).toFixed(1)).join('') + 'Z';
+    homeSvgCache.set(c.points, d);
+  }
+  return `<svg class="homeMap" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><path d="${d}" fill="none" stroke="#2c3036" stroke-width="6" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="#f4f4f2" stroke-width="0.8" stroke-dasharray="3 4"/></svg>`;
+}
+const homeSeg = (data, items, cur) => `<div class="seg2" role="radiogroup">${items.map(([v, label, sub]) => `<button type="button" role="radio" data-${data}="${v}" class="${String(v) === String(cur) ? 'on' : ''}" aria-checked="${String(v) === String(cur)}">${label}${sub ? `<small>${sub}</small>` : ''}</button>`).join('')}</div>`;
+const homeRoundSeg = (data, cur) => homeSeg(data, Array.from({ length: ROUNDS }, (_, i) => [i, 'R' + (i + 1)]), cur);
+function homeCard(me){
+  const H = career.home, P = career.homePlan, ico = '<span class="facIco"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16c0-5 3-9 8-9h3c3 0 5 2 5 4s-2 4-5 4h-4c-2 0-3 1-3 2s1 2 3 2h7"/><path d="M4 16v4M4 4v4l3-1-3-1"/></svg></span>';
+  const effTxt = seat => `観客席の多くがチームカラーになり、地元スポンサーのボーナス <b>+${money(HOME_BONUS[seat || 0])}</b>・ドライバーのチーム愛 <b>+${HOME_LOVE}</b>（マシンの速さには影響しません）`;
+  const lo = Math.min(...Object.values(HOME_BASE)), hi = Math.max(...Object.values(HOME_BASE)) + HOME_SEAT[HOME_SEAT.length - 1];
+  if(H){
+    const open = H.stage === 'open', cal = career.calendar, ci = cal.findIndex(r => r.home), nextIn = ci >= career.round ? ci - career.round : -1;
+    const ty = COURSE_TYPES[H.type];
+    const prog = clamp(career.round/cal.length, 0, 1);
+    return `<div class="facCard homeCard${open ? ' open' : ''}">
+      <div class="facHead">${ico}<div style="min-width:0"><b>${esc(H.name)}</b><div class="muted" style="font-size:11.5px">ホームGP ・ ${ty.name} ・ 観客席：${HOME_SEAT_N[H.seat]}</div></div>${open ? '<span class="homeTag">HOME GP</span>' : '<span class="homeTag">建設中</span>'}</div>
+      <div class="homeJudge">${homeSvg(H.course)}<div class="hjT">${open
+        ? `<span>開催 <b class="num">${H.races || 0}</b> 回 ・ ホームでの最高位 <b class="num">${H.best && H.best < 99 ? 'P' + H.best : '—'}</b> ・ ホーム優勝 <b class="num">${H.wins || 0}</b> 回</span>
+           <small>${ci < 0 ? '今季のカレンダーにはありません（来季から開催）' : nextIn > 0 ? `今季は第${ci + 1}戦（あと${nextIn}戦）` : nextIn === 0 ? `次のレースがホームGPです（第${ci + 1}戦）` : `今季のホームGPは終わりました（第${ci + 1}戦）`}</small>`
+        : `<span>今季の終わりに完成し、来季の第${(H.round || 0) + 1}戦から開催します</span><div class="homeBar"><i style="width:${Math.round(prog*100)}%"></i></div><small>工事の進み：第${Math.min(career.round, cal.length)}戦 / 全${cal.length}戦</small>`}
+        ${H.mode === 'self' && H.judge ? `<small>判定：${homeJudgeTxt(H.judge)}</small>` : ''}</div></div>
+      <div class="facEff"><span class="muted">効果</span><span>${effTxt(H.seat)}</span></div>
+      <div class="homeRow"><span class="hLab">開催する時期</span>${homeRoundSeg('hround2', H.round || 0)}<span class="muted" style="font-size:11px">${open ? '変えると来季から' : ''}</span></div>
+      <div class="facFoot"><span class="muted">開催費 ${money(HOME_FEE)}/シーズン（開幕に支払い）</span><span class="facBtns">${open ? '' : `<button class="b sm" type="button" data-hedit="build">コースを作り直す</button>`}</span></div>
+    </div>`;
+  }
+  if(!P){
+    return `<div class="facCard homeCard">
+      <div class="facHead">${ico}<div style="min-width:0"><b>ホームGP</b><div class="muted" style="font-size:11.5px">自チームのサーキットを建てて、GPを開催する</div></div></div>
+      <p class="facD">地元にサーキットを建てると、来季から毎シーズン、カレンダーの1戦がホームGPになります。コースは自動で作るか、コース作成の画面で自分で作れます。</p>
+      <div class="facEff"><span class="muted">効果</span><span>${effTxt(0)}</span></div>
+      <div class="facFoot"><span class="muted">建設費 ${money(lo)}〜${money(hi)} ・ 開催費 ${money(HOME_FEE)}/シーズン</span><span class="facBtns"><button class="b sm go" type="button" data-hplan>建設を計画する</button></span></div>
+    </div>`;
+  }
+  const cost = homePlanCost(P), poor = cost != null && career.money < cost, on = armed.key === 'homebuild';
+  const can = cost != null && !poor && P.name.trim();
+  const typeRow = P.mode === 'auto'
+    ? `<div class="homeRow"><span class="hLab">コースのタイプ</span>${homeSeg('htype', HOME_TYPES.map(k => [k, COURSE_TYPES[k].short, money(HOME_BASE[k])]), P.type)}</div>`
+    : `<div class="homeRow"><span class="hLab">コース</span>${P.course && P.judge
+        ? `<div class="homeJudge" style="flex:1 1 260px">${homeSvg(P.course)}<div class="hjT"><span class="muted" style="font-size:11px">作ったコースから自動で判定</span><b>判定：${COURSE_TYPES[P.judge.type].name}（${money(HOME_BASE[P.judge.type])}）</b><small>${homeJudgeTxt(P.judge)}</small></div><button class="b sm" type="button" data-hedit="plan">コースを作り直す</button></div>`
+        : `<button class="b sm go" type="button" data-hedit="plan">コース作成の画面でコースを作る</button><span class="muted" style="font-size:11.5px">タイプは、作ったコースの直線の割合とコーナーの形で自動で決まります</span>`}</div>`;
+  return `<div class="facCard homeCard">
+    <div class="facHead">${ico}<div style="min-width:0"><b>ホームGPの建設を計画する</b><div class="muted" style="font-size:11.5px">選ぶ内容で建設費が変わります</div></div></div>
+    <div class="homeRow"><span class="hLab">サーキットの名前</span><input type="text" id="homeName" maxlength="16" value="${esc(P.name)}" aria-label="サーキットの名前"></div>
+    <div class="homeRow"><span class="hLab">コースの作り方</span>${homeSeg('hmode', [['self', '自分で作る'], ['auto', '自動で作る']], P.mode)}</div>
+    ${typeRow}
+    <div class="homeRow"><span class="hLab">観客席の規模</span>${homeSeg('hseat', HOME_SEAT.map((c, i) => [i, HOME_SEAT_N[i], `+${money(c)} ・ ボーナス ${money(HOME_BONUS[i])}`]), P.seat)}</div>
+    <div class="homeRow"><span class="hLab">開催する時期</span>${homeRoundSeg('hround', P.round)}<span class="muted" style="font-size:11px">カレンダーの1戦と入れ替わります</span></div>
+    <div class="homeTot"><div class="hT"><small>建設費の合計</small><b>${cost != null ? money(cost) : '—'}</b></div><div class="hN"><span>開催費 ${money(HOME_FEE)}/シーズン</span><span>今季の終わりに完成（来季から開催）</span></div>
+      <span class="facBtns"><button class="b sm" type="button" data-hcancel>やめる</button><button class="b sm ${can ? 'go' : ''}" type="button" data-hbuild ${can ? '' : 'disabled'}>${cost == null ? 'コースを作ってください' : poor ? '資金が足りません' : on ? 'もう一度押して確定' : '建設を始める'}</button></span></div>
+  </div>`;
+}
+function homeBind(el){
+  const P = career.homePlan, H = career.home;
+  el.querySelectorAll('[data-hplan]').forEach(b => b.onclick = () => { const me = myTeam(); career.homePlan = { name: `${me.name}サーキット`.slice(0, 16), mode: 'self', type: 'flow', seat: 0, round: Math.min(3, ROUNDS - 1), course: null, judge: null }; saveCareer(); renderHQ(); });
+  el.querySelectorAll('[data-hcancel]').forEach(b => b.onclick = () => { delete career.homePlan; saveCareer(); renderHQ(); });
+  const nm = el.querySelector('#homeName'); if(nm && P) nm.onchange = () => { P.name = nm.value.trim().slice(0, 16) || P.name; saveCareer(); renderHQ(); };
+  el.querySelectorAll('[data-hmode]').forEach(b => b.onclick = () => { P.mode = b.dataset.hmode; saveCareer(); renderHQ(); });
+  el.querySelectorAll('[data-htype]').forEach(b => b.onclick = () => { P.type = b.dataset.htype; saveCareer(); renderHQ(); });
+  el.querySelectorAll('[data-hseat]').forEach(b => b.onclick = () => { P.seat = +b.dataset.hseat; saveCareer(); renderHQ(); });
+  el.querySelectorAll('[data-hround]').forEach(b => b.onclick = () => { P.round = +b.dataset.hround; saveCareer(); renderHQ(); });
+  el.querySelectorAll('[data-hround2]').forEach(b => b.onclick = () => { H.round = +b.dataset.hround2; saveCareer(); renderHQ(H.stage === 'open' ? `ホームGPの開催を、来季から第${H.round + 1}戦にします。` : ''); });
+  el.querySelectorAll('[data-hedit]').forEach(b => b.onclick = () => homeEdOpen(b.dataset.hedit));
+  el.querySelectorAll('[data-hbuild]').forEach(b => b.onclick = homeBuild);
+}
+function homeBuild(){
+  const P = career.homePlan; if(!P || career.home) return;
+  const nmEl = document.getElementById('homeName'); if(nmEl && nmEl.value.trim()) P.name = nmEl.value.trim().slice(0, 16);
+  const cost = homePlanCost(P); if(cost == null || career.money < cost || !P.name.trim()) return;
+  if(!confirmTwice('homebuild', cost)) return;
+  let course = P.course, type = P.mode === 'self' ? P.judge.type : P.type;
+  if(P.mode === 'auto'){ course = homeAutoCourse(type); if(!course){ renderHQ('コースを作れませんでした。もう一度押してください'); return; } }
+  career.money = r1(career.money - cost);
+  career.home = { stage: 'build', name: P.name.trim(), mode: P.mode, type, seat: P.seat, round: P.round, course, judge: P.mode === 'self' ? P.judge : null, paid: cost, since: career.season, races: 0, best: 99, wins: 0 };
+  delete career.homePlan;
+  saveCareer(); renderHQ(`ホームサーキット「${career.home.name}」の建設を始めました（${money(cost)}）。今季の終わりに完成し、来季の第${P.round + 1}戦から開催します。`);
+}
+/* ---------- コース作成の画面でホームGPのコースを作る ---------- */
+function homeEdOpen(kind){
+  if(careerRace && !careerRace.done){ renderHQ('レース中はコースを作れません。レースが終わってから作ってください。'); return; }
+  if(Q){ renderHQ('予選中はコースを作れません。'); return; }
+  const src = kind === 'build' ? career.home.course : (career.homePlan.draft || career.homePlan.course);
+  homeEd = { kind };
+  $('#hq').hidden = true; $('#quali').hidden = true; document.querySelector('main').hidden = false; document.body.classList.add('homeEd');
+  setMode('edit');
+  if(src && src.points && src.points.length) loadCourse({ name: '', points: src.points, startPos: src.startPos || 0, closed: src.closed !== false, size: src.size || 'M', type: src.city ? 'street' : undefined, city: src.city || undefined });
+  else loadCourse({ name: '', points: [], startPos: 0, closed: false, size: 'M' });
+  $('#cname').value = kind === 'build' ? career.home.name : career.homePlan.name;
+  homeEdUI(); applyLayout(); phoneLayout(); dirty = true; bgDirty = true;
+  window.scrollTo({ top: 0 });
+}
+let homeEdHtml = '';
+function homeEdUI(){
+  const box = document.getElementById('homeEdBox'); if(!box) return;
+  box.hidden = !homeEd; if(!homeEd){ homeEdHtml = ''; return; }
+  const H = career.home, P = career.homePlan, seat = homeEd.kind === 'build' ? H.seat : P.seat;
+  let body, ok = false, j = null;
+  if(!track) body = '<p class="muted" style="margin:0">点を置くか手描きで、1周につながるコースを作ってください。つながると、タイプを判定します。</p>';
+  else {
+    j = judgeCourse(track); const why = homeCheck(track); ok = !why;
+    const fix = why && gridStartPos(track) !== null && !homeStartOk(track);
+    body = `<div class="hjRes"><span class="muted" style="font-size:11px">作ったコースから自動で判定</span><b>判定：${COURSE_TYPES[j.type].name}</b><small>${homeJudgeTxt(j)}</small></div>${why ? `<div class="warn" style="margin-top:6px">${why}</div>` : ''}${fix ? '<div class="acts" style="margin-top:6px"><button class="b sm" type="button" id="homeEdStart">スタート位置を直線に合わせる</button></div>' : ''}`;
+  }
+  const cost = j ? homeCostOf(j.type, seat) : null, diff = homeEd.kind === 'build' && cost != null ? r1(cost - H.paid) : 0, poor = diff > 0 && career.money < diff;
+  const costTxt = cost == null ? '' : homeEd.kind === 'build'
+    ? (diff > 0 ? `タイプが変わるので、差額 <b>${money(diff)}</b> がかかります` : '建設費は追加でかかりません（安くなっても返金はありません）')
+    : `建設費 <b>${money(cost)}</b>（観客席：${HOME_SEAT_N[seat]}）`;
+  const html = `<h2>ホームGPのコース</h2>${body}${costTxt ? `<div class="hjCost">${costTxt}</div>` : ''}
+    <div class="acts"><button class="b sm" type="button" id="homeEdTrial" ${ok ? '' : 'disabled'} title="自チームの2台がAIでこのコースを走ります">試走する</button></div>
+    <div class="acts"><button class="b sm go" type="button" id="homeEdOk" ${ok && !poor ? '' : 'disabled'}>${poor ? '資金が足りません' : diff > 0 ? `差額を払って決める` : 'このコースに決める'}</button><button class="b sm" type="button" id="homeEdBack">本部に戻る</button></div>
+    <p class="muted" style="margin:6px 0 0;font-size:11.5px">決めずに戻っても、描いたコースは残ります。保存したコースを読み込んで使うこともできます。</p>`;
+  if(html !== homeEdHtml){ box.innerHTML = html; homeEdHtml = html; }
+  $('#homeEdOk').onclick = homeEdDecide; $('#homeEdTrial').onclick = homeTrialStart;
+  { const fs = document.getElementById('homeEdStart'); if(fs) fs.onclick = () => { const sp = gridStartPos(track); if(sp === null) return; pushUndo(); course.startPos = sp; syncSliders(); rebuild(); }; } $('#homeEdBack').onclick = () => { homeEdLeave(false); hqTab = 'fac'; lsSet(HQ_TAB_KEY, hqTab); showHQ(); };
+}
+// 描きかけのコースを残して、コース作成の画面を抜ける
+function homeEdLeave(){
+  if(!homeEd) return;
+  if(homeTrial) homeTrialStop();
+  const kind = homeEd.kind; homeEd = null; homeEdHtml = ''; bgDirty = true; dirty = true;
+  document.body.classList.remove('homeEd'); const box = document.getElementById('homeEdBox'); if(box) box.hidden = true;
+  if(kind === 'plan' && career.homePlan && course.points.length) career.homePlan.draft = { points: course.points.map(p => ({ x: Math.round(p.x), y: Math.round(p.y) })), startPos: course.startPos, closed: course.closed, size: mapSize, city: course.type === 'street' ? course.city || null : null };
+  saveCareer();
+}
+/* ---------- 試走：自チームの2台がAIで、作りかけのコースを周回する（タイヤは減らない・接触でのクラッシュなし・止めるまで走る） ---------- */
+var homeTrial = null;
+function homeTrialStart(){
+  if(!homeEd || homeTrial || !track || homeCheck(track)) return;
+  const me = myTeam();
+  machines = me.drivers.map((code, slot) => { const m = machineFor(me, code); m.tcam = slot ? 'y' : 'k'; delete m.mine; return m; });
+  if(machines[0]) machines[0].mine = true;
+  homeTrial = { crash: $('#crashOn').checked, wx: $('#weatherMode').value, key: '', type: course.type, city: course.city };
+  { const j = judgeCourse(track); course.type = j.type; if(j.type !== 'street') course.city = undefined; rebuild(); }   // 判定したタイプで走らせる（本番と同じ道幅・景色）
+  HOME_CROWD = (p => [p[0], p[0], p[2] || p[0]])(palOf(me));                    // 観客席はホームGPと同じくチームカラー
+  $('#crashOn').checked = false; $('#weatherMode').value = 'dry';
+  document.body.classList.add('homeTrial');
+  setMode('race');
+  startRace(); race.laps = 999;
+  setLights(0); $('#cd').style.display = 'none';                      // 試走なのでスタートの合図は待たない
+  race.state = 'racing'; race.goAt = performance.now();
+  { const RLs = racingLine(track), hw = track.width/2; for(const c of race.cars){ const off = c.lat - RLs[c.idx]; c.dirtyGrid = false; c.pack = { b: clamp(off, -hw*0.6, hw*0.6)*0.8, p0: c.prog, len: track.N*0.35 }; } }
+  try{ setCam('all'); }catch(e){}
+  $('#homeTrialBar').hidden = false; homeTrialTick();
+  applyLayout(); phoneLayout(); dirty = true;
+  window.scrollTo({ top: 0 });
+}
+function homeTrialTick(){
+  const bar = document.getElementById('homeTrialBar'); if(!bar || !homeTrial || !race.cars) return;
+  const cs = race.cars.map(c => `<span class="htC"><b>${esc(c.m.name)}</b><small>${c.laps.length}周</small><small>前の周</small><span class="num">${c.laps.length ? fmt(c.laps[c.laps.length - 1]) : '—'}</span><small>ベスト</small><span class="num">${c.best != null ? fmt(c.best) : '—'}</span></span>`).join('');
+  const html = `<span class="htK">TEST RUN</span>${cs}<button class="b sm" type="button" id="homeTrialStop">試走をやめる</button>`;
+  if(html !== homeTrial.key){ bar.innerHTML = html; homeTrial.key = html; $('#homeTrialStop').onclick = homeTrialStop; }
+}
+function homeTrialStop(){
+  if(!homeTrial) return;
+  $('#crashOn').checked = homeTrial.crash; $('#weatherMode').value = homeTrial.wx;
+  const T0 = homeTrial; homeTrial = null; HOME_CROWD = null;
+  course.type = T0.type; course.city = T0.city; document.body.classList.remove('homeTrial'); $('#homeTrialBar').hidden = true; $('#homeTrialBar').innerHTML = '';
+  resetRace(); setMode('edit'); rebuild(); homeEdHtml = ''; homeEdUI(); bgDirty = true; dirty = true;
+}
+function homeEdDecide(){
+  if(!homeEd || !track || homeCheck(track)) return;
+  const j = judgeCourse(track), sp = course.startPos;   // スタート位置は、作った人が決めた位置のまま
+  const c = { points: course.points.map(p => ({ x: Math.round(p.x), y: Math.round(p.y) })), startPos: sp, size: mapSize, city: course.type === 'street' && j.type === 'street' && course.city ? course.city : null };
+  let msg;
+  if(homeEd.kind === 'build'){
+    const H = career.home, cost = homeCostOf(j.type, H.seat), diff = r1(cost - H.paid);
+    if(diff > 0){ if(career.money < diff) return; career.money = r1(career.money - diff); H.paid = cost; }
+    H.course = c; H.type = j.type; H.judge = j; H.mode = 'self';
+    msg = `ホームGPのコースを作り直しました（${COURSE_TYPES[j.type].name}${diff > 0 ? `・差額 ${money(diff)}` : ''}）。`;
+  } else {
+    const P = career.homePlan; P.course = c; P.judge = j; P.mode = 'self'; delete P.draft;
+    msg = `コースを決めました。判定は「${COURSE_TYPES[j.type].name}」です。`;
+  }
+  homeEd = null; homeEdHtml = ''; bgDirty = true; dirty = true; document.body.classList.remove('homeEd'); $('#homeEdBox').hidden = true;
+  saveCareer(); hqTab = 'fac'; lsSet(HQ_TAB_KEY, hqTab); showHQ(); renderHQ(msg);
 }
 /* 施設タブのPUワークスのカード（レベルは1だけ）。建てると来季からワークス（自社製PU）になる。中身はマシン開発タブの「自社PUを始める」と同じ */
 function puFacCard(me){
@@ -15551,6 +15898,7 @@ function renderHQ(msg){
         ${career.last.led.sub ? `<tr><td>代役ドライバーの契約料</td><td class="lossT">${money(career.last.led.sub)}</td></tr>` : ''}
         ${career.last.led.resApp ? `<tr><td>リザーブの出場給（市場価値との差額）</td><td class="lossT">${money(career.last.led.resApp)}</td></tr>` : ''}
         ${career.last.led.dist ? `<tr><td>参戦分配金</td><td class="gainT">+${money(career.last.led.dist)}</td></tr>` : ''}
+        ${career.last.led.home ? `<tr><td>ホームGP：地元スポンサーのボーナス</td><td class="gainT">+${money(career.last.led.home)}</td></tr>` : ''}
         ${career.last.led.goal ? `<tr><td>スポンサー目標ボーナス</td><td class="gainT">+${money(career.last.led.goal)}</td></tr>` : ''}
         ${career.last.led.loan ? `<tr><td>借入の返済</td><td class="lossT">${money(career.last.led.loan)}</td></tr>` : ''}
         ${career.last.led.fac ? `<tr><td>施設の維持費</td><td class="lossT">${money(career.last.led.fac)}</td></tr>` : ''}
@@ -15582,6 +15930,7 @@ function renderHQ(msg){
         ${(() => { const L = []; (off.signed || []).filter(s => s.team !== career.team).forEach(s => L.push(`<b>${esc((teamOf(s.team) || {}).name || '')}</b>：${s.out}が引退し、${s.in}が加入`));
           (off.con && off.con.ai || []).forEach(x => L.push(x.kind === 'move' ? `<b>${esc((teamOf(x.team) || {}).name || '')}</b>が${esc((teamOf(x.from) || {}).name || '')}の<b>${x.in}</b>を獲得（${x.out}は${esc((teamOf(x.from) || {}).name || '')}へ）` : `<b>${esc((teamOf(x.team) || {}).name || '')}</b>：${x.out}と更改せず、${x.in}が加入`));
           return L.length ? `<div style="margin-top:8px"><b>ライバルチームの移籍</b>${L.map(t => `<div class="muted" style="font-size:12.5px">・${t}</div>`).join('')}</div>` : ''; })()}
+        ${off.home ? `<div class="${off.home.opened ? 'warn' : 'muted'}" style="margin-top:6px">${off.home.opened ? `ホームサーキット「${esc(career.home.name)}」が完成しました。` : ''}今季はホームGPを第${off.home.round}戦に開催します（開催費 ${money(off.home.fee)}）。</div>` : ''}
         ${off.rookies.length ? `<div style="margin-top:6px">新人が移籍市場に入りました：${off.rookies.filter(c => career.fa.includes(c)).map(c => `<b>${c}</b>`).join('、') || 'すべて他チームに加入'}</div>` : ''}
       </div>
     </div>` : '';
@@ -15591,7 +15940,7 @@ function renderHQ(msg){
       <ol class="calH">${career.calendar.map((c, i) => {
         const now = i === career.round, my = c.res ? c.res.my.map(r => r.pos ? 'P' + r.pos : 'DNF') : [], best = c.res ? Math.min(...c.res.my.map(r => r.pos || 99)) : 99;
         const st = c.res ? `<span class="chRes${best <= 3 ? ' pod' : best <= 10 ? ' pts' : ''}">${my.join(' / ')}</span><small>優勝 ${c.res.winner || '—'}</small>` : now ? '<span class="chNext">次戦</span>' : `<small>${COURSE_TYPES[c.type].short}</small>`;
-        return `<li class="ch${now ? ' now' : ''}${c.res ? ' done' : ''}"><span class="chRd">R${i + 1}</span><span class="chFlag">${gpFlag(c.name, 22)}</span><span class="chNm">${esc(c.name.replace(/GP$/, ''))}</span>${st}</li>`;
+        return `<li class="ch${now ? ' now' : ''}${c.res ? ' done' : ''}${c.home ? ' home' : ''}">${c.home ? '<span class="chHome">HOME</span>' : ''}<span class="chRd">R${i + 1}</span><span class="chFlag">${gpFlag(c.name, 22)}</span><span class="chNm">${esc(c.name.replace(/GP$/, ''))}</span>${st}</li>`;
       }).join('')}</ol>
     </div>`;
   const drivers = (() => {
@@ -15899,6 +16248,7 @@ function renderHQ(msg){
   el.querySelectorAll('[data-fac]').forEach(b => b.onclick = () => upgradeFac(b.dataset.fac));
   el.querySelectorAll('[data-facsell]').forEach(b => b.onclick = () => sellFac(b.dataset.facsell));
   el.querySelectorAll('[data-puself]').forEach(b => b.onclick = puStartSelf);
+  homeBind(el);
   el.querySelectorAll('[data-facren]').forEach(b => b.onclick = () => renovateFac(b.dataset.facren));
   el.querySelectorAll('[data-facdown]').forEach(b => b.onclick = () => skipRenovateFac(b.dataset.facdown));
   const lb = $('#loanBtn'); if(lb) lb.onclick = borrow;
@@ -16159,7 +16509,7 @@ $('#lcBtn').onclick = () => toggleData('showLap');
 window.addEventListener('orientationchange', phoneLayout);
 function syncDock(){
   try{ syncTO(); }catch(e){}
-  const dk = $('#dock'); if(!dk || !careerRace || mode !== 'race' || document.querySelector('main').hidden) return;
+  const dk = $('#dock'); if(!dk || (!careerRace && !homeTrial) || mode !== 'race' || document.querySelector('main').hidden) return;
   const sb = $('#startBtn'), c = myCar();
   dk.classList.toggle('pre', race.state === 'idle' || race.state === 'countdown');   // スタート前（畳んだときはタイヤの代わりにスタートを出す）
   const key = [race.state, $('#startLbl').textContent, sb.disabled, sb.classList.contains('pause'), race.timeScale, pw.pace, pw.mode, pw.stay, pw.pick, pw.suggest, pw.drive, $('#pwBox').textContent, $('#pwBox').disabled, $('#pwBox').classList.contains('on'), !!MY, $('#resetBtn').disabled].join('|');
@@ -17404,7 +17754,7 @@ function cityBuilding(g, b, crowd){
   // 沿道のビルの屋上で観戦する人たち
   if(crowd && b.style !== 'gable' && b.style !== 'court' && w > 14 && h > 14 && rnd() < 0.3 && crowd((x0 + x1)/2, (y0 + y1)/2)){
     const pw = Math.min(w - 4, 8 + rnd()*14), ph = Math.min(h - 4, 6 + rnd()*8), px = x0 + 2 + rnd()*(w - 4 - pw), py = y0 + 2 + rnd()*(h - 4 - ph);
-    for(let y = py; y < py + ph; y += 1.9) for(let x = px; x < px + pw; x += 1.9){ if(rnd() < 0.25) continue; g.fillStyle = CROWD_COLS[Math.floor(rnd()*CROWD_COLS.length)]; g.fillRect(x, y, 1.3, 1.3); }
+    for(let y = py; y < py + ph; y += 1.9) for(let x = px; x < px + pw; x += 1.9){ if(rnd() < 0.25) continue; g.fillStyle = crowdPick(rnd, CROWD_COLS); g.fillRect(x, y, 1.3, 1.3); }
   }
 }
 /* 街を描く（範囲 x0..x1, y0..y1） */
@@ -17593,7 +17943,7 @@ function drawTempStand(g, s){
   for(let r = 0; r < rows; r++){
     const y = -dep/2 + 1.5 + r*(dep - 5)/rows;
     g.fillStyle = r % 2 ? '#2f6db5' : '#3b7cc4'; g.fillRect(-L/2 + 1.5, y, L - 3, (dep - 5)/rows - 0.6);   // 座席
-    for(let x = -L/2 + 2.5; x < L/2 - 2; x += 2.1){ if(rnd() < 0.18) continue; g.fillStyle = CROWD_COLS[Math.floor(rnd()*CROWD_COLS.length)]; g.fillRect(x, y + 0.5, 1.4, 1.4); }
+    for(let x = -L/2 + 2.5; x < L/2 - 2; x += 2.1){ if(rnd() < 0.18) continue; g.fillStyle = crowdPick(rnd, CROWD_COLS); g.fillRect(x, y + 0.5, 1.4, 1.4); }
   }
   g.fillStyle = '#eef0f2'; g.fillRect(-L/2, dep/2 - 3, L, 3);                    // 後ろの屋根
   g.fillStyle = '#f2f2f2'; g.fillRect(-L/2, -dep/2, L, 0.8);                     // 手すり
@@ -19338,7 +19688,7 @@ function newsHtml(list){
   $('#resetBtn').onclick = () => { if(careerRace && careerRace.done) showHQ(); else resetRace(); };
   $('#hqBtn').onclick = showHQ;
   $('#tabHQ').onclick = showHQ;
-  $('#tabRace').onclick = () => { if(!career) return; if(Q){ $('#hq').hidden = true; $('#quali').hidden = false; syncTabs('race'); return; } if(careerRace && !careerRace.done) showRaceView(); else goRace(); };
+  $('#tabRace').onclick = () => { if(!career) return; if(homeEd) homeEdLeave(false); if(Q){ $('#hq').hidden = true; $('#quali').hidden = false; syncTabs('race'); return; } if(careerRace && !careerRace.done) showRaceView(); else goRace(); };
 }
 
 /* 既存のキャリアにオーナー目標とスポンサー契約の提案を用意する */
