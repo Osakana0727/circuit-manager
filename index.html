@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<!-- サーキットマネージャー ver 1.2.0 -->
+<!-- サーキットマネージャー ver 1.2.1 -->
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="version" content="1.2.0">
+<meta name="version" content="1.2.1">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>サーキットマネージャー</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1675,6 +1675,11 @@ body.career.pcRace .tc.pre .tcStart{grid-column:1}
 .tcStart em{font-style:normal;color:#5fd98a}.tcStart em.hot{color:#ff9f6b}.tcStart em.cold{color:#5fd6ff}
 .tcStart .tsShort{display:none}
 .tcStart .tsSeg.two{grid-template-columns:repeat(2,1fr)}
+.facCard.ren{box-shadow:inset 0 0 0 2px #e5323b}
+.facRen{display:flex;flex-direction:column;gap:6px;margin:4px 0 6px;padding:8px;border-radius:8px;background:rgba(229,50,59,.1);font-size:12px;line-height:1.5}
+.facRen b{color:#e5323b}
+.facRen .facBtns{display:flex;flex-wrap:wrap;gap:6px}
+.facWarn{margin:4px 0 6px;padding:6px 8px;border-radius:8px;background:rgba(255,196,0,.16);font-size:12px;line-height:1.5}
 .tsPlan{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;margin-top:6px;padding:6px 8px;border-radius:7px;background:rgba(255,255,255,.06);font-size:12px;min-width:0}
 .tsPlan .tsPL,.tsPlan .tsPS{color:#aab0b8;white-space:nowrap}
 .tsPlan .tsPS{margin-left:auto}
@@ -2363,7 +2368,7 @@ body.phoneRace .wxPg{grid-template-columns:repeat(8,1fr)}
 </head>
 <body>
 <header>
-  <h1 id="appTitle" style="user-select:none">サーキットマネージャー<small class="appVer">ver 1.2.0</small></h1>
+  <h1 id="appTitle" style="user-select:none">サーキットマネージャー<small class="appVer">ver 1.2.1</small></h1>
   <div class="hdrTools">
   <button class="b sm" id="soundBtn" hidden aria-pressed="true" title="効果音のオン・オフ"></button>
   <label class="volWrap" id="volWrap" hidden title="音量"><span class="volLab">音量</span><input type="range" id="volume" min="0" max="150" step="5" aria-label="音量"><span class="num volV" id="volV"></span></label>
@@ -7289,7 +7294,9 @@ let lastOutRadio = '';
 function pwOut(c, kind){
   const list = OUT_RADIO[kind]; if(!list) return;
   const pool = list.filter(l => l[0] !== lastOutRadio);
-  const [drv, eng] = pool[Math.floor(Math.random()*pool.length)];
+  let [drv, eng] = pool[Math.floor(Math.random()*pool.length)];
+  // 小ネタ：市街地コースで1台だけで壁に突っ込んだときは、ときどき名場面風の一言（2019年アゼルバイジャンGP予選のルクレール）
+  if(kind === 'crash' && track && track.type === 'street' && Math.random() < 0.4) [drv, eng] = ["I'm stupid. I'm stupid.", '……ケガがなければ、それでいい。ゆっくり戻ってきて'];
   lastOutRadio = drv;
   if(kind !== 'trouble' && kind !== 'garage'){ c.userBox = false; }
   const cv = pwConv();
@@ -9820,6 +9827,16 @@ function stepCar(c, dt){
       c.x = P[0]; c.y = P[1]; c.h = Math.atan2(P2[1] - P[1], P2[0] - P[0]); c.v = Math.max(c.v, PIT_LIM*0.7);
       c.lane = pitOff(T, j)*pitSide(T); c.pitStuck = 0; c.pitUnstuck = (c.pitUnstuck || 0) + 1;
     }
+  } else if(c.inPit && !c.served && !race.red && !c.redSpot && !c.postIn && c.v < 2 && race.t > (c.stopUntil || 0) + 0.5 && c.boxIdx != null){
+    // 安全策：作業の前に、ピットレーンの途中（自分の停止位置の手前）で止まったまま動けなくなったとき（ダブルスタックの待ちなど）
+    c.pitStuck = (c.pitStuck || 0) + dt;
+    if(c.pitStuck > 1.2){
+      const d = laneDist(T, best, c.boxIdx);
+      if(d <= 14) c.forceServe = true;                                   // 停止位置のすぐ手前：着いたことにして作業を始める
+      else { const j = (best + Math.max(1, Math.round(Math.min(25, d - 8)/T.sp))) % N, j2 = (j + 1) % N, P = pitPos(T, j), P2 = pitPos(T, j2);
+        c.x = P[0]; c.y = P[1]; c.h = Math.atan2(P2[1] - P[1], P2[0] - P[0]); c.v = Math.max(c.v, 40); c.lane = pitOff(T, j)*pitSide(T); }
+      c.pitStuck = 0; c.pitUnstuck = (c.pitUnstuck || 0) + 1;
+    }
   } else c.pitStuck = 0;
   // 周回判定
   const r = (best - T.startIdx + N) % N;
@@ -9937,9 +9954,11 @@ function stepCar(c, dt){
       c.redParked = true; c.v = 0; c.stopUntil = Infinity; c.drs = false; c.userBox = false;
       c.comp = c.nextComp; c.wear = 0; c.wearLapStart = 0; noteTyre(c, c.comp); c.boxComp = null; c.redStop = true; c.tt = TT_BLANKET[c.comp] ?? 80; c.ttSave = false;
       if(c.m === MY){ pw.pick = null; pw.suggest = null; syncPwButtons(); }   // 赤旗中の交換でも、指示したタイヤの選択を戻す
-    } else if(c.inPit && !c.served && c.trouble && passedIdx(c.lastIdx, best, c.boxIdx, N)){
+    } else if(c.inPit && !c.served && c.trouble && (c.forceServe || passedIdx(c.lastIdx, best, c.boxIdx, N))){
+      c.forceServe = false;
       retireInGarage(c); return;                            // トラブルでピットに戻った車はガレージに入ってリタイア
-    } else if(c.inPit && !c.served && passedIdx(c.lastIdx, best, c.boxIdx, N)){
+    } else if(c.inPit && !c.served && (c.forceServe || passedIdx(c.lastIdx, best, c.boxIdx, N))){
+      c.forceServe = false;
       c.served = true; c.pits++; SFX.pit(c);
       c.comp = c.nextComp; c.wear = 0; c.wearLapStart = 0; noteTyre(c, c.comp); c.tt = TT_BLANKET[c.comp] ?? 80; c.ttSave = false; c.ttOut = race.t;   // タイヤウォーマーから出した温度
       // ダブルスタック：チームメイトの作業中なら、それが終わって少し間を置くまで待つ
@@ -10980,7 +10999,7 @@ function startSpin(c, dir){
    ② 止まる：後ろから来る車が通り過ぎるのを待ってから動き出す（走ってくる車の前には出ない）
    ③ 向き直る：止まった向きで変える。ほぼ前向きならそのまま、横向きで内側を向いていれば少し前に進みながらハンドルを切って、
       逆向き・外を向いているならアクセルを踏んでその場でくるっと回る（スピンターン。白煙が出る） */
-const SPIN_FR = 140, SPIN_FR_OFF = 300;
+const SPIN_FR = 260, SPIN_FR_OFF = 460;   // （2026-10：復帰を早めるため 140/300 から強めた）
 const SOLO_SPIN = 0.035;                   // オーバーステアのうち、立て直せずに単独でスピンする割合（晴れ・普通のペース・新しいタイヤのとき）   // 滑っているときの減速（舗装／芝・グラベル）
 function spinSlideSet(c){                   // 滑り始め（接触で押されて、もう一度滑り出したときも）
   const s = c.spin, u = Math.random();
@@ -10992,7 +11011,7 @@ function spinTraffic(c, T){                 // 後ろから近づいてくる車
   return race.cars.some(o => {
     if(o === c || o.out || o.inPit || o.spin || o.finish !== null || o.v < 40) return false;
     const d = ((c.idx - o.idx + N) % N) * T.sp;
-    return d > 0 && d < Math.max(70, o.v*1.8);
+    return d > 0 && d < Math.max(35, o.v*0.5);                         // すぐ後ろ（約0.5秒以内）に迫っている車だけを待つ
   });
 }
 function stepSpin(c, dt, T, best){
@@ -11012,10 +11031,10 @@ function stepSpin(c, dt, T, best){
     c.x += Math.cos(c.h)*c.v*dt; c.y += Math.sin(c.h)*c.v*dt;
     const yaw = Math.abs(c.bodyOff - prev)/Math.max(dt, 1e-4);
     if(c.v > 10){ scrubSmoke(c, -1, dt, 0.6 + Math.min(1.4, yaw*0.35)); scrubSmoke(c, 1, dt, 0.3 + Math.min(0.8, yaw*0.15)); if(c.off) emitDust(c, Math.random() < 0.7 ? 1 : 0); }
-    if(c.v < 4){ c.v = 0; s.phase = 'stopped'; s.until = race.t + 0.8 + Math.random()*0.7; }
+    if(c.v < 4){ c.v = 0; s.phase = 'stopped'; s.until = race.t + 0.2 + Math.random()*0.3; }
   } else if(s.phase === 'stopped'){
     c.v = 0;
-    if(race.t >= s.until && (!spinTraffic(c, T) || race.t - s.until > 8)){   // 後ろの車が来なくなったら（長く待ちすぎたら、それでも動く）
+    if(race.t >= s.until && (!spinTraffic(c, T) || race.t - s.until > 1.5)){   // 後ろの車が来なくなったら（1.5秒待っても来続けるなら、それでも動く）
       const body = c.h + c.bodyOff; c.h = body; c.bodyOff = 0;
       const rel = wrapAng(body - p.a), hn = Math.cos(body)*p.nx + Math.sin(body)*p.ny;
       const outward = hn*Math.sign(c.lat || 1) > 0.35 && Math.abs(c.lat) > half*0.4;   // コースの外側を向いている
@@ -11024,20 +11043,20 @@ function stepSpin(c, dt, T, best){
     }
   } else if(s.phase === 'pivot'){                                         // スピンターン：その場でくるっと向きを変える
     c.v = 4;
-    c.h += s.turnDir * 2.8 * dt;
+    c.h += s.turnDir * 5.5 * dt;
     c.x += Math.cos(c.h)*c.v*dt; c.y += Math.sin(c.h)*c.v*dt;
     scrubSmoke(c, -1, dt, 1.8);
     if(sndCan('spinturn', 600)) noise(0.5, { filter: 'bandpass', freq: 1800, q: 1.2, vol: 0.05 });
     if(Math.abs(wrapAng(c.h - p.a)) < 0.25) s.phase = 'go';
   } else if(s.phase === 'roll'){                                          // 少し前に進みながらハンドルを切って向き直る
-    c.v = Math.min(20, c.v + 25*dt);
+    c.v = Math.min(45, c.v + 70*dt);
     const rel = wrapAng(c.h - p.a);
-    c.h -= Math.sign(rel) * Math.min(Math.abs(rel), 1.4*dt);
+    c.h -= Math.sign(rel) * Math.min(Math.abs(rel), 2.4*dt);
     c.x += Math.cos(c.h)*c.v*dt; c.y += Math.sin(c.h)*c.v*dt;
     if(Math.abs(rel) < 0.25) s.phase = 'go';
   }
   if(s.phase === 'go'){                                                   // 復帰：ここから普通に走ってラインへ戻る
-    c.bodyOff = 0; c.spin = null; c.v = Math.max(c.v, 12);
+    c.bodyOff = 0; c.spin = null; c.v = Math.max(c.v, 45);
     c.lane = clamp(c.lat, -(half - 5), half - 5); c.laneT = 0;
     return;
   }
@@ -12502,7 +12521,7 @@ function guideHtml(){
     <p><b>ADUO</b>：シーズンの1/3と2/3が終わった時点で、PUメーカーの性能指数（出力50%・ドライバビリティ30%・信頼性20%）を比べます。トップから${ADUO_LV[1].min}%以上遅れたメーカーは、今季の残りでPU開発枠+1・PUの開発費−15%、${ADUO_LV[2].min}%以上なら+2・−30%になります（ライバルのメーカーにも効き、カスタマーのPUにも届きます）。</p>
     <p>PUを自分で作る「ワークス」は4チームだけです。ほかのチームはワークスからPUを買う「カスタマー」で、PUの性能はメーカーと同じになります。カスタマーはPUを開発できず、毎戦 ${money(PU_FEE)} の供給料を払います。ワークスはPU専用の開発枠でPUを開発でき、カスタマーの数だけ供給料を受け取ります。新しい仕様はワークスが先に使い、カスタマーには1戦遅れで届きます。シーズンの終わりに、カスタマーは来季の供給元を選び直します（強いメーカーは前年の順位が良くないと供給してくれません）。資金を払えば、来季から自社PUのワークスにもなれます（参入1年目はPU開発枠が増え、開発費が少し安く、伸びも大きくなります。2年目は伸びの優遇だけが残ります）。ワークスは来季に受け入れるカスタマーの数（0〜3）を決められます。</p>
     ${sub('contract', '契約・更改・引き抜き')}
-    <p>契約には年数があります。満了したら、更改金（年俸の${RENEW_K}倍）を払って更改するか、移籍市場で入れ替えます。決めるまでレースに進めません。成長した選手ほど、更改のときの年俸が上がります。シーズンの終わりに、ライバルが有望な選手の引き抜きを申し出ることがあり、違約金を受け取って放出するか断るかを選べます。放出するときは、移籍市場の選手（相手チームが代わりに放出する選手も含む）か自チームのリザーブから後任を選べます。</p>
+    <p>契約には年数があります。満了したら、更改金（年俸の${RENEW_K}倍）を払って更改するか、移籍市場で入れ替えます。リザーブも同じく、満了したらシーズンの初めに更改するか放出するかを選びます（強く育ってリザーブを嫌がったり、チーム愛が低いと断られることがあります）。ライバルがリザーブをレギュラーとして引き抜きに来ることもあり、受けると違約金が入ります。決めるまでレースに進めません。成長した選手ほど、更改のときの年俸が上がります。シーズンの終わりに、ライバルが有望な選手の引き抜きを申し出ることがあり、違約金を受け取って放出するか断るかを選べます。放出するときは、移籍市場の選手（相手チームが代わりに放出する選手も含む）か自チームのリザーブから後任を選べます。</p>
     ${sub('market', '移籍市場')}
     <p>契約金は年俸の${SIGN_K}倍です。年数（1〜3年）を選べ、若手は短い契約、ベテランは長い契約のほうが年俸が安くなります。交代したドライバーは移籍市場に移ります。「○○をリザーブへ下ろす」で契約すると、外れたドライバーはリザーブとしてチームに残ります（契約の年数と年俸はそのまま・チーム愛 −${DEMOTE_LOVE}。リザーブ枠に空きが必要で、総合80以上のドライバーは降格に応じません）。</p>
     ${sub('love', 'チーム愛')}
@@ -12530,7 +12549,7 @@ function guideHtml(){
     <p><b>先行研究</b>：予告されたシーズンだけ、開発枠を使って来季の研究ができます（1回 ${M(RES_COST)}）。研究するほど来季の初期値が平均より高くなります（効果の上限は、変わる項目が少ないテーマほど1項目あたり大きく、空力 +${REG_THEMES.aero.max.toFixed(1)}・パワーユニット +${REG_THEMES.pu.max.toFixed(1)}・全面 +${REG_THEMES.all.max.toFixed(1)}。当たり外れ ±25%）。今季を強くするか、今季を捨てて来季に賭けるかの判断です。研究を${RES_EASE[0]}回以上すると、オーナーは目標より1つ下（${RES_EASE[1]}回以上で2つ下）の順位までを「達成」として扱います。ライバルもそれぞれの方針で研究します。</p>
     <p><b>新規則1年目</b>：変わった部分の開発は、1回あたり ×${REG_BOOST} 伸びます。</p>
     ${sub('fac', '施設')}
-    <p>強化するとすぐに効きます（工期なし）。強化の費用は ${M(facCost(1))}（Lv1）〜 ${M(facCost(FAC_MAX))}（Lv${FAC_MAX}）。レベルごとに毎戦の維持費がかかります。チームによって最初のレベルが違い、ライバルもシーズンの終わりに強化します。</p>
+    <p>強化するとすぐに効きます（工期なし）。強化の費用は ${M(facCost(1))}（Lv1）〜 ${M(facCost(FAC_MAX))}（Lv${FAC_MAX}）。レベルごとに毎戦の維持費がかかり、高いレベルほど急に高くなります（Lv1 ${M(facUpkeep(1))}〜Lv5 ${M(facUpkeep(5))}/戦）。Lv4以上の施設は、シーズンの切り替えで「来季、改修が必要」と予告されることがあり（Lv4 25%・Lv5 40%）、予告された施設は次のシーズンの初めに改修する（強化費の半分）か、改修せずに1レベル下げるかを選びます。チームによって最初のレベルが違い、ライバルもシーズンの終わりに強化します。</p>
     ${tbl(['施設', 'Lv1', `Lv${FAC_MAX}`], FACS.map(f => [`<b>${f.n}</b><br><small>${esc(f.d)}</small>`, esc(f.eff(1)), esc(f.eff(FAC_MAX))]))}`)}
   ${sec('quali', '予選', `
     <p>Q1（全車）→ Q2 → Q3（上位10台）のノックアウト方式で、Q1とQ2ではそれぞれ下位${qCut(20)}台が脱落します。各車2回アタックし、良いほうのタイムが残ります。</p>
@@ -12800,7 +12819,7 @@ function repayAll(){
   saveCareer(); renderHQ(`借入を${money(b)}全額返しました。`);
 }
 function sellFac(k){
-  const t = myTeam(), lv = facLv(t, k); if(lv <= 0) return;
+  const t = myTeam(), lv = facLv(t, k); if(lv <= 0 || (career.facRen && career.facRen[k])) return;   // 改修を決める前は売れない
   if(!confirmTwice('facsell' + k, -r1(facCost(lv)*0.5))) return;
   const back = r1(facCost(lv)*0.5);
   t.fac[k] = lv - 1; career.money = r1(career.money + back);
@@ -13115,7 +13134,39 @@ const FACS = [
 ];
 const FAC_K = Object.fromEntries(FACS.map(f => [f.k, f]));
 const facCost = lv => 2 + lv*2;                 // Lv(lv−1) → lv に上げる費用（Lv1 $4M … Lv5 $12M）
-const facUpkeep = lv => r1(lv*0.12);            // 1つの施設の、1戦あたりの維持費（Lv5 で $0.6M）
+const FAC_UPKEEP = [0, 0.1, 0.2, 0.4, 0.7, 1.1];  // 1つの施設の、1戦あたりの維持費（2026-10：高いレベルほど急に高くなる。以前は Lv×$0.12M）
+const facUpkeep = lv => FAC_UPKEEP[clamp(lv, 0, FAC_MAX)] ?? 0;
+/* 施設の老朽化（2026-10）：Lv4以上の施設は、シーズンの切り替えで「来季、改修が必要」と予告されることがある（Lv4 25%・Lv5 40%）。
+   予告された施設は、次のシーズンの初めに改修するか（そのレベルの強化費の半分）、改修せずに1レベル下げるかを選ぶ。決めるまでレースには進めない */
+const FAC_WARN_P = { 4: 0.25, 5: 0.4 }, FAC_REN_K = 0.5;
+const facRenCost = lv => r1(facCost(lv)*FAC_REN_K);
+function facAging(rep){
+  const me = myTeam(), warn = career.facWarn || {}, next = {};
+  career.facRen = {};
+  for(const f of FACS){
+    const lv = facLv(me, f.k);
+    if(warn[f.k] && lv >= 4) career.facRen[f.k] = { lv, cost: facRenCost(lv) };
+    else if(lv >= 4 && Math.random() < (FAC_WARN_P[lv] || 0)) next[f.k] = true;
+  }
+  career.facWarn = next;
+  rep.facRen = Object.keys(career.facRen); rep.facWarn = Object.keys(next);
+  // ライバルの施設も古くなる（予告なしで、改修するか1レベル下がる）
+  career.teams.forEach(t => { if(t.id === career.team || !t.fac) return;
+    FACS.forEach(f => { const lv = t.fac[f.k] || 0; if(lv >= 4 && Math.random() < (FAC_WARN_P[lv] || 0) && Math.random() < 0.45) t.fac[f.k] = lv - 1; }); });
+}
+function renovateFac(k){
+  const R = career.facRen && career.facRen[k], t = myTeam(); if(!R) return;
+  if(career.money < R.cost) return;
+  if(!confirmTwice('facren' + k, R.cost)) return;
+  career.money = r1(career.money - R.cost); delete career.facRen[k];
+  saveCareer(); renderHQ(`${FAC_K[k].n}を改修しました（${money(R.cost)}）。Lv${facLv(t, k)}のまま使えます。`);
+}
+function skipRenovateFac(k){
+  const R = career.facRen && career.facRen[k], t = myTeam(); if(!R) return;
+  if(!confirmTwice('facdown' + k)) return;
+  t.fac[k] = Math.max(0, facLv(t, k) - 1); delete career.facRen[k];
+  saveCareer(); renderHQ(`${FAC_K[k].n}は改修せず、Lv${t.fac[k]}に下がりました。`);
+}
 const pitMiss = lv => Math.max(0.01, 0.08 - lv*0.014);
 const pitRange = lv => `${(1.0 - lv*0.02).toFixed(2)}〜${(1.0 - lv*0.02 + 0.5 - lv*0.06).toFixed(2)}`;
 const facLv = (t, k) => (t && t.fac && t.fac[k]) || 0;
@@ -13297,7 +13348,7 @@ function scoutStars(d){
 }
 function upgradeFac(k){
   const t = myTeam(), lv = facLv(t, k);
-  if(lv >= FAC_MAX) return;
+  if(lv >= FAC_MAX || (career.facRen && career.facRen[k])) return;   // 改修を決める前は強化できない
   const cost = facCost(lv + 1); if(career.money < cost) return;
   if(!confirmTwice('fac' + k, cost)) return;                                   // 高い買い物なので、2回押して確定
   career.money = r1(career.money - cost); t.fac[k] = lv + 1;
@@ -14132,6 +14183,7 @@ function goRace(force){
   if(!career || career.round >= career.calendar.length || career.fired) return;
   if(!career.sponsor && !(careerRace && careerRace.round === career.round && !careerRace.done)){ renderHQ('先にスポンサー契約を選んでください。'); return; }
   if(careerRace && careerRace.round === career.round && !careerRace.done){ showRaceView(); return; }   // 途中のレースに戻る
+  { const fr = Object.keys(career.facRen || {}); if(fr.length){ hqTab = 'fac'; lsSet(HQ_TAB_KEY, hqTab); renderHQ('施設の改修を決めてください：' + fr.map(k => FAC_K[k].n).join('、') + '。改修するか、改修せずにレベルを下げるかを選ぶまで、レースには進めません。'); return; } }
   { const pc = pendingContracts(); if(pc.length){ if(hqTab !== 'ov' && hqTab !== 'drv') hqTab = 'ov'; renderHQ('契約の手続きが残っています：' + pc.join('、') + '。先に決めてください。'); return; } }
   if(!force && devLeftAsk()) return;                     // 開発枠が残っていれば確認する
   const rd = career.calendar[career.round];
@@ -14357,8 +14409,9 @@ function pendingContracts(){
   if(!career) return [];
   const me = myTeam(), out = [];
   me.drivers.forEach(c => { const d = career.drivers[c]; if(d && d.con && d.con.yrs <= 0) out.push(d.leave ? `${c}の後任を移籍市場で選ぶ（更新を拒否）` : `${c}の契約更改`); });
-  career.offers = (career.offers || []).filter(o => me.drivers.includes(o.code) && teamOf(o.team));
-  career.offers.forEach(o => out.push(`${o.code}への獲得の申し出`));
+  resList(me).forEach(c => { const d = career.drivers[c]; if(d && d.con && d.con.yrs <= 0) out.push(d.leave ? `リザーブ${c}の放出（更新を拒否）` : `リザーブ${c}の契約更改`); });
+  career.offers = (career.offers || []).filter(offerValid);
+  career.offers.forEach(o => out.push(`${o.code}${o.res ? '（リザーブ）' : ''}への獲得の申し出`));
   if(career.pu && career.pu.choose && !puWorks(me)) out.push('来季のPUの供給元');
   return out;
 }
@@ -14405,6 +14458,85 @@ function refusePoach(i){
   career.offers.splice(i, 1); poachUI = { code: null, pick: null }; saveCareer(); renderHQ(`${rv_name(o)}の申し出を断りました。${o.code}は契約どおりチームに残ります。${low ? `移籍を望んでいた${o.code}は不満そうです（チーム愛 −8）。` : `${o.code}は残れて喜んでいます（チーム愛 +3）。`}`);
 }
 const rv_name = o => { const t = teamOf(o.team); return t ? t.name : 'ライバル'; };
+/* ---------- AIチームのドライバー市場（2026-10） ----------
+   ① 契約満了：年齢・総合・成績を見て、更改するか、移籍市場のもっと良い選手と入れ替えるかを決める（満了者の3〜4割が入れ替わる目安）
+   ② 移籍：上位チームが、下位チームの有望な選手を引き抜く（1シーズンに0〜2件）。押し出された選手は下位チームへ回る
+   自チームの選手（レギュラー・リザーブ）は対象にしない */
+function aiContracts(rep){
+  rep.con.ai = [];
+  const me = career.team, inFA = c => career.fa.includes(c), D = c => career.drivers[c];
+  const faTop = () => career.fa.map(D).filter(d => d && !d.retired && d.st).sort((a, b) => appeal(b) - appeal(a));
+  const newCon = d => ({ yrs: 1 + Math.floor(Math.random()*3), sal: d.sal });
+  const AI = career.teams.filter(t => t.id !== me);
+  // ① 契約満了
+  for(const t of AI) t.drivers.forEach((c, slot) => {
+    const d = D(c); if(!d || !d.con || d.con.yrs > 0) return;
+    const mate = D(t.drivers[1 - slot]), pts = career.dpts[c] || 0, mpts = mate ? (career.dpts[mate.code] || 0) : 0;
+    const best = faTop()[0];
+    let keep = 0.68;
+    if(d.age >= 33) keep -= 0.2 + (d.age - 33)*0.05;                   // ベテラン
+    if(best && appeal(best) > appeal(d) + 0.3) keep -= 0.3;            // 移籍市場にもっと良い選手がいる
+    if(mpts >= 10 && pts < mpts*0.4) keep -= 0.15;                     // チームメイトに大きく負けた
+    if(ovr(d) >= 8) keep += 0.3;
+    if(Math.random() < clamp(keep, 0.1, 0.95) || !best){ d.con = newCon(d); return; }
+    // 入れ替え：移籍市場の上位3人から選ぶ
+    const pool = faTop().slice(0, 3), n = pool[Math.floor(Math.random()*pool.length)];
+    t.drivers[slot] = n.code; career.fa = career.fa.filter(x => x !== n.code); n.con = newCon(n); n.rival = false;
+    delete d.con; d.rival = false; career.fa.push(c);
+    rep.con.ai.push({ kind: 'rel', team: t.id, out: c, in: n.code });
+  });
+  // ② AIチームどうしの移籍（上位チームが下位チームの有望な選手を引き抜く）
+  const rank = AI.slice().sort((a, b) => (career.cpts[b.id] || 0) - (career.cpts[a.id] || 0));
+  for(let k = 0; k < 2; k++){
+    if(Math.random() > 0.6) continue;
+    const top = rank[Math.floor(Math.random()*Math.min(4, rank.length))]; if(!top) continue;
+    const ws = top.drivers.indexOf(top.drivers.slice().sort((a, b) => appeal(D(a)) - appeal(D(b)))[0]), weak = D(top.drivers[ws]);
+    const lower = rank.slice(rank.indexOf(top) + 1);
+    const cands = [];
+    lower.forEach(t => t.drivers.forEach((c, slot) => { const d = D(c); if(d && appeal(d) > appeal(weak) + 0.3 && !rep.con.ai.some(x => x.in === c || x.out === c)) cands.push({ t, slot, d }); }));
+    if(!cands.length) continue;
+    cands.sort((a, b) => appeal(b.d) - appeal(a.d));
+    const pick = cands[Math.floor(Math.random()*Math.min(3, cands.length))];
+    // 交換：引き抜いた選手は上位チームへ、押し出された選手は下位チームへ
+    top.drivers[ws] = pick.d.code; pick.t.drivers[pick.slot] = weak.code;
+    pick.d.con = { yrs: 2 + Math.floor(Math.random()*2), sal: pick.d.sal }; weak.con = newCon(weak); pick.d.rival = weak.rival = false;
+    rep.con.ai.push({ kind: 'move', team: top.id, from: pick.t.id, in: pick.d.code, out: weak.code });
+  }
+}
+// 申し出がまだ有効か（レギュラーへの申し出は、まだ自チームのレギュラーなら。リザーブへの申し出は、まだ自チームのリザーブなら）
+const offerValid = o => !!teamOf(o.team) && (o.res ? isRes(myTeam(), o.code) : myTeam().drivers.includes(o.code));
+// リザーブの契約更改の要求額（1戦あたり）：リザーブの割合で、年数・チーム愛で変わる
+const resAskFor = (code, yrs) => { const d = career.drivers[code], k = resKOf(d); return k === null ? null : r1(Math.max(0.2, d.sal*k*conMult(d.age, yrs)*loveAskK(d))); };
+function renewRes(code, yrs){
+  const me = myTeam(), d = career.drivers[code]; if(!d || !isRes(me, code) || !d.con || d.con.yrs > 0 || d.leave) return;
+  const ask = resAskFor(code, yrs); if(ask === null) return;
+  const fee = r1(ask*RENEW_K); if(career.money < fee) return;
+  if(!confirmTwice('rrenew' + code + yrs, fee)) return;
+  career.money = r1(career.money - fee); d.con = { yrs, sal: ask };
+  d.loveD = 0; loveAdd(d, 6 + (yrs >= 3 ? 3 : 0));
+  saveCareer(); renderHQ(`リザーブ${code}（${d.name}）と${yrs}年で契約を更改しました（年俸 ${money(ask)}/戦・更改金 ${money(fee)}）。`);
+}
+function releaseRes(code){
+  const me = myTeam(), d = career.drivers[code]; if(!d || !isRes(me, code)) return;
+  if(!confirmTwice('rrel' + code)) return;
+  delete d.con; d.leave = false; d.love = null; me.reserves = me.reserves.filter(r => r.code !== code); career.fa.push(code);
+  if(career.sub && career.sub.code === code) career.sub = null;
+  saveCareer(); renderHQ(`リザーブ${code}（${d.name}）との契約を終え、移籍市場に出しました。`);
+}
+// リザーブの引き抜きを受ける：違約金を受け取り、そのリザーブはライバルのレギュラーになる（ライバルのいちばん総合の低いドライバーが移籍市場へ）
+function acceptResPoach(i){
+  const o = (career.offers || [])[i]; if(!o || !o.res) return;
+  const me = myTeam(), rv = teamOf(o.team), d = career.drivers[o.code];
+  if(!rv || !isRes(me, o.code)){ career.offers.splice(i, 1); saveCareer(); renderHQ(); return; }
+  if(!confirmTwice('rpoach' + o.code)) return;
+  const rslot = rv.drivers.indexOf(poachOut(o)), out = rv.drivers[rslot];
+  rv.drivers[rslot] = o.code; delete career.drivers[out].con; career.drivers[out].rival = false; career.fa.push(out);
+  me.reserves = me.reserves.filter(r => r.code !== o.code); if(career.sub && career.sub.code === o.code) career.sub = null;
+  d.con = { yrs: 2, sal: d.sal }; d.rival = false; d.love = null;
+  if(career.train) delete career.train[o.code];
+  career.money = r1(career.money + o.fee); career.offers.splice(i, 1);
+  saveCareer(); renderHQ(`リザーブ${o.code}は${rv.name}のレギュラーとして移籍しました。違約金 ${money(o.fee)} を受け取りました。`);
+}
 // シーズンの終わりの契約処理：年数を1つ進め、AIは自動で更改し、自チームは更改の交渉とライバルの申し出を用意する
 function contractOffseason(rep){
   const me = myTeam(); career.offers = [];
@@ -14412,10 +14544,15 @@ function contractOffseason(rep){
   career.teams.forEach(t => t.drivers.forEach(c => {
     const d = career.drivers[c], mineT = t.id === career.team;
     if(d.con){ d.con.yrs = Math.max(0, d.con.yrs - 1); } else d.con = { yrs: mineT ? 2 : 1 + Math.floor(Math.random()*3), sal: d.sal };
-    if(d.con.yrs <= 0 && !mineT) d.con = { yrs: 1 + Math.floor(Math.random()*3), sal: d.sal };   // AIチームは自動で更改
   }));
-  for(const R of resFix(me).slice()){ const r = R.code, d = career.drivers[r];        // リザーブの契約：年数を進め、満了なら移籍市場へ
-    if(d){ if(!d.con) d.con = { yrs: 1, sal: r1(d.sal*RES_K) }; d.con.yrs = Math.max(0, d.con.yrs - 1); if(d.con.yrs <= 0){ delete d.con; career.fa.push(r); me.reserves = me.reserves.filter(x => x.code !== r); rep.con.resOut = r; } } }
+  aiContracts(rep);                                                    // AIチーム：契約満了の判断と、AIチームどうしの移籍
+  for(const R of resFix(me).slice()){ const r = R.code, d = career.drivers[r];        // リザーブの契約：年数を進める。満了ならシーズンの初めに更改するか決める
+    if(!d) continue;
+    if(!d.con) d.con = { yrs: 1, sal: r1(d.sal*RES_K) };
+    d.con.yrs = Math.max(0, d.con.yrs - 1); d.leave = false;
+    if(d.con.yrs <= 0){ const L = loveOf(d);
+      if(resKOf(d) === null || (L < 30 && Math.random() < (L < 20 ? 0.7 : 0.3))) d.leave = true;   // 強くなってリザーブを嫌がる・チーム愛が低いと、更新を断られる
+      (rep.con.resExp = rep.con.resExp || []).push(r); } }
   me.drivers.forEach(c => { const d = career.drivers[c]; d.loveD = 0; loveAdd(d, 3); d.leave = false; });   // シーズンを一緒に越えた
   me.drivers.forEach(c => { const d = career.drivers[c]; d.rival = false; if(d.con.yrs <= 0){ rep.con.expired.push(c); const L = loveOf(d);
     if(L < 30 && Math.random() < (L < 20 ? 0.7 : 0.3)){ d.leave = true; (rep.con.leave = rep.con.leave || []).push(c); }                // チーム愛が低いと、更新を断られる
@@ -14427,6 +14564,16 @@ function contractOffseason(rep){
       const rv = rivals[Math.floor(Math.random()*rivals.length)];
       const o = { code: cand.code, team: rv.id, fee: r1(cand.sal*(3 + cand.con.yrs)*(1 + Math.max(0, loveOf(cand) - 50)/100)) };   // 残りたい選手ほど違約金が上がる
       career.offers.push(o); rep.con.offer = o;
+    }
+  }
+  // リザーブの引き抜き：ライバルが、自チームのリザーブをレギュラーとして迎えたいと申し出ることがある（契約が残っている選手だけ）
+  const rc = resList(me).map(c => career.drivers[c]).filter(d => d && d.con && d.con.yrs > 0 && !d.retired).sort((a, b) => appeal(b) - appeal(a))[0];
+  if(rc && Math.random() < clamp((appeal(rc) - 5.8)*0.35, 0, 0.7)*clamp(1.3 - loveOf(rc)/100, 0.3, 1.3)){
+    const rivals = career.teams.filter(t => t.id !== career.team && Math.min(...t.drivers.map(c => ovr(career.drivers[c]))) < ovr(rc));
+    if(rivals.length){
+      const rv = rivals[Math.floor(Math.random()*rivals.length)];
+      const o = { code: rc.code, team: rv.id, res: true, fee: r1(rc.sal*(1.5 + rc.con.yrs)*(1 + Math.max(0, loveOf(rc) - 50)/100)) };
+      career.offers.push(o); rep.con.resOffer = o;
     }
   }
 }
@@ -14840,6 +14987,7 @@ function nextSeason(){
     rep.signed.push({ team: t.id, out: code, in: pickC });
   }));
   contractOffseason(rep);
+  facAging(rep);                                                        // 施設の老朽化：改修の予告と、予告された施設の改修
   // オーナーの評価とシーズン賞金（選手権の最終順位で決まる）
   const ease = wasAnn ? resEase(myResPts) : 0;                          // 来季への投資（先行研究）の分、目標をゆるめて評価する
   const fpos = cons.findIndex(x => x.id === career.team) + 1;
@@ -15263,16 +15411,36 @@ function facHtml(){
   const rivalBest = k => Math.max(...career.teams.filter(t => t.id !== me.id).map(t => facLv(t, k)));
   return `<div class="sec facSec">
     <h2>施設<button type="button" class="qm" data-guide="fac" aria-label="遊び方を見る">?</button><span class="kick">維持費 合計 ${money(up)}/戦</span></h2>
-    <p class="note" style="margin:0 0 8px">強化するとすぐに効果が出ます。レベルが上がるほど、毎戦の維持費も増えます。</p>
-    <div class="facGrid">${FACS.map(f => { const lv = facLv(me, f.k), max = lv >= FAC_MAX, cost = max ? 0 : facCost(lv + 1), can = !max && career.money >= cost, rb = rivalBest(f.k);
-      return `<div class="facCard">
+    <p class="note" style="margin:0 0 8px">強化するとすぐに効果が出ます。レベルが上がるほど、毎戦の維持費が急に増えます。Lv4以上は古くなると改修が必要になります（1シーズン前に予告）。</p>
+    <div class="facGrid">${FACS.map(f => { const lv = facLv(me, f.k), max = lv >= FAC_MAX, cost = max ? 0 : facCost(lv + 1), ren = career.facRen && career.facRen[f.k], warn = career.facWarn && career.facWarn[f.k], can = !max && !ren && career.money >= cost, rb = rivalBest(f.k);
+      return `<div class="facCard${ren ? ' ren' : ''}">
         <div class="facHead"><span class="facIco"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${f.ico}"/></svg></span><div style="min-width:0"><b>${f.n}</b><div class="facPips" aria-label="Lv${lv}">${Array.from({ length: FAC_MAX }, (_, i) => `<i class="${i < lv ? 'on' : ''} ${i === rb - 1 ? 'rv' : ''}"></i>`).join('')}<span class="num">Lv${lv}</span></div></div></div>
         <p class="facD">${f.d}</p>
+        ${ren ? `<div class="facRen"><b>老朽化：改修が必要です</b><span>改修すればLv${lv}のまま、改修しなければLv${lv - 1}に下がります。決めるまでレースには進めません。</span>
+          <div class="facBtns"><button class="b sm ${career.money >= ren.cost ? 'go' : ''}" type="button" data-facren="${f.k}" ${career.money >= ren.cost ? '' : 'disabled'}>${armed.key === 'facren' + f.k ? 'もう一度押して確定' : `改修する ${money(ren.cost)}`}</button><button class="b sm ghost" type="button" data-facdown="${f.k}">${armed.key === 'facdown' + f.k ? 'もう一度押して確定' : `改修せずLv${lv - 1}に下げる`}</button></div></div>`
+          : warn ? `<div class="facWarn">来季、改修が必要になる見込みです（改修費 ${money(facRenCost(lv))}・改修しなければ1レベル下がる）</div>` : ''}
         <div class="facEff"><span class="muted">今</span>${lv ? f.eff(lv) : '効果なし'}</div>
         ${max ? '' : `<div class="facEff nx"><span class="muted">Lv${lv + 1}</span>${f.eff(lv + 1)}</div>`}
-        <div class="facFoot"><span class="muted">維持費 ${money(facUpkeep(lv))}/戦${max ? '' : ` → ${money(facUpkeep(lv + 1))}`}</span><span class="facBtns">${lv > 0 ? `<button class="b sm ghost" type="button" data-facsell="${f.k}" title="1段階下げて、建設費の半分を受け取る">${armed.key === 'facsell' + f.k ? 'もう一度押して売却' : `売却 +${money(r1(facCost(lv)*0.5))}`}</button>` : ''}<button class="b sm ${can ? 'go' : ''}" type="button" data-fac="${f.k}" ${can ? '' : 'disabled'}>${max ? '最大' : armed.key === 'fac' + f.k ? 'もう一度押して確定' : `強化 ${money(cost)}`}</button></span></div>
-      </div>`; }).join('')}</div>
+        <div class="facFoot"><span class="muted">維持費 ${money(facUpkeep(lv))}/戦${max ? '' : ` → ${money(facUpkeep(lv + 1))}`}</span><span class="facBtns">${lv > 0 && !ren ? `<button class="b sm ghost" type="button" data-facsell="${f.k}" title="1段階下げて、建設費の半分を受け取る">${armed.key === 'facsell' + f.k ? 'もう一度押して売却' : `売却 +${money(r1(facCost(lv)*0.5))}`}</button>` : ''}<button class="b sm ${can ? 'go' : ''}" type="button" data-fac="${f.k}" ${can ? '' : 'disabled'}>${max ? '最大' : armed.key === 'fac' + f.k ? 'もう一度押して確定' : `強化 ${money(cost)}`}</button></span></div>
+      </div>`; }).join('')}${puFacCard(me)}</div>
     <div class="legend" style="margin-top:8px"><span><i style="background:var(--blue)"></i>自チームのレベル</span><span><em style="position:static;display:inline-block;width:10px;height:10px;border-radius:2px;box-shadow:inset 0 0 0 2px #e5323b;background:transparent"></em>ライバルの最高レベル</span></div>
+  </div>`;
+}
+/* 施設タブのPUワークスのカード（レベルは1だけ）。建てると来季からワークス（自社製PU）になる。中身はマシン開発タブの「自社PUを始める」と同じ */
+function puFacCard(me){
+  const P = career.pu; if(!P) return '';
+  const works = puWorks(me), soon = !works && P.selfNext, lv = works ? 1 : 0;
+  const inProg = !!(careerRace && !careerRace.done), poor = career.money < PU_SELF_COST, can = !works && !soon && !poor && !inProg, on = armed.key === 'puself';
+  const rivals = career.teams.filter(t => t.id !== me.id && puWorks(t)).length;
+  const cs = works ? puCustomers(me) : [], mk = works ? null : teamOf(puMakerOf(me));
+  const now = works ? `ワークス（自社製PU）・カスタマー ${cs.length}チーム${cs.length ? `（供給料 +${money(puLedger(me))}/戦）` : ''}` : soon ? '準備中。来季からワークスになります' : `カスタマー（${esc(mk.name)}製のPUを購入）`;
+  const btn = works ? '最大' : soon ? '来季から稼働' : on ? `もう一度押して確定（${money(PU_SELF_COST)}）` : `建設する（来季から・${money(PU_SELF_COST)}）`;
+  return `<div class="facCard">
+    <div class="facHead"><span class="facIco">${PART_ICO.pu}</span><div style="min-width:0"><b>PUワークス</b><div class="facPips" aria-label="Lv${lv}"><i class="${lv ? 'on' : ''} ${rivals ? 'rv' : ''}"></i><span class="num">Lv${lv}</span></div></div></div>
+    <p class="facD">パワーユニットを自社で作る工場。ワークスになると、PU専用の開発枠でPUを開発でき、ほかのチームにPUを供給して供給料を受け取れます。</p>
+    <div class="facEff"><span class="muted">今</span>${now}</div>
+    ${works || soon ? '' : `<div class="facEff nx"><span class="muted">Lv1</span>来季からワークス。最初はメーカーの平均より少し低い性能・信頼性から始まり、参入1〜2年目は開発の優遇があります</div>`}
+    <div class="facFoot"><span class="muted">${inProg && !works && !soon ? 'レース中は建設できません' : poor && !works && !soon ? '資金が足りません' : 'ワークスは全部で' + (rivals + (works ? 1 : 0)) + 'チーム'}</span><span class="facBtns"><button class="b sm ${can ? 'go' : ''}" type="button" data-puself ${can ? '' : 'disabled'}>${btn}</button></span></div>
   </div>`;
 }
 /* 画面下のバーに出す資金。2回押して確定する操作の1回目のあとは、確定したときの残りも並べる */
@@ -15411,6 +15579,9 @@ function renderHQ(msg){
         ${(off.gnote || []).map(x => `<div class="gtNote"><b>${x.code}</b>：${esc(x.t)}</div>`).join('')}
         ${off.retired.length ? `<div style="margin-top:6px">引退：${off.retired.map(c => `<b>${c}</b> ${esc(career.drivers[c].name)}（${career.drivers[c].age}歳）`).join('、')}</div>` : '<div class="muted" style="margin-top:6px">引退したドライバーはいません。</div>'}
         ${off.signed.filter(s => s.team === career.team).map(s => `<div class="warn" style="margin-top:6px">${s.out} の引退で、${s.in}（${esc(career.drivers[s.in].name)}）が加入しました。</div>`).join('')}
+        ${(() => { const L = []; (off.signed || []).filter(s => s.team !== career.team).forEach(s => L.push(`<b>${esc((teamOf(s.team) || {}).name || '')}</b>：${s.out}が引退し、${s.in}が加入`));
+          (off.con && off.con.ai || []).forEach(x => L.push(x.kind === 'move' ? `<b>${esc((teamOf(x.team) || {}).name || '')}</b>が${esc((teamOf(x.from) || {}).name || '')}の<b>${x.in}</b>を獲得（${x.out}は${esc((teamOf(x.from) || {}).name || '')}へ）` : `<b>${esc((teamOf(x.team) || {}).name || '')}</b>：${x.out}と更改せず、${x.in}が加入`));
+          return L.length ? `<div style="margin-top:8px"><b>ライバルチームの移籍</b>${L.map(t => `<div class="muted" style="font-size:12.5px">・${t}</div>`).join('')}</div>` : ''; })()}
         ${off.rookies.length ? `<div style="margin-top:6px">新人が移籍市場に入りました：${off.rookies.filter(c => career.fa.includes(c)).map(c => `<b>${c}</b>`).join('、') || 'すべて他チームに加入'}</div>` : ''}
       </div>
     </div>` : '';
@@ -15549,11 +15720,16 @@ function renderHQ(msg){
       <p class="note">名前を押すと、ドライバーの能力と戦績、チームのマシンの能力と戦績を表示します。</p>
     </div>`;
   const conCard = (() => {
-    const offers = (career.offers || []).filter(o => me.drivers.includes(o.code) && teamOf(o.team));
+    const offers = (career.offers || []).filter(offerValid);
     const exp = me.drivers.filter(c => career.drivers[c].con && career.drivers[c].con.yrs <= 0);
+    const rexp = resList(me).filter(c => career.drivers[c] && career.drivers[c].con && career.drivers[c].con.yrs <= 0);
     const puC = puChoiceHtml();
-    if(!offers.length && !exp.length && !puC) return '';
+    if(!offers.length && !exp.length && !rexp.length && !puC) return '';
     const offHtml = offers.map((o, i) => { const d = career.drivers[o.code], open = poachUI.code === o.code, sc = myFac('scout') >= 4, outC = poachOut(o);
+      if(o.res){ const on = armed.key === 'rpoach' + o.code;   // リザーブの引き抜き：後任は要らない（受けると違約金が入り、リザーブの枠が1つ空く）
+        return `<div class="cBlk"><div class="cHead"><b>${o.code}</b> ${esc(d.name)}<span class="cTag">リザーブ</span><span class="cTag hot">引き抜き</span></div>
+          <p class="cTxt">${esc(rv_name(o))}が、${o.code}をレギュラーとして迎えたいと申し出ています（${d.age}歳・総合${pt100(ovr(d))}・${conTxt(d)}）。違約金は <b>${money(o.fee)}</b>。${loveOf(d) >= 60 ? `${o.code}は<b>チームに残りたい</b>と言っています。` : loveOf(d) < 40 ? `${o.code}は<b>レギュラーになりたがっています</b>。断ると不満が出ます。` : ''}</p>
+          <div class="cActs"><button type="button" class="b sm ${on ? 'go' : ''}" data-rpoach="${i}" ${inProgress ? 'disabled' : ''}>${on ? 'もう一度押して確定' : `放出する（違約金 +${money(o.fee)}）`}</button><button type="button" class="b sm" data-refuse="${i}">断る</button></div></div>`; }
       const head = `<div class="cHead"><b>${o.code}</b> ${esc(d.name)}<span class="cTag hot">引き抜き</span></div>
         <p class="cTxt">${esc(rv_name(o))}が獲得を申し出ています（${d.age}歳・総合${pt100(ovr(d))}・${conTxt(d)}）。違約金は <b>${money(o.fee)}</b>${loveOf(d) > 50 ? `（チーム愛${Math.round(loveOf(d))}：残りたい気持ちのぶん上乗せ）` : ''}。${loveOf(d) >= 60 ? `${o.code}は<b>チームに残りたい</b>と言っています。` : loveOf(d) < 40 ? `${o.code}は<b>移籍に前向き</b>です（断るとチーム愛が下がります）。` : ''}放出する場合は、移籍市場かリザーブから後任を選べます（契約金なし・年俸は市場価値。移籍市場からは2年契約、リザーブは昇格扱いで残りの契約年数のまま）。</p>`;
       if(!open) return `<div class="cBlk">${head}<div class="cActs"><button type="button" class="b sm" data-poachopen="${o.code}" ${inProgress ? 'disabled' : ''}>放出する（後任を選ぶ）</button><button type="button" class="b sm" data-refuse="${i}">断る</button></div></div>`;
@@ -15571,8 +15747,15 @@ function renderHQ(msg){
         ${d.leave ? '' : `<div class="cOpts">${[1, 2, 3].map(y => { const a = askFor(c, y), fee = r1(a*RENEW_K), k = 'renew' + c + y, on = armed.key === k;
           return `<button type="button" class="b sm ${on ? 'go' : ''}" data-renew="${c}" data-yrs="${y}" ${career.money >= fee ? '' : 'disabled'}><b>${y}年契約</b><span>${money(a)}/戦</span><small>${on ? 'もう一度押して確定' : '更改金 ' + money(fee)}</small></button>`; }).join('')}</div>`}
         ${poor && !d.leave ? `<div class="cActs"><button type="button" class="b sm ${armed.key === 'renew' + c + '1f' ? 'go' : ''}" data-renew="${c}" data-yrs="1" data-free="1">${armed.key === 'renew' + c + '1f' ? 'もう一度押して確定' : '更改金なしで1年だけ更改（年俸 ' + money(r1(askFor(c, 1)*1.25)) + '/戦）'}</button></div>` : ''}</div>`; }).join('');
+    const rexpHtml = rexp.map(c => { const d = career.drivers[c], refuse = d.leave || resAskFor(c, 1) === null, onRel = armed.key === 'rrel' + c;
+      return `<div class="cBlk"><div class="cHead"><b>${c}</b> ${esc(d.name)}<span class="cTag">リザーブ</span><span class="cTag">契約満了</span>${refuse ? '<span class="cTag hot">更新を拒否</span>' : ''}</div>
+        ${refuse ? `<p class="cTxt"><b class="lossT">${resAskFor(c, 1) === null ? `総合${pt100(ovr(d))}まで伸び、リザーブとしての契約には応じないと言っています。` : `チーム愛が低く（${Math.round(loveOf(d))}）、${c}は契約の更新を断りました。`}</b>放出してください（レギュラーとして迎えるなら、移籍市場から）。</p>`
+          : `<p class="cTxt">${d.age}歳・総合 <b class="num">${pt100(ovr(d))}</b>。リザーブとしての年俸は市場価値の一部です。更改金は年俸の${RENEW_K}倍です。</p>
+        <div class="cOpts">${[1, 2, 3].map(y => { const a = resAskFor(c, y), fee = r1(a*RENEW_K), on = armed.key === 'rrenew' + c + y;
+          return `<button type="button" class="b sm ${on ? 'go' : ''}" data-rrenew="${c}" data-yrs="${y}" ${career.money >= fee ? '' : 'disabled'}><b>${y}年契約</b><span>${money(a)}/戦</span><small>${on ? 'もう一度押して確定' : '更改金 ' + money(fee)}</small></button>`; }).join('')}</div>`}
+        <div class="cActs"><button type="button" class="b sm ${onRel ? 'go' : ''}" data-rrel="${c}">${onRel ? 'もう一度押して確定' : '更改せずに放出する'}</button></div></div>`; }).join('');
     return `<div class="sec conSec"><h2>契約<button type="button" class="qm" data-guide="contract" aria-label="遊び方を見る">?</button><span class="kick">更改・引き抜き</span></h2>
-      <p class="note" style="margin:0 0 4px">決めるまでレースには進めません。更改しない場合は、移籍市場から別のドライバーと交代してください。</p>${puC}${offHtml}${expHtml}</div>`;
+      <p class="note" style="margin:0 0 4px">決めるまでレースには進めません。更改しない場合は、移籍市場から別のドライバーと交代してください（リザーブは放出するだけでもかまいません）。</p>${puC}${offHtml}${expHtml}${rexpHtml}</div>`;
   })();
   const market = `
     <div class="sec">
@@ -15715,6 +15898,9 @@ function renderHQ(msg){
   { const rb = $('#resBtn'); if(rb) rb.onclick = research; }
   el.querySelectorAll('[data-fac]').forEach(b => b.onclick = () => upgradeFac(b.dataset.fac));
   el.querySelectorAll('[data-facsell]').forEach(b => b.onclick = () => sellFac(b.dataset.facsell));
+  el.querySelectorAll('[data-puself]').forEach(b => b.onclick = puStartSelf);
+  el.querySelectorAll('[data-facren]').forEach(b => b.onclick = () => renovateFac(b.dataset.facren));
+  el.querySelectorAll('[data-facdown]').forEach(b => b.onclick = () => skipRenovateFac(b.dataset.facdown));
   const lb = $('#loanBtn'); if(lb) lb.onclick = borrow;
   { const gd = $('#guideDismiss'); if(gd) gd.onclick = () => { lsSet(GUIDE_KEY, true); renderHQ(); }; }
   const rb = $('#repayBtn'); if(rb) rb.onclick = repayAll;
@@ -15741,6 +15927,9 @@ function renderHQ(msg){
   el.querySelectorAll('[data-relres]').forEach(b => b.onclick = () => releaseReserve(b.dataset.relres));
   el.querySelectorAll('[data-rdem]').forEach(b => b.onclick = () => answerResDemand(b.dataset.rdem === '1'));
   el.querySelectorAll('[data-renew]').forEach(b => b.onclick = () => renew(b.dataset.renew, +b.dataset.yrs, !!b.dataset.free));
+  el.querySelectorAll('[data-rrenew]').forEach(b => b.onclick = () => renewRes(b.dataset.rrenew, +b.dataset.yrs));
+  el.querySelectorAll('[data-rrel]').forEach(b => b.onclick = () => releaseRes(b.dataset.rrel));
+  el.querySelectorAll('[data-rpoach]').forEach(b => b.onclick = () => acceptResPoach(+b.dataset.rpoach));
   el.querySelectorAll('[data-poach]').forEach(b => b.onclick = () => acceptPoach(+b.dataset.poach, poachUI.pick));
   el.querySelectorAll('[data-puch]').forEach(b => b.onclick = () => puChoose(b.dataset.puch));
   el.querySelectorAll('[data-pucap]').forEach(b => b.onclick = () => { career.pu.cap = +b.dataset.pucap; saveCareer(); renderHQ(); });
@@ -16083,7 +16272,7 @@ const tyreHidden = c => preStart() && c.m.team !== career.team;
 function startTyreInfo(){
   const T = race.trackT, info = ['S', 'M', 'H'].map(k => ({ k, o: ttEstOff(k, T, 0), fit: ttFitAt(k, T) }));
   const ok = info.filter(x => x.fit === 'ok');
-  const rec = ok.length ? (ok.find(x => x.k === 'M') || ok[0]).k : info.slice().sort((a, b) => Math.abs(a.o) - Math.abs(b.o))[0].k;   // 適温に入るもの（Mを優先）。なければいちばん近いもの
+  const rec = ok.length ? ok[0].k : info.slice().sort((a, b) => Math.abs(a.o) - Math.abs(b.o))[0].k;   // 適温に入るものの中で一番速いもの（S→M→Hの順）。なければいちばん近いもの
   return { info, rec };
 }
 /* スタートタイヤごとの作戦の見込み（スタート前の表示用。AIの作戦計算と同じ方法で、ばらつきを入れずに最速の作戦を求める）。
@@ -16118,7 +16307,8 @@ function startPlanInfo(c){
   if(!ok.length) return null;
   const b = Math.min(...ok.map(k => res[k].t));
   ok.forEach(k => res[k].d = Math.round((res[k].t - b)*10)/10);
-  res.rec = ok.reduce((a, k) => res[k].t < res[a].t ? k : a, ok[0]);
+  const fitOk = ok.filter(k => res[k].fit === 'ok'), recFrom = fitOk.length ? fitOk : ok;   // おすすめ：路面温度に合う（適温の）タイヤの中で一番速いもの。合うものがなければ全体で一番速いもの
+  res.rec = recFrom.reduce((a, k) => res[k].t < res[a].t ? k : a, recFrom[0]);
   res.loss = loss;
   if(cache.size > 20) cache.clear();
   cache.set(key, res);
