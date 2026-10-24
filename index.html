@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<!-- サーキットマネージャー ver 1.3.0 -->
+<!-- サーキットマネージャー ver 1.4.0 -->
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="version" content="1.3.0">
+<meta name="version" content="1.4.0">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>サーキットマネージャー</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1452,6 +1452,134 @@ body.phoneRace .stage:has(#flag:not(:empty)) #camctl{top:80px}
   #records .recLink{flex-wrap:wrap;row-gap:0}
   #records .recLink .muted{flex-basis:100%;font-size:8.5px}   /* 名前は略号の下に（長い名前は「・」で折り返す） */
 }
+/* 記録：シーズン別ランキング・戦ごとの結果・ポイント推移・自チームの歩み */
+.recTitle .recClose{margin-left:auto}
+.rcBar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.rcLab{font-size:12px}
+.rcSeasons{flex-wrap:wrap}
+.rcSeasons button small{font-size:9.5px;margin-left:3px;opacity:.75}
+.rcHead{display:flex;align-items:center;gap:8px;margin:2px 0 8px}
+.rcHead b{font-size:16px}
+.rcBadge{display:inline-block;font:700 10.5px "Chakra Petch","M PLUS 1p",system-ui,sans-serif;letter-spacing:.04em;padding:1px 7px;border-radius:4px;background:var(--btn);color:var(--muted);border:1px solid var(--line);vertical-align:1px}
+.rcBadge.live{background:var(--signal);color:var(--signalText);border-color:var(--signal)}
+.rcBadge.fin{background:var(--tower);color:var(--towerText);border-color:var(--tower)}
+.rcCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:8px;margin-bottom:10px}
+.rcCard{display:flex;flex-direction:column;gap:2px;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.rcCard .kick{font-size:10.5px;color:var(--muted);font-weight:700;letter-spacing:.03em}
+.rcCard b{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rcCard small{font:700 12px "Chakra Petch",sans-serif;color:var(--muted)}
+.rcCard.rcCh{box-shadow:inset 3px 0 0 #f5c518}
+.rcCard.mine{box-shadow:inset 3px 0 0 #00c8ff}
+.rcWho{display:flex;align-items:center;gap:6px;min-width:0}
+.rcWho .logo{margin:0;flex:none}
+.rcWho b{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.rcWho b.cd{flex:none}
+.rcWho .muted{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rcNone{color:var(--muted)}
+.rcTools{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;margin:4px 0 8px}
+.rcPos{white-space:nowrap}
+.rcP{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;padding:0 4px;border-radius:5px;font:700 12px "Chakra Petch",sans-serif}
+.rcP.m1{background:#f5c518;color:#2a2000}
+.rcP.m2{background:#c9ced6;color:#1f2328}
+.rcP.m3{background:#d08b4f;color:#2a1405}
+.rcChg{display:inline-block;min-width:24px;margin-left:4px;font:700 10.5px "Chakra Petch",sans-serif;color:var(--muted)}
+.rcChg.up{color:#1a9a55}
+.rcChg.dn{color:#d7263d}
+.rcChg.new{color:var(--blue);font-size:9.5px}
+.rcTeam{display:inline-flex;align-items:center}
+.rcPts{font-weight:700}
+/* 戦ごとの結果 */
+.rgTbl{border-collapse:separate;border-spacing:3px;font-size:12px}
+.rgTbl th{font-size:11px;color:var(--muted);font-weight:500;text-align:left;padding:2px 4px;white-space:nowrap}
+.rgTbl th.n,.rgTbl td.n{text-align:right;font-family:"Chakra Petch",sans-serif}
+.rgTbl th.rgH{text-align:center;padding:2px 1px}
+.rgH .flag{display:block;margin:0 auto 2px}
+.rgH span{font:700 10.5px "Chakra Petch",sans-serif}
+.rgTbl td{padding:2px 4px;white-space:nowrap}
+.rgN{display:flex;align-items:center;gap:6px;min-height:26px}
+.rgN .logo{margin:0;flex:none}
+.rgDot{width:4px;height:16px;border-radius:2px;flex:none}
+.rgTbl tr.mine .rgN{box-shadow:inset 3px 0 0 #00c8ff;padding-left:7px;border-radius:2px}
+.rgTbl tr.mine .rgN b{color:var(--text)}
+.rg{position:relative;text-align:center;min-width:40px;height:26px;border-radius:5px;background:var(--btn);font:700 12px "Chakra Petch",sans-serif;color:var(--muted)}
+td.rg{padding:0 3px}
+.rg.p1{background:#f5c518;color:#2a2000}
+.rg.p2{background:#c9ced6;color:#1f2328}
+.rg.p3{background:#d08b4f;color:#2a1405}
+.rg.pt{background:rgba(31,191,106,.24);color:var(--text)}
+.rg.dnf{background:rgba(215,38,61,.16);color:#d7263d}
+.rg.fut{background:transparent;box-shadow:inset 0 0 0 1px var(--line)}
+.rg.nod,.rg.none{background:transparent;color:var(--muted)}
+.rg i.pl,.rg i.fl{position:absolute;top:3px;width:5px;height:5px;border-radius:50%}
+.rg i.pl{left:3px;background:currentColor}
+.rg i.fl{right:3px;background:#a24bff}
+.rgLeg{display:flex;flex-wrap:wrap;gap:5px 12px;margin-top:8px;font-size:11px;color:var(--muted)}
+.rgLeg span{display:inline-flex;align-items:center;gap:5px}
+.rgLeg i.rg{display:inline-block;min-width:0;width:14px;height:12px;border-radius:3px}
+.rgLeg i.rg:not([class*=" p"]):not(.dnf){box-shadow:inset 0 0 0 1px var(--line)}
+.lgDot{display:inline-block;width:6px;height:6px;border-radius:50%}
+.lgDot.pl{background:var(--text)}
+.lgDot.fl{background:#a24bff}
+/* ポイント推移 */
+.rcChart{position:relative;max-width:780px}
+.rcSvg{display:block;width:100%;height:auto}
+.rcSvg .gl{stroke:var(--line);stroke-width:1}
+.rcSvg .ax{fill:var(--muted);font:500 10px "Chakra Petch",sans-serif}
+.rcSvg .lb{fill:var(--text);font:700 11px "Chakra Petch","M PLUS 1p",sans-serif}
+.rcSvg .lb .lv{fill:var(--muted);font-weight:500}
+.rcSvg .mk{stroke:var(--panel);stroke-width:2}
+.rcSvg .hv{fill:transparent;cursor:crosshair}
+.rcSvg .rcX{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+.rcTip{position:absolute;top:4px;transform:translateX(-50%);background:var(--tower);color:var(--towerText);padding:6px 9px;border-radius:8px;font-size:11.5px;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.3);min-width:120px;z-index:2}
+.rcTip b{display:block;margin-bottom:3px;font-size:12px;white-space:nowrap}
+.rcTip div{display:flex;align-items:center;gap:10px;justify-content:space-between;line-height:1.55}
+.rcTip i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;box-shadow:0 0 0 1px rgba(255,255,255,.45)}
+.rcTip .v{font:700 12px "Chakra Petch",sans-serif}
+.rcTip .v small{font-weight:500;color:#aab0b8;margin-left:2px}
+.rcLeg{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:11.5px}
+.rcLeg span{display:inline-flex;align-items:center;gap:5px;font-weight:700}
+.rcLeg svg{width:18px;height:6px}
+/* 自チームの歩み */
+.rmCap{color:var(--muted);margin-top:4px}
+.rmCap .muted{font-weight:500;letter-spacing:0}
+.rmBars{display:flex;gap:6px;height:160px;overflow-x:auto;padding-top:2px;margin-bottom:10px}
+.rmCol{flex:1 0 36px;max-width:68px;display:flex;flex-direction:column;align-items:center;height:100%}
+.rmBarA{flex:1;width:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;border-bottom:1px solid var(--line)}
+.rmCol i{display:block;width:72%;border-radius:4px 4px 0 0;background:#00a3d9;min-height:3px}
+.rmCol.gold i{background:#f5c518}
+.rmCol.live i{background:repeating-linear-gradient(135deg,#00a3d9 0 4px,rgba(0,163,217,.35) 4px 8px)}
+.rmV{font:700 12px "Chakra Petch",sans-serif;margin-bottom:3px}
+.rmS{font:700 11px "Chakra Petch",sans-serif;color:var(--muted);margin-top:3px;display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.rmS small{font-size:9px;font-weight:500}
+.rmTbl .b{white-space:nowrap}
+.rmDp{font:700 11px "Chakra Petch",sans-serif;color:var(--text)}
+/* 並べ替えできる見出し */
+.sortH{border:0;background:none;color:inherit;font:inherit;padding:0;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:1px}
+.sortH:hover{color:var(--text);text-decoration:underline}
+.sortH.on{color:var(--text);font-weight:700}
+.sortH i{font-style:normal;font-size:8px;display:inline-block;min-width:8px}
+.sortH:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .rcChg.up{color:#3ce08c}:root:not([data-theme="light"]) .rcChg.dn,:root:not([data-theme="light"]) .rg.dnf{color:#ff5a6e}}
+:root[data-theme="dark"] .rcChg.up{color:#3ce08c}
+:root[data-theme="dark"] .rcChg.dn,:root[data-theme="dark"] .rg.dnf{color:#ff5a6e}
+@media (max-width:560px){
+  #records .opt{display:none}
+  .rcCards{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+  .rcCard{padding:6px 8px;grid-column:span 2}
+  .rcCard.rcCh{grid-column:span 3}
+  .rcCard b{font-size:13px}
+  .rcCard .kick{font-size:9.5px;letter-spacing:0}
+  .rcCard small{font-size:11px}
+  .rcTools .seg2{flex-wrap:wrap}
+  .rgTbl{border-spacing:2px;font-size:11px}
+  .rg{min-width:26px;height:23px;font-size:11px}
+  .rgTbl td.n,.rgTbl th.n{padding-left:2px}
+  .rcP{min-width:18px;height:17px;font-size:10.5px;padding:0 3px}
+  .rcChg{min-width:0;font-size:9px;margin-left:2px}
+  #records .rcTeam .tn{display:none}
+  #records .sortH{white-space:nowrap;word-break:keep-all;letter-spacing:-.03em}
+  #records th:has(.sortH){padding-left:2px;padding-right:2px}
+}
 /* 開催国の国旗 */
 .flag{display:inline-block;vertical-align:-2px;border-radius:2px;margin-right:6px;flex:none}
 .nrName .flag{vertical-align:-1px;margin-right:8px}
@@ -2407,12 +2535,32 @@ body.career.pcRace .wxPop{right:auto;left:50%;transform:translateX(-50%)}
 .wxPg .k1{background:#1e3a52}.wxPg .k2{background:#1d4ed8}.wxPg .k3{background:#3730a3}.wxPg .h{color:#6b7280}
 .wxPa b{color:#ffc400}.wxPn{margin-top:4px;font-size:10px;color:#8b929b}
 body.phoneRace .wxFc i:nth-child(n+6){display:none}
+/* 狭い画面（スマホなど）の路面表示を短く：「路面ウェット 46%」→ 水滴＋46%、「インター有利」→ INT、予報バーは3本 */
+.wxDrop,.wxS{display:none}
+body:not(.pcRace) .stage.wxTop .wxL{display:none}
+body:not(.pcRace) .stage.wxTop .wxDrop{display:inline-block;width:8px;height:11px;margin-right:3px;vertical-align:-1px}
+body:not(.pcRace) .stage.wxTop .wxS{display:inline;font-family:"Chakra Petch",sans-serif;letter-spacing:.04em}
+body:not(.pcRace) .stage.wxTop .wxbox .wx.adv{font-family:"Chakra Petch",sans-serif;font-size:10.5px}
+body:not(.pcRace) .stage.wxTop .wxbox .wx+.wx{margin-left:3px}
+body:not(.pcRace) .stage.wxTop .wxFc{padding-left:5px;margin-left:3px}
+body:not(.pcRace) .stage.wxTop .wxFc i:nth-child(n+4){display:none}
+/* チーム本部：押して横に広がったボタンは、元の幅のまま文字を折り返す（hqRestore が armFit を付ける） */
+#hq button.armFit{white-space:normal;flex-wrap:wrap;line-height:1.2;text-align:center;row-gap:1px;padding-left:6px;padding-right:6px;min-width:0}
+#hq button.armFit .left{flex-basis:100%;text-align:center}
+/* 斜め視点（3D風）：傾きは描画（tiltWarp）で付ける。ここは奥の霞の帯と、描く前の一瞬の空の色だけ */
+.stage.tilt{background:linear-gradient(180deg,#8fbde3 0%,#cfe3f1 13%,#dbe8e6 15%,#6f9f55 17%,#5f9748 100%)}
+.stage.tilt.skyRain{background:linear-gradient(180deg,#7d8791 0%,#b7bec5 13%,#c3c9c9 15%,#5f7f50 17%,#55804a 100%)}
+.stage.tilt::before{content:"";position:absolute;left:0;right:0;top:0;height:20%;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(143,189,227,1) 0%,rgba(196,221,238,.98) 26%,rgba(214,230,234,.9) 38%,rgba(214,230,232,.55) 52%,rgba(214,230,232,.18) 74%,rgba(214,230,232,0) 100%)}
+.stage.tilt.skyRain::before{background:linear-gradient(180deg,rgba(125,135,145,1) 0%,rgba(176,184,191,.98) 26%,rgba(190,197,199,.9) 38%,rgba(190,197,199,.55) 52%,rgba(190,197,199,.18) 74%,rgba(190,197,199,0) 100%)}
+/* 速報バナー：上端の中央に入りきらないときは、上の段（LAP・路面表示）の下に出す */
+.stage.toastLow .toasts{top:var(--toastTop,44px)!important;left:var(--toastL,8px)!important;right:8px!important}
 body.phoneRace .wxPg{grid-template-columns:repeat(8,1fr)}
 </style>
 </head>
 <body>
 <header>
-  <h1 id="appTitle" style="user-select:none">サーキットマネージャー<small class="appVer">ver 1.3.0</small></h1>
+  <h1 id="appTitle" style="user-select:none">サーキットマネージャー<small class="appVer">ver 1.4.0</small></h1>
   <div class="hdrTools">
   <button class="b sm" id="soundBtn" hidden aria-pressed="true" title="効果音のオン・オフ"></button>
   <label class="volWrap" id="volWrap" hidden title="音量"><span class="volLab">音量</span><input type="range" id="volume" min="0" max="150" step="5" aria-label="音量"><span class="num volV" id="volV"></span></label>
@@ -2459,6 +2607,7 @@ body.phoneRace .wxPg{grid-template-columns:repeat(8,1fr)}
       <button id="camLead" title="先頭の車を追いかける">先頭</button>
       <button id="camFree" title="フリーカメラ：ドラッグで移動、ホイール（スマホは2本指）で拡大縮小。ミニマップを押すとその場所へ。キー：F・矢印・＋−">フリー</button>
       <button id="camRot" title="追従視点：追いかけている車の進む向きが常に画面の上になるよう回転します">追従視点</button>
+      <button id="camTilt" title="斜め視点：コースを少し斜めから見ているように表示します（もう一度押すと真上からに戻ります）">斜め</button>
       <span class="who" id="camWho"></span>
       <span class="sep"></span>
       <button id="camOut" aria-label="ズームアウト">−</button>
@@ -3799,7 +3948,7 @@ let bcast = false;                                    // 中継レイアウト�
 // 回転を含む変換：画面 = 画面中央 + 回転(rot) × 倍率a × (ワールド − カメラ中心)。setTransform(a,b,c,d,e,f) の形で返す
 function camXf(cm = cam){
   const a = dpr*scale*cm.z, r = cm.rot || 0, co = Math.cos(r)*a, si = Math.sin(r)*a;
-  const cx = cv.width/2, cy = cv.height/2;
+  const cx = cv.width/2, cy = cv.height/2 + (cm.mode !== 'all' && typeof tiltActive === 'function' && tiltActive() ? cv.height*(cv.height > cv.width*1.2 ? TILT.dropTall : TILT.drop) : 0);   // 斜め視点：追っている車を少し手前（下）に映し、進む先を広く見せる
   return { a, b: si, c: -si, d: co, A: co, e: cx - (co*cm.x - si*cm.y), f: cy - (si*cm.x + co*cm.y), rot: r };
 }
 // 画面上の点（デバイスピクセル）→ワールド
@@ -3808,8 +3957,70 @@ function xfInv(X, sx, sy){
   return { x: (X.d*dx + X.b*dy)/det, y: (-X.b*dx + X.d*dy)/det };
 }
 function screenToWorld(e, canvas = cv, cm = cam){
-  const r = canvas.getBoundingClientRect();
-  return xfInv(camXf(cm), (e.clientX - r.left)*dpr, (e.clientY - r.top)*dpr);
+  const L = cvLocal(canvas, e.clientX, e.clientY);
+  return xfInv(camXf(cm), L.x*dpr, L.y*dpr);
+}
+/* ---------- 斜め視点（3D風） ----------
+   レース画面をいったん真上から別のキャンバス（tiltBuf）に描き、それを細い横の帯に分けて、
+   奥ほど小さく・手前ほど大きく写す（tiltWarp）。CSSの3D変形は使わない（スマホのブラウザで、大きなキャンバスを
+   3D変形すると描画が消えることがあるため）。普通の2D描画だけなので、どのブラウザでも同じに見える。
+   ・傾きと遠近の中心はキャンバスの中央：追いかけている車は画面の中央のまま
+   ・奥（上）に地面が足りない分は、空（tiltWarp）と霞の帯（.stage.tilt::before）で見せる
+   ・押した位置は cvLocal() で傾きを戻してから、コース上の位置に直す
+   ・レース中だけ。コース作成の画面は真上からのまま */
+const TILT = { ang: 28, d: 2.0, s: 1.22, res: 1.35, drop: 0.05, dropTall: 0.17 };   // 角度（度）、視点までの距離（キャンバスの高さに対する倍率）、拡大率、描く細かさの倍率、追う車を下へずらす量（横長・縦長の画面）
+let tiltOn = lsGet('circuitMaker.view3d.v1', true);
+const tiltActive = () => !!tiltOn && mode === 'race';
+function applyTilt(){
+  const on = tiltActive();
+  for(const c of [cv, cv2]){
+    const st = c.parentElement; if(!st) continue;
+    st.classList.toggle('tilt', on);
+    st.style.perspective = ''; st.style.perspectiveOrigin = ''; c.style.transform = '';   // 以前のCSSの3D変形の名残を消す（スマホのブラウザで画面が消えることがあったため、いまは描画で傾ける）
+  }
+  const b = $('#camTilt'); if(b){ b.classList.toggle('on', !!tiltOn); b.setAttribute('aria-pressed', tiltOn ? 'true' : 'false'); }
+}
+const tiltBuf = document.createElement('canvas'), tiltBctx = tiltBuf.getContext('2d');
+// 描画関数 fn を、斜め視点なら tiltBuf に描かせてから target へ傾けて写す
+function paintView(target, fn){
+  if(!tiltActive()){ fn(target); return; }
+  const c = target.canvas;
+  if(tiltBuf.width !== c.width || tiltBuf.height !== c.height){ tiltBuf.width = c.width; tiltBuf.height = c.height; }
+  fn(tiltBctx);
+  tiltWarp(tiltBuf, target);
+}
+// 真上から描いた絵（src）を、奥へ TILT.ang 度倒して遠近をつけた絵として g に写す（cvLocal と同じ式の逆向き）
+function tiltWarp(src, g){
+  const W = g.canvas.width, H = g.canvas.height, a = TILT.ang*Math.PI/180, ca = Math.cos(a), sa = Math.sin(a), d = TILT.d*H, s = TILT.s;
+  const vAt = y => { const dy = y - H/2, den = s*(d*ca + dy*sa); return den > 0 ? H/2 + d*dy/den : -Infinity; };   // 画面の高さ y に写る、元の絵の高さ
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  const rain = race.rain > 0.08, sky = g.createLinearGradient(0, 0, 0, H*0.22);
+  sky.addColorStop(0, rain ? '#7d8791' : '#8fbde3'); sky.addColorStop(1, rain ? '#c3c9c9' : '#dbe8e6');
+  g.fillStyle = sky; g.fillRect(0, 0, W, H);
+  g.imageSmoothingEnabled = true;
+  const step = Math.max(2, Math.round(H/360));                     // 帯の高さ（デバイスピクセル）。帯の数は多くても約360本
+  for(let y = 0; y < H; y += step){
+    let v0 = vAt(y), v1 = vAt(y + step);
+    if(v1 <= 0) continue; if(v0 >= H) break;
+    let y0 = y, hh = step;
+    if(v0 < 0){ const k = (0 - v0)/(v1 - v0); y0 = y + step*k; hh = step*(1 - k); v0 = 0; }   // 地平線（元の絵の上端）にかかる帯
+    if(v1 > H) v1 = H;
+    const t = (v0 + v1)/2 - H/2, kx = s*d/(d - s*t*sa);            // この帯の横の拡大率
+    const u0 = Math.max(0, W/2 - W/(2*kx)), u1 = Math.min(W, W/2 + W/(2*kx));
+    g.drawImage(src, u0, v0, u1 - u0, Math.max(0.5, v1 - v0), W/2 + (u0 - W/2)*kx, y0, (u1 - u0)*kx, hh + 0.6);   // +0.6：帯のあいだの細い隙間を防ぐ
+  }
+}
+function setTilt(v){ tiltOn = !!v; lsSet('circuitMaker.view3d.v1', tiltOn); applyTilt(); resize(); dirty = true; bgDirty = true; }
+// 画面上の点（clientX/Y）→ キャンバスの左上からの位置（CSSピクセル、傾ける前の座標）
+function cvLocal(canvas, x, y){
+  const st = canvas.parentElement;
+  if(!st || !st.classList.contains('tilt')){ const r = canvas.getBoundingClientRect(); return { x: x - r.left, y: y - r.top }; }
+  const R = st.getBoundingClientRect(), w = canvas.clientWidth, h = canvas.clientHeight;
+  const Cx = R.left + st.clientLeft + canvas.offsetLeft + w/2, Cy = R.top + st.clientTop + canvas.offsetTop + h/2;
+  const a = TILT.ang*Math.PI/180, d = TILT.d*h, s = TILT.s, dx = x - Cx, dy = y - Cy;
+  // 倒した面の上の点 (u, t)（中央からの距離）が、遠近をつけて画面のどこに写るかを逆にたどる
+  const t = d*dy/(s*(d*Math.cos(a) + dy*Math.sin(a))), f = d/(d - s*t*Math.sin(a));
+  return { x: w/2 + dx/(f*s), y: h/2 + t };
 }
 const setXf = X => ctx.setTransform(X.d, X.b, X.c, X.d, X.e, X.f);
 function setCam(m, machine){
@@ -3839,9 +4050,9 @@ function enterFree(){
 }
 const fcamCanvas = () => bcast ? cv2 : cv;
 function fcamZoomAt(canvas, clientX, clientY, z){
-  const r = canvas.getBoundingClientRect(), p = screenToWorld({ clientX, clientY }, canvas, cam);
+  const p = screenToWorld({ clientX, clientY }, canvas, cam), L = cvLocal(canvas, clientX, clientY);
   z = clamp(z, fcamZMin(), FCAM_ZMAX);
-  setFcam(p.x - (clientX - r.left - r.width/2)/(scale*z), p.y - (clientY - r.top - r.height/2)/(scale*z), z);
+  setFcam(p.x - (L.x - canvas.clientWidth/2)/(scale*z), p.y - (L.y - canvas.clientHeight/2)/(scale*z), z);
   updateCamUI();
 }
 const fptr = new Map();                                   // フリーカメラを操作中の指（マウス）
@@ -3869,8 +4080,8 @@ function racePtrMove(e){
   if(g.kind === 'pinch'){
     if(fptr.size < 2) return;
     const [a, b] = [...fptr.values()], mx = (a.x + b.x)/2, my = (a.y + b.y)/2;
-    const z = clamp(g.z0*Math.hypot(a.x - b.x, a.y - b.y)/g.d0, fcamZMin(), FCAM_ZMAX);
-    setFcam(g.wx - (mx - r.left - r.width/2)/(scale*z), g.wy - (my - r.top - r.height/2)/(scale*z), z); updateCamUI();
+    const z = clamp(g.z0*Math.hypot(a.x - b.x, a.y - b.y)/g.d0, fcamZMin(), FCAM_ZMAX), L = cvLocal(g.canvas, mx, my);
+    setFcam(g.wx - (L.x - g.canvas.clientWidth/2)/(scale*z), g.wy - (L.y - g.canvas.clientHeight/2)/(scale*z), z); updateCamUI();
     return;
   }
   if(g.kind !== 'drag') return;
@@ -3878,8 +4089,8 @@ function racePtrMove(e){
     if(Math.hypot(e.clientX - g.sx, e.clientY - g.sy) < 6) return;
     g.moved = true; g.px = e.clientX; g.py = e.clientY; enterFree(); g.canvas.style.cursor = 'grabbing'; return;
   }
-  const k = scale*fcam.z;
-  setFcam(fcam.x - (e.clientX - g.px)/k, fcam.y - (e.clientY - g.py)/k, fcam.z);
+  const k = scale*fcam.z, L1 = cvLocal(g.canvas, e.clientX, e.clientY), L0 = cvLocal(g.canvas, g.px, g.py);
+  setFcam(fcam.x - (L1.x - L0.x)/k, fcam.y - (L1.y - L0.y)/k, fcam.z);
   g.px = e.clientX; g.py = e.clientY;
 }
 function racePtrUp(e){
@@ -3933,9 +4144,28 @@ function fixOverlays(){
   // 左右の隅にある表示（左上：LAP・旗の状態、右上：路面）の広いほうに合わせて、両側を同じだけ空ける
   const sideOf = (stage, wx) => { const hud = stage.querySelector('.hud');
     return Math.max(wx && !wx.hidden ? wx.offsetWidth : 0, hud ? Math.max(...[...hud.children].map(e => e.offsetWidth), 0) : 0); };
-  st.style.setProperty('--side', sideOf(st, $('#wxbox')) + 'px');
-  if(st2 && !st2.hidden) st2.style.setProperty('--side', sideOf(st2, $('#wxbox2')) + 'px');   // ズーム画面の速報バナーも左右の表示を避ける
+  // 速報バナーの置き場所：ふだんは上端の中央（左右の表示のあいだ）。そこに入りきらないとき
+  // （スマホで雨になり、右上の路面表示が広がったときなど）は、上の段の下に画面の幅いっぱいで出す。
+  // そのときミニマップが左上にあれば、その右側から出す
+  const place = (stage, wx) => {
+    const side = sideOf(stage, wx), tb = stage.querySelector('.toasts');
+    stage.style.setProperty('--side', side + 'px');
+    const low = !!tb && !document.body.classList.contains('pcRace') && stage.clientWidth - 2*(side + 12) < TOAST_MIN_W;
+    stage.classList.toggle('toastLow', low);
+    if(!low) return;
+    const R = stage.getBoundingClientRect(), hud = stage.querySelector('.hud'), vis = e => e && !e.hidden && e.offsetParent !== null;
+    let bot = 0;
+    [...(hud ? hud.children : []), wx].forEach(e => { if(!vis(e)) return; const r = e.getBoundingClientRect(); if(r.height) bot = Math.max(bot, r.bottom - R.top); });
+    const top = Math.round(bot + 6);
+    let left = 8;
+    const mm = stage.querySelector('.miniMap');
+    if(vis(mm)){ const r = mm.getBoundingClientRect(); if(r.width && r.top - R.top < top + 44 && r.right - R.left < stage.clientWidth*0.5) left = Math.round(r.right - R.left + 8); }
+    stage.style.setProperty('--toastTop', top + 'px'); stage.style.setProperty('--toastL', left + 'px');
+  };
+  place(st, $('#wxbox'));
+  if(st2 && !st2.hidden) place(st2, $('#wxbox2'));   // ズーム画面の速報バナーも左右の表示を避ける
 }
+const TOAST_MIN_W = 160;   // 速報バナーを上端の中央に出すのに要る最低の幅（px）。これより狭いときは上の段の下に出す
 /* 中継レイアウトのズーム画面にも、全体画面と同じ LAP・旗の状態・路面の表示を出す（全体画面側が書き換わるたびに写す） */
 {
   const pairs = [['#hint','#hint2'], ['#flag','#flag2'], ['#weather','#weather2']];
@@ -3946,6 +4176,7 @@ function fixOverlays(){
   const mo = new MutationObserver(()=>{ sync(); requestAnimationFrame(fixOverlays); });
   for(const [a] of pairs) mo.observe($(a), { childList: true, subtree: true, characterData: true });
   mo.observe($('#wxbox'), { attributes: true, attributeFilter: ['hidden'] });
+  { const mm = $('#miniMap'); if(mm) new MutationObserver(() => requestAnimationFrame(fixOverlays)).observe(mm, { attributes: true, attributeFilter: ['hidden'] }); }
 }
 new ResizeObserver(()=>fixOverlays()).observe(document.body);
 function updateCamUI(){
@@ -3967,11 +4198,13 @@ function updateCamUI(){
   if(mode === 'race'){ const fc = fcamCanvas(); for(const c of [cv, cv2]) c.style.touchAction = free && c === fc ? 'none' : (c === cv ? 'auto' : ''); fc.classList.toggle('freeCam', free); (fc === cv ? cv2 : cv).classList.remove('freeCam'); }
 }
 function resize(){
-  const w = cv.clientWidth; dpr = window.devicePixelRatio || 1; scale = w / VW;
+  const w = cv.clientWidth; dpr = window.devicePixelRatio || 1;
+  if(typeof tiltActive === 'function' && tiltActive() && dpr < 2) dpr = dpr*TILT.res;   // 斜め視点：手前が拡大されるので、解像度の低い画面だけ少し細かく描く（高解像度の画面はそのまま＝重くしない）
+  scale = w / VW;
   cv.width = Math.round(w*dpr); cv.height = Math.round((document.body.classList.contains('phoneRace') && cv.clientHeight ? cv.clientHeight : w*0.7)*dpr); dirty = true; bgDirty = true;
   cv2.width = cv.width; cv2.height = cv.height;       // 中継レイアウトでは2枚とも同じ大きさなので背景を共用できる
 }
-new ResizeObserver(resize).observe(cv);
+new ResizeObserver(() => { resize(); if(typeof applyTilt === 'function') applyTilt(); }).observe(cv);
 
 function tracePath(pts){ ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y); for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x, pts[i].y); ctx.closePath(); }
 
@@ -5161,12 +5394,12 @@ function draw(){
   if(!cv.width || !cv.height) return;                 // レイアウト切り替えの途中などで大きさが0のときは描かない
   ensureBg();
   if(RP.play){                                         // リプレイ中：カメラの画面だけリプレイに差し替える
-    if(bcast){ drawView(ctx1, allCam); drawReplay(ctx2); }
-    else drawReplay(ctx1);
+    if(bcast){ paintView(ctx1, g => drawView(g, allCam)); paintView(ctx2, g => drawReplay(g)); }
+    else paintView(ctx1, g => drawReplay(g));
     return;
   }
-  if(bcast){ drawView(ctx1, allCam); drawView(ctx2, cam); }
-  else drawView(ctx1, cam);
+  if(bcast){ paintView(ctx1, g => drawView(g, allCam)); paintView(ctx2, g => drawView(g, cam)); }
+  else paintView(ctx1, g => drawView(g, cam));
 }
 /* ---------- クラッシュのリプレイ（自動中継のときだけ） ----------
    レース中は直近の約9秒ぶんの「全車の位置・向き」と「煙や砂煙の粒」を記録しておく。
@@ -8158,6 +8391,7 @@ function bestTyreFor(w){
   return best;
 }
 const TY_ADV = { M:'スリック有利', I:'インター有利', W:'ウェット有利' };
+const TY_SHORT = { M:'DRY', I:'INT', W:'WET' };   // 狭い画面の路面表示で使う短い書き方（色は TY_ADV と同じ）
 /* 作戦用：予報で、何周後に雨用タイヤ（I・W）のほうが速くなりそうか（1＝次の周）。
    予報の範囲で見えない、または確からしさが低い（55%未満）ときは null。
    スリックからスリックへ替えた直後に雨が来て、もう一度ピットに入る「無駄なピット」を避けるのに使う */
@@ -10668,13 +10902,14 @@ function drawSpray(){
    強いブレーキの踏み始めに、ブレーキ能力が低いほど・雨ほど・接近戦ほど・タイヤが減っているほどミスしやすい。
    ・タイヤロック：前輪の片側がロックして白煙とブレーキ痕。少し止まりにくくなり、タイヤに平らな部分ができて摩耗が進む
    ・オーバーラン：ブレーキが遅れてコーナーで止まりきれず、外へはみ出してランオフエリアを通ってから戻る */
-/* ---------- アンダーステア・オーバーステア（スピンは廃止。下のスピン関連の処理は、現在は呼ばれない） ----------
+/* ---------- アンダーステア・オーバーステア・単独スピン ----------
    ・アンダーステア：コーナーの入口でフロントのグリップが足りず、曲がりきれずに外へ膨らむ（前輪から白煙）。
      前の車の真後ろ（ダーティエア）、コーナリング能力が低い車、減ったタイヤ、雨で起きやすい
    ・オーバーステア：立ち上がりでアクセルを踏んだとき、リアが外へ流れて車体が内側を向く。
      カウンターを当てて立て直すが、その間は加速できない（後輪から白煙）。加速・タイヤ管理が低い車、雨で起きやすい
-   ・スピン：オーバーステアを立て直せなかったとき。車体が回りながら滑って止まり、向きを直してから復帰する。
-     スピンした区間には短いイエローが出る。勢いよくフェンスに当たるとクラッシュ */
+   ・単独スピン：立ち上がりのオーバーステアのうち、立て直せなかった一部（割合は SOLO_SPIN。雨・減ったタイヤ・冷えたタイヤ・
+     プッシュ中・設定の「事故の起きやすさ」で増減）。startSpin で始まり、滑る→止まる→向き直る→復帰の流れは stepSpin（下の「スピン」の項）。
+     スピンした区間にはイエローが出る。滑っている途中に勢いよくフェンスへ当たるとクラッシュ。接触で当てられた側がスピンすることもある */
 const UNDER_GRIP = 0.5;
 /* ---------- OTモード・ブースト・バッテリー ----------
    ・バッテリー（ers：0〜1）はブレーキで回収し、ブーストで使う。残りわずかになると直線の終わりで最高速が落ちる（クリッピング）
@@ -11087,8 +11322,9 @@ function startSpin(c, dir){
       止まる直前にゆるむ（速度が落ちたぶんだけ回るので、止まったときには横向き（約90°）か逆向き（約180°）になっていることが多い）
    ② 止まる：後ろから来る車が通り過ぎるのを待ってから動き出す（走ってくる車の前には出ない）
    ③ 向き直る：止まった向きで変える。ほぼ前向きならそのまま、横向きで内側を向いていれば少し前に進みながらハンドルを切って、
-      逆向き・外を向いているならアクセルを踏んでその場でくるっと回る（スピンターン。白煙が出る） */
+      逆向き・外を向いているならアクセルを踏んで、前輪を軸にリアを振り回して向きを変える（スピンターン。後輪から白煙が出る） */
 const SPIN_FR = 260, SPIN_FR_OFF = 460;   // （2026-10：復帰を早めるため 140/300 から強めた）
+const SPIN_PIVOT_F = 6.2;                  // スピンターンの軸：車の中心から前の車軸までの距離（scrubSmoke の前輪の位置と同じ）
 const SOLO_SPIN = 0.035;                   // オーバーステアのうち、立て直せずに単独でスピンする割合（晴れ・普通のペース・新しいタイヤのとき）   // 滑っているときの減速（舗装／芝・グラベル）
 function spinSlideSet(c){                   // 滑り始め（接触で押されて、もう一度滑り出したときも）
   const s = c.spin, u = Math.random();
@@ -11130,13 +11366,17 @@ function stepSpin(c, dt, T, best){
       s.turnDir = rel > 0 ? -1 : 1;
       s.phase = Math.abs(rel) < 0.3 ? 'go' : (Math.abs(rel) > 1.9 || outward) ? 'pivot' : 'roll';
     }
-  } else if(s.phase === 'pivot'){                                         // スピンターン：その場でくるっと向きを変える
+  } else if(s.phase === 'pivot'){                                         // スピンターン：前輪を軸にして、リアを振り回して向きを変える
+    if(s.px == null){ s.px = c.x + Math.cos(c.h)*SPIN_PIVOT_F; s.py = c.y + Math.sin(c.h)*SPIN_PIVOT_F; s.pt = 0; s.pa = Math.abs(wrapAng(c.h - p.a)); }   // 軸＝前の車軸の位置（回っている間は動かさない）
+    s.pt += dt;
+    const left = Math.abs(wrapAng(c.h - p.a));                             // 向き直るまでに残っている角度
+    const w = 5.2 * Math.min(1, 0.35 + s.pt*2.6) * (0.35 + 0.65*Math.min(1, left/0.9));   // 回り始めは踏み込みながら加速し、向きがそろう手前でゆるめる
+    c.h += s.turnDir * w * dt;
+    c.x = s.px - Math.cos(c.h)*SPIN_PIVOT_F; c.y = s.py - Math.sin(c.h)*SPIN_PIVOT_F;   // 車の中心は、軸から前の車軸までの距離を保って回る（＝リアが弧を描く）
     c.v = 4;
-    c.h += s.turnDir * 5.5 * dt;
-    c.x += Math.cos(c.h)*c.v*dt; c.y += Math.sin(c.h)*c.v*dt;
-    scrubSmoke(c, -1, dt, 1.8);
+    scrubSmoke(c, -1, dt, 2.0); scrubSmoke(c, 1, dt, 0.25);              // 白煙は主に後輪から（前輪はほとんど動かない）
     if(sndCan('spinturn', 600)) noise(0.5, { filter: 'bandpass', freq: 1800, q: 1.2, vol: 0.05 });
-    if(Math.abs(wrapAng(c.h - p.a)) < 0.25) s.phase = 'go';
+    if(left < 0.25){ s.phase = 'go'; s.px = s.py = null; }
   } else if(s.phase === 'roll'){                                          // 少し前に進みながらハンドルを切って向き直る
     c.v = Math.min(45, c.v + 70*dt);
     const rel = wrapAng(c.h - p.a);
@@ -11156,6 +11396,7 @@ function stepSpin(c, dt, T, best){
   if(Math.abs(lat2) > lim){
     if(s.phase === 'slide' && c.v > CRASH_V && $('#crashOn').checked && !race.red && !race.form){ c.spin = null; crashIncident(c); return; }
     const o = (Math.abs(lat2) - lim)*Math.sign(lat2); c.x -= p.nx*o; c.y -= p.ny*o; c.v *= 0.5;
+    if(s.px != null){ s.px -= p.nx*o; s.py -= p.ny*o; }                  // スピンターン中にフェンスへ押し戻されたら、軸も一緒にずらす
   }
 }
 // タイヤの白煙とタイヤ痕。axle：+1 前輪／-1 後輪。k：強さ
@@ -11752,15 +11993,17 @@ function renderStandings(force){
     const dry = race.wet < 0.02 && race.rain <= 0.02;           // 雨も路面の濡れもなければ天候モードに関係なくDRY
     let wxHtml = dry
       ? '<span class="wx">DRY</span>'
-      : `<span class="wx rainy" title="路面の濡れ具合">${weatherLabel()} <span class="num">${Math.round(race.wet*100)}%</span></span>`;
+      : `<span class="wx rainy" title="路面の濡れ具合（${weatherLabel()}）"><span class="wxL">${weatherLabel()} </span><svg class="wxDrop" viewBox="0 0 10 13" aria-hidden="true"><path d="M5 .8C3.4 3.6 1 6 1 8.5a4 4 0 0 0 8 0C9 6 6.6 3.6 5 .8z" fill="currentColor"/></svg><span class="num">${Math.round(race.wet*100)}%</span></span>`;
     const T = race.trackT == null ? null : Math.round(race.trackT);
     // 路面が濡れているときは、路面温度の代わりにタイヤの目安（走行ライン上の濡れ具合で一番速いタイヤ）
-    const ttHtml = !dry ? `<span class="wx adv adv${bestTyreFor(rWet())}" title="いまの路面で速いタイヤ">${TY_ADV[bestTyreFor(rWet())]}</span>`
+    const bt = !dry ? bestTyreFor(rWet()) : null;
+    const ttHtml = !dry ? `<span class="wx adv adv${bt}" title="いまの路面で速いタイヤ：${TY_ADV[bt]}"><span class="wxL">${TY_ADV[bt]}</span><span class="wxS">${TY_SHORT[bt]}</span></span>`
       : T == null ? '' : `<span class="wx tt num${T < 25 ? ' cool' : (T > 42 ? ' hot' : '')}" title="路面温度">${T}℃</span>`;
     const fcHtml = wxBarHtml();
     if(wxEl.innerHTML !== wxHtml + ttHtml){ wxEl.innerHTML = wxHtml + ttHtml; fixOverlays(); }
+    { const grey = race.rain > 0.08; ['#stage', '#stage2'].forEach(q => { const e = $(q); if(e && e.classList.contains('skyRain') !== grey) e.classList.toggle('skyRain', grey); }); }   // 斜め視点の空：雨なら灰色
     const fcEl = $('#wxFc');                                       // 予報バーは別の要素（路面の％が変わっても作り直さない＝押しやすい）
-    if(fcEl){ if(fcEl.hidden !== !fcHtml){ fcEl.hidden = !fcHtml; fixOverlays(); } if(fcHtml && fcEl.innerHTML !== fcHtml) fcEl.innerHTML = fcHtml; }
+    if(fcEl){ if(fcEl.hidden !== !fcHtml){ fcEl.hidden = !fcHtml; fixOverlays(); } if(fcHtml && fcEl.innerHTML !== fcHtml){ fcEl.innerHTML = fcHtml; fixOverlays(); } }
     const pop = $('#wxPop');
     if(pop && !pop.hidden){ if(!fcHtml) pop.hidden = true; else { const h = wxPopHtml(); if(pop.innerHTML !== h) pop.innerHTML = h; } }
   }
@@ -12118,6 +12361,7 @@ function setMode(m){
   applyLayout();
   if(m === 'edit') stepCam(0, true);                   // 編集中は常にコース全体
   cv.style.touchAction = m === 'edit' ? 'none' : 'auto';
+  applyTilt(); resize();                               // 斜め視点はレース中だけ
   gesture = null; ptrs.clear(); edCursor();
   if(m === 'edit'){
     if(race.state !== 'idle') resetRace(); updateHint();
@@ -12185,6 +12429,7 @@ $('#camLead').onclick = ()=>setCam('lead');
 $('#camFree').onclick = ()=>{ if(cam.mode === 'free') setCam('all'); else enterFree(); };
 function setFollowRot(on){ followRot = on; lsSet('circuitMaker.followRot.v1', on); if(on && cam.mode === 'all') setCam(MY ? 'car' : 'lead', MY || undefined); updateCamUI(); dirty = true; }
 $('#camRot').onclick = ()=>{ setFollowRot(!followRot); $('#camRot').blur(); };
+$('#camTilt').onclick = ()=>{ setTilt(!tiltOn); $('#camTilt').blur(); };
 $('#camAuto').onclick = ()=>{ DIR.shot = null; DIR.next = 0; setCam('auto'); };
 $('#camIn').onclick = ()=>{ if(cam.mode === 'free'){ setFcam(fcam.x, fcam.y, fcam.z*1.25); updateCamUI(); return; } cam.zi = Math.min(CAM_ZOOMS.length-1, cam.zi+1); if(cam.mode === 'all') cam.mode = 'lead'; updateCamUI(); renderStandings(true); };
 $('#camOut').onclick = ()=>{ if(cam.mode === 'free'){ setFcam(fcam.x, fcam.y, fcam.z/1.25); updateCamUI(); return; } cam.zi = Math.max(0, cam.zi-1); updateCamUI(); };
@@ -12572,7 +12817,7 @@ function guideHtml(){
       ['マシン開発', 'パワーユニット・空力・ブレーキの7項目の開発'],
       ['施設', '風洞・シミュレーターなど5つの施設の強化と売却'],
       ['移籍市場', 'ドライバーとの契約（交代・リザーブ）'],
-      ['記録', '選手権の順位表、歴代チャンピオン・通算成績・レース履歴']])}
+      ['記録', '選手権の順位表、シーズン別ランキング（戦ごとの結果・ポイント推移）、歴代チャンピオン・通算成績・レース履歴・自チームの歩み']])}
     <p class="gNote">スマホでは画面下の「予選へ」ボタンから、いつでもレースの準備に進めます。各画面の <span class="qm qmS">?</span> を押すと、このガイドの該当する所が開きます。</p>`)}
   ${sec('money', 'お金の仕組み', `
     <p>毎戦の収支は「前戦の結果」の「この戦いの収支」で確認できます。</p>
@@ -13959,7 +14204,7 @@ const HQ_TAB_ICO = {
 };
 let hqTab = lsGet(HQ_TAB_KEY, 'ov'); if(!HQ_TABS.some(([k]) => k === hqTab)) hqTab = 'ov';
 const hqOpen = new Set();                         // 前戦の結果で開いている折りたたみ（ニュースの続き・収支の内訳）
-let recView = 'champs', recPick = null;          // 記録の表示（歴代チャンピオン・チーム・ドライバー・レース履歴）と、詳しく見ている対象
+let recView = 'season', recPick = null;          // 記録の表示（歴代チャンピオン・チーム・ドライバー・レース履歴）と、詳しく見ている対象
 /* ---------- 過去の成績（通算記録） ----------
    career.stats.drivers[code] / career.stats.teams[id]：出走・優勝・表彰台・ポール・FL・ポイント・リタイア・タイトル・ベスト順位
    それぞれ seasons[シーズン] にシーズンごとのポイントと最終順位を持つ。career.raceLog は全レースの記録 */
@@ -13996,8 +14241,9 @@ function recordStats(order, rows, rd){
     d.starts++; if(!teamsRun.has(r.team)){ t.starts++; teamsRun.add(r.team); }
     sd.pts += r.pts; if(fin && pos === 1) sd.wins++; if(fin && pos <= 3) sd.podiums++;
   });
-  const pole = order.find(c => c.grid === 1);
+  const pole = order.find(c => c.grid === 1), flc = order.find(c => c.best != null && c.best === bestAll);
   career.raceLog.push({ season: career.season, round: career.round + 1, name: rd.name, type: rd.type, winner: rows[0] && rows[0].pos ? rows[0].code : null, winTeam: rows[0] ? rows[0].team : null,
+    fl: flc ? flc.m.name : null, res: rows.map(r => [r.code, r.team, r.pos, r.pts]),   // 戦ごとの結果・ポイント推移用：全員の［略号, チーム, 順位（リタイアはnull）, ポイント］
     pole: pole ? pole.m.name : null, my: rows.map((r, i) => ({ code: r.code, pos: r.pos, pts: r.pts, grid: order[i] ? order[i].grid : null, team: r.team })).filter(r => r.team === career.team).map(({ team, ...r }) => r) });
 }
 function recordSeasonStats(){
@@ -15802,6 +16048,54 @@ function addLeftToArmed(root){
   const after = r1(career.money - armed.cost);
   root.querySelectorAll('button').forEach(b => { if(b.textContent.includes('もう一度押して確定') && !b.querySelector('.left')) b.insertAdjacentHTML('beforeend', `<small class="left">${armed.cost >= 0 ? '残り' : '確定後'} ${money(after)}</small>`); });
 }
+/* ---------- チーム本部：ボタンを押して描き直しても、押したボタンが画面の同じ位置に残るようにする ----------
+   本部はボタンを押すたびに全体を描き直す。そのとき上のほうの表示（メッセージ・案内・資金など）の高さが変わると、
+   押したボタンが上下にずれて見える。押したボタン（なければ近くの目印になる親）の画面上の位置を、描き直しの前後で同じにする */
+let hqHit = null;
+function hqKeyOf(n){
+  if(n.id) return '#' + CSS.escape(n.id);
+  const ds = [...n.attributes].filter(a => a.name.startsWith('data-')).map(a => `[${a.name}="${CSS.escape(a.value)}"]`).join('');
+  return ds ? n.tagName.toLowerCase() + ds : null;
+}
+document.addEventListener('click', e => {
+  const hq = $('#hq'), t = e.target && e.target.closest ? e.target.closest('button, [role="button"], summary, a, label, input, select') : null;
+  if(!hq || hq.hidden || !t || !hq.contains(t)){ hqHit = null; return; }
+  const chain = [];
+  for(let n = t; n && n !== hq && chain.length < 5; n = n.parentElement){ const k = hqKeyOf(n); if(k) chain.push({ k, i: [...hq.querySelectorAll(k)].indexOf(n), el: n, self: n === t }); }
+  hqHit = chain.length ? { chain, t: performance.now() } : null;
+}, true);   // 押したボタンの処理より先に記録する
+function hqAnchor(){
+  if(!hqHit || performance.now() - hqHit.t > 1500) return null;
+  const hq = $('#hq'); if(!hq || hq.hidden) return null;
+  const list = hqHit.chain.filter(c => c.el.isConnected).map(c => { const r = c.el.getBoundingClientRect(); return { ...c, top: r.top, bot: r.bottom, left: r.left, w: r.width, ot: c.el.offsetTop, oh: c.el.offsetHeight }; });
+  return list.length ? list : null;
+}
+function hqRestore(a){
+  const hq = $('#hq'); if(!a || !hq || hq.hidden) return;
+  for(const c of a){
+    const L = hq.querySelectorAll(c.k), el = L[c.i] || (L.length === 1 ? L[0] : null);
+    if(!el || el.offsetParent === null) continue;
+    let r = el.getBoundingClientRect();
+    // 押したボタンが「もう一度押して確定」などで横に広がり、横並びの中で位置が変わったときは、
+    // 元の幅のまま文字を折り返して、同じ場所に残す（2回目も同じ所を押せるように）
+    const covers = r.left <= c.left + 1 && r.right >= c.left + c.w - 1;                                         // 広がっても、元の場所をまだ覆っている（右寄せのボタンが左へ広がった等）
+    const rowMoved = Math.abs(el.offsetTop - c.ot) > 1 && Math.abs(el.offsetTop + el.offsetHeight - c.ot - c.oh) > 1;   // 上下の端がどちらも動いた＝次の行に回った
+    if(c.self && el.tagName === 'BUTTON' && r.width > c.w + 1 && (!covers || rowMoved)){
+      el.classList.add('armFit'); el.style.width = c.w + 'px'; el.style.maxWidth = c.w + 'px';
+      r = el.getBoundingClientRect();
+    }
+    const dt = r.top - c.top, db = r.bottom - c.bot;
+    const dy = Math.abs(dt) <= Math.abs(db) ? dt : db;   // ボタン自体の高さが変わったとき（「もう一度押して確定」で2行になる等）は、動かなかった側の端に合わせる
+    if(Math.abs(dy) > 0.5){
+      // 短い表示に切り替わってページが縮み、下まで戻せないときは、下に余白を足して位置を保つ
+      const want = window.scrollY + dy, max = document.documentElement.scrollHeight - window.innerHeight;
+      if(want > max + 0.5) hq.style.paddingBottom = ((parseFloat(hq.style.paddingBottom) || 0) + want - max) + 'px';
+      window.scrollTo({ top: want, behavior: 'instant' });
+    }
+    hqHit.chain.forEach(x => { const L2 = hq.querySelectorAll(x.k); x.el = L2[x.i] || L2[0] || x.el; });   // 同じ操作で続けて描き直しても、新しいボタンを目印にする
+    return;
+  }
+}
 function renderHQ(msg){
   const el = $('#hq');
   if(career && !career.fired && hqView !== 'new'){ const pm = checkPayDeal(); if(pm) msg = pm + (msg ? ' ' + msg : ''); }
@@ -16254,8 +16548,13 @@ function renderHQ(msg){
   const lb = $('#loanBtn'); if(lb) lb.onclick = borrow;
   { const gd = $('#guideDismiss'); if(gd) gd.onclick = () => { lsSet(GUIDE_KEY, true); renderHQ(); }; }
   const rb = $('#repayBtn'); if(rb) rb.onclick = repayAll;
-  el.querySelectorAll('[data-rv]').forEach(b => b.onclick = () => { recView = b.dataset.rv; recPick = null; renderHQ(); document.getElementById('records')?.scrollIntoView({ block: 'start' }); });
-  el.querySelectorAll('[data-rp]').forEach(b => b.onclick = () => { recPick = recPick === b.dataset.rp ? null : b.dataset.rp; renderHQ(); document.getElementById('records')?.scrollIntoView({ block: 'start' }); });
+  el.querySelectorAll('[data-rv]').forEach(b => b.onclick = () => { recView = b.dataset.rv; recPick = null; renderHQ(); });
+  el.querySelectorAll('[data-rp]').forEach(b => b.onclick = () => openProf(b.dataset.rp));   // 名前：戦績を画面の上に重ねて出す（表の上に差し込むと、押した行が下に押し出されるため）
+  el.querySelectorAll('[data-rsn]').forEach(b => b.onclick = () => { const n = +b.dataset.rsn; recView = 'season'; recSeason = n === career.season ? null : n; recPick = null; renderHQ(); });
+  el.querySelectorAll('[data-rside]').forEach(b => b.onclick = () => { recSide = b.dataset.rside; renderHQ(); });
+  el.querySelectorAll('[data-rsub]').forEach(b => b.onclick = () => { recSub = b.dataset.rsub; renderHQ(); });
+  el.querySelectorAll('[data-rs]').forEach(b => b.onclick = () => { const [tb, k] = b.dataset.rs.split(':'), o = recSort[tb]; if(o[0] === k) o[1] = -o[1]; else { o[0] = k; o[1] = -1; } renderHQ(); });
+  bindRecChart(el);
   el.querySelectorAll('[data-sreq]').forEach(b => b.onclick = () => answerSreq(b.dataset.sreq === '1'));
   el.querySelectorAll('[data-evo]').forEach(b => b.onclick = () => { if(career.ev && career.ev.kind === 'cash'){ career.ev = null; saveCareer(); renderHQ(); } else answerEvent(b.dataset.evo); });
   el.querySelectorAll('[data-sp]').forEach(b => b.onclick = () => { spPickSel = +b.dataset.sp; payPick = null; renderSponsorPick(); });
@@ -16266,7 +16565,7 @@ function renderHQ(msg){
   el.querySelectorAll('[data-tpol]').forEach(b => b.onclick = () => { career.tpol = b.dataset.tpol; saveCareer(); renderHQ(); });
   el.querySelectorAll('[data-dswap]').forEach(b => b.onclick = () => { const t = myTeam(); t.drivers.reverse(); saveCareer(); renderHQ(); });
   el.querySelectorAll('[data-prof]').forEach(b => b.onclick = () => openProf(b.dataset.prof));   // カードの「戦績」
-  el.querySelectorAll('[data-spk]').forEach(b => b.onclick = () => { const k = b.dataset.spk || null; standPick = k && standPick === k && !b.closest('.prPanel') ? null : k; renderHQ(); const p = document.getElementById('standProf'); if(p && standPick) p.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
+  el.querySelectorAll('[data-spk]').forEach(b => b.onclick = () => { const k = b.dataset.spk; if(k) openProf(k); });   // 選手権の名前：戦績を画面の上に重ねて出す（記録タブ・ドライバータブと同じ）
   el.querySelectorAll('[data-sign]').forEach(b => b.onclick = () => sign(b.dataset.sign, +b.dataset.slot));
   { const pc = el.querySelector('#popCard'); if(pc) pc.onclick = openIncome; }
   el.querySelectorAll('[data-signd]').forEach(b => b.onclick = () => signDemote(b.dataset.signd, +b.dataset.slot));
@@ -16292,8 +16591,10 @@ function renderHQ(msg){
   const gr = $('#goRace'); if(gr) gr.onclick = () => { sndInit(); goRace(); };
   const grb = $('#goRaceBar'); if(grb) grb.onclick = () => { sndInit(); goRace(); };
   el.querySelectorAll('[data-hqt]').forEach(b => b.onclick = () => {
+    const fromNav = !!b.closest('.hqTabs');
     hqTab = b.dataset.hqt; lsSet(HQ_TAB_KEY, hqTab); renderHQ();
     const nav = el.querySelector('.hqTabs'), hh = ($('header') || {}).offsetHeight || 0;
+    if(nav && !fromNav){ window.scrollTo({ top: Math.max(0, window.scrollY + nav.getBoundingClientRect().top - hh - 8), behavior: 'instant' }); return; }   // 「やること」などからタブへ移るときは、タブの先頭から見せる
     if(nav && nav.getBoundingClientRect().top < hh) window.scrollTo({ top: window.scrollY + nav.getBoundingClientRect().top - hh - 8 });   // タブが画面の上に隠れていたら、タブの位置まで戻す
   });
   el.querySelectorAll('details[data-fold]').forEach(d => d.addEventListener('toggle', () => { d.open ? hqOpen.add(d.dataset.fold) : hqOpen.delete(d.dataset.fold); }));
@@ -18778,6 +19079,9 @@ function wireQLive(el){
 }
 
 /* ---------- 記録の表示 ---------- */
+{ const inner = renderHQ; renderHQ = function(msg){ const a = hqAnchor(); if(a){ const hq = $('#hq'); if(hq) hq.style.paddingBottom = ''; } const r = inner(msg); hqRestore(a);
+  if(a){ requestAnimationFrame(() => { hqRestore(a); requestAnimationFrame(() => hqRestore(a)); }); }   // 画像の読み込みなどで、描き直しの直後に高さが変わる分も合わせる
+  return r; }; }   // 押したボタンの位置を保つ（上の hqAnchor／hqRestore）
 const posTxt = p => p == null ? '—' : p + '位';
 /* 選手権の一覧から開く詳細：ドライバー（能力・戦績）／チーム（マシンの能力・戦績） */
 /* ドライバータブ・移籍市場のカードから開く戦績（記録タブと同じ内容を、画面の上に重ねて出す） */
@@ -18840,56 +19144,266 @@ function profPanel(key){
   }
   return '';
 }
+/* ---------- 記録タブ：シーズン別ランキング・戦ごとの結果・ポイント推移・自チームの歩み ----------
+   過去のシーズン：career.stats の seasons[シーズン]（最終順位・ポイント・優勝・表彰台）から作る。
+   戦ごとの結果とポイント推移：career.raceLog の res（全員の順位とポイント。この機能を入れた後のレースから記録）を使う */
+const REC_TABS = [['season','シーズン別'],['champs','歴代チャンピオン'],['teams','チーム通算'],['drivers','ドライバー通算'],['races','レース履歴'],['mine','自チームの歩み']];
+let recSeason = null, recSide = 'd', recSub = 'table';
+const recSort = { teams: ['titles', -1], drivers: ['titles', -1] };
+const recDark = () => { const th = document.documentElement.dataset.theme; return th ? th === 'dark' : !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); };
+const tColOf = id => { const t = teamOf(id); let c = t ? palOf(t)[0] : '#8b929b';
+  if(/^#[0-9a-f]{6}$/i.test(c)){ const n = parseInt(c.slice(1), 16), L = (0.2126*(n >> 16 & 255) + 0.7152*(n >> 8 & 255) + 0.0722*(n & 255))/255;   // 線・点がページの地の色に溶けないように
+    if(recDark() && L < 0.3) c = shadeHex(c, 0.5); else if(!recDark() && L > 0.85) c = shadeHex(c, -0.35); }
+  return c; };
+const tShort = t => t ? (t.short || String(t.name).split(/[・ ]/)[0]) : '—';
+function recSeasonData(sn){
+  ensureStats();
+  const S = career.stats, cur = sn === career.season;
+  const log = (career.raceLog || []).filter(r => r.season === sn).sort((a, b) => a.round - b.round);
+  const sOf = (o, k) => ((o[k] || {}).seasons || {})[sn];
+  let drv, tms;
+  if(cur){
+    drv = driverTable().map((x, i) => { const sd = sOf(S.drivers, x.code) || {}; return { code: x.code, team: x.team ? x.team.id : sd.team, pts: x.pts, pos: i + 1, wins: sd.wins || 0, podiums: sd.podiums || 0 }; });
+    tms = teamTable().map((x, i) => ({ id: x.id, pts: x.pts, pos: i + 1, drivers: x.t.drivers.slice() }));
+  } else {
+    drv = Object.keys(S.drivers).filter(c => sOf(S.drivers, c)).map(code => { const sd = sOf(S.drivers, code); return { code, team: sd.team, pts: sd.pts || 0, pos: sd.pos, wins: sd.wins || 0, podiums: sd.podiums || 0 }; })
+      .sort((a, b) => (a.pos ?? 999) - (b.pos ?? 999) || b.pts - a.pts);
+    tms = Object.keys(S.teams).filter(id => sOf(S.teams, id)).map(id => ({ id, ...sOf(S.teams, id) }))
+      .sort((a, b) => (a.pos ?? 999) - (b.pos ?? 999) || b.pts - a.pts);
+  }
+  const poles = {}, fls = {};
+  log.forEach(r => { if(r.pole) poles[r.pole] = (poles[r.pole] || 0) + 1; if(r.fl) fls[r.fl] = (fls[r.fl] || 0) + 1; });
+  drv.forEach(d => { d.poles = poles[d.code] || 0; d.fl = fls[d.code] || 0; });
+  tms.forEach(t => { const ds = drv.filter(d => d.team === t.id);
+    t.wins = ds.reduce((a, d) => a + d.wins, 0); t.podiums = ds.reduce((a, d) => a + d.podiums, 0); t.poles = ds.reduce((a, d) => a + d.poles, 0); });
+  const rounds = cur ? career.calendar.map((rd, i) => ({ round: i + 1, name: rd.name, log: log.find(r => r.round === i + 1) || null }))
+                     : log.map(r => ({ round: r.round, name: r.name, log: r }));
+  return { sn, cur, over: !cur || career.round >= career.calendar.length, done: log.length, total: cur ? career.calendar.length : log.length, log, drv, tms, rounds };
+}
+const recPrev = (side, id, sn) => { const o = side === 'd' ? career.stats.drivers[id] : career.stats.teams[id], p = o && o.seasons && o.seasons[sn - 1]; return p ? p.pos : null; };
+function recChg(now, before, hasPrev){
+  if(!hasPrev || now == null) return '';
+  if(before == null) return '<span class="rcChg new" title="前のシーズンは出走なし">NEW</span>';
+  const d = before - now;
+  return d > 0 ? `<span class="rcChg up" title="前のシーズン ${before}位">▲${d}</span>` : d < 0 ? `<span class="rcChg dn" title="前のシーズン ${before}位">▼${-d}</span>` : `<span class="rcChg" title="前のシーズン ${before}位">–</span>`;
+}
+const rcMedal = p => p === 1 ? 'm1' : p === 2 ? 'm2' : p === 3 ? 'm3' : '';
+/* B：シーズンのまとめカード */
+function recCards(D){
+  const H = (career.history || []).find(h => h.season === D.sn), lab = D.over ? 'チャンピオン' : '現在の首位';
+  const d1 = D.drv[0], t1 = D.tms[0], dd = d1 && career.drivers[d1.code], tt = t1 && teamOf(t1.id), show = x => x && (x.pts > 0 || D.over);
+  const top = (key, unit) => { const m = Math.max(0, ...D.drv.map(x => x[key])); if(!m) return '<b class="rcNone">—</b>';
+    const w = D.drv.filter(x => x[key] === m); return `<b>${w.slice(0, 3).map(x => x.code).join('・')}</b><small>${m}${unit}${w.length > 3 ? ` ほか${w.length - 3}人` : ''}</small>`; };
+  const me = D.tms.find(t => t.id === career.team), myPos = H ? H.myPos : (me && D.done ? me.pos : null);
+  return `<div class="rcCards">
+    <div class="rcCard rcCh"><span class="kick">${lab}・ドライバー</span>${show(d1) ? `<div class="rcWho">${natFlag(d1.code, 12)}<b class="cd">${d1.code}</b><span class="muted">${dd ? esc(dd.name) : ''}</span></div><small>${d1.pts} pts</small>` : '<b class="rcNone">—</b>'}</div>
+    <div class="rcCard rcCh"><span class="kick">${lab}・チーム</span>${show(t1) && tt ? `<div class="rcWho">${teamLogo(tt, 16)}<b>${esc(tt.name)}</b></div><small>${t1.pts} pts</small>` : '<b class="rcNone">—</b>'}</div>
+    <div class="rcCard"><span class="kick">最多優勝</span>${top('wins', '勝')}</div>
+    <div class="rcCard"><span class="kick">最多ポール</span>${top('poles', '回')}</div>
+    <div class="rcCard mine"><span class="kick">自チーム</span><b>${myPos ? 'P' + myPos : '—'}</b><small>${me ? me.pts + ' pts' : ''}</small></div>
+  </div>`;
+}
+/* A：シーズンの順位表 */
+function recStand(D){
+  const hasPrev = D.sn > 1 && (career.history || []).some(h => h.season === D.sn - 1);
+  if(recSide === 'd'){
+    if(!D.drv.length) return '<p class="note">このシーズンの記録がありません。</p>';
+    const lead = D.drv[0].pts;
+    return `<table class="stand rcStand"><tr><th>POS</th><th>ドライバー</th><th>チーム</th><th class="n">優勝</th><th class="n">表彰台</th><th class="n opt">ポール</th><th class="n">PTS</th><th class="n opt">差</th></tr>${D.drv.map(x => {
+      const t = teamOf(x.team), dd = career.drivers[x.code];
+      return `<tr class="${x.team === career.team ? 'mine' : ''}"><td class="rcPos"><span class="rcP ${rcMedal(x.pos)}">${x.pos ?? '—'}</span>${recChg(x.pos, recPrev('d', x.code, D.sn), hasPrev)}</td>
+        <td><button type="button" class="recLink" data-rp="d:${x.code}">${natFlag(x.code)}<b>${x.code}</b> <span class="muted">${dd ? esc(dd.name) : ''}</span></button></td>
+        <td>${t ? `<span class="rcTeam" title="${esc(t.name)}">${teamLogo(t, 16)}<span class="tn">${esc(tShort(t))}</span></span>` : '<span class="muted">—</span>'}</td>
+        <td class="n">${x.wins}</td><td class="n">${x.podiums}</td><td class="n opt">${x.poles}</td><td class="n rcPts">${x.pts}</td><td class="n muted opt">${x.pos === 1 || x.pts === lead ? '' : '−' + (lead - x.pts)}</td></tr>`; }).join('')}</table>`;
+  }
+  if(!D.tms.length) return '<p class="note">このシーズンの記録がありません。</p>';
+  const lead = D.tms[0].pts;
+  return `<table class="stand rcStand"><tr><th>POS</th><th>チーム</th><th class="opt">ドライバー</th><th class="n">優勝</th><th class="n">表彰台</th><th class="n">PTS</th><th class="n opt">差</th></tr>${D.tms.map(x => {
+    const t = teamOf(x.id);
+    return `<tr class="${x.id === career.team ? 'mine' : ''}"><td class="rcPos"><span class="rcP ${rcMedal(x.pos)}">${x.pos ?? '—'}</span>${recChg(x.pos, recPrev('t', x.id, D.sn), hasPrev)}</td>
+      <td>${t ? `<button type="button" class="recLink" data-rp="t:${x.id}">${teamLogo(t, 18)}${esc(t.name)}</button>` : '—'}</td>
+      <td class="muted opt">${(x.drivers || []).join(' / ')}</td><td class="n">${x.wins}</td><td class="n">${x.podiums}</td><td class="n rcPts">${x.pts}</td><td class="n muted opt">${x.pos === 1 || x.pts === lead ? '' : '−' + (lead - x.pts)}</td></tr>`; }).join('')}</table>`;
+}
+/* C：戦ごとの結果（縦にドライバー／チーム、横にラウンド） */
+const rgCls = p => p == null ? 'dnf' : p === 1 ? 'p1' : p === 2 ? 'p2' : p === 3 ? 'p3' : p <= 10 ? 'pt' : '';
+function recGrid(D){
+  if(!D.rounds.length) return '<p class="note">このシーズンのレースの記録がありません。</p>';
+  if(!D.rounds.some(r => r.log && r.log.res)) return `<p class="note">${D.done ? 'このシーズンのレースは、戦ごとの順位を記録するようになる前のものなので表示できません。これからのレースは記録されます。' : 'まだレースがありません。レースを終えると、ここに戦ごとの順位が並びます。'}</p>`;
+  const head = D.rounds.map(r => `<th class="rgH" title="${esc(r.name)}">${gpFlag(r.name, 11)}<span>R${r.round}</span></th>`).join('');
+  const blank = r => !r.log ? '<td class="rg fut"></td>' : !r.log.res ? '<td class="rg nod" title="記録なし">·</td>' : null;
+  let rows;
+  if(recSide === 'd'){
+    rows = D.drv.map(x => `<tr class="${x.team === career.team ? 'mine' : ''}"><td class="rgN"><span class="rgDot" style="background:${tColOf(x.team)}"></span><button type="button" class="recLink" data-rp="d:${x.code}"><b>${x.code}</b></button></td>${D.rounds.map(r => {
+      const b = blank(r); if(b) return b;
+      const e = r.log.res.find(q => q[0] === x.code); if(!e) return '<td class="rg none" title="出走なし"></td>';
+      const p = e[2], pole = r.log.pole === x.code, fl = r.log.fl === x.code;
+      return `<td class="rg ${rgCls(p)}" title="${esc(r.name)}：${p == null ? 'リタイア' : p + '位'}${e[3] ? `（${e[3]}pts）` : ''}${pole ? '・ポール' : ''}${fl ? '・ファステストラップ' : ''}">${p == null ? 'R' : p}${pole ? '<i class="pl"></i>' : ''}${fl ? '<i class="fl"></i>' : ''}</td>`; }).join('')}<td class="n rcPts">${x.pts}</td></tr>`).join('');
+  } else {
+    rows = D.tms.map(x => { const t = teamOf(x.id);
+      return `<tr class="${x.id === career.team ? 'mine' : ''}"><td class="rgN">${t ? teamLogo(t, 14) : ''}<button type="button" class="recLink" data-rp="t:${x.id}"><b>${esc(tShort(t))}</b></button></td>${D.rounds.map(r => {
+        const b = blank(r); if(b) return b;
+        const es = r.log.res.filter(q => q[1] === x.id); if(!es.length) return '<td class="rg none"></td>';
+        const pts = es.reduce((a, q) => a + q[3], 0), fin = es.map(q => q[2]).filter(p => p != null), best = fin.length ? Math.min(...fin) : null;
+        return `<td class="rg ${rgCls(best)}" title="${esc(r.name)}：${es.map(q => `${q[0]} ${q[2] == null ? 'リタイア' : q[2] + '位'}`).join('・')}（${pts}pts）">${pts}</td>`; }).join('')}<td class="n rcPts">${x.pts}</td></tr>`; }).join('');
+  }
+  const L = [['p1', '優勝'], ['p2', '2位'], ['p3', '3位'], ['pt', '入賞（10位以内）'], ['', '入賞圏外'], ['dnf', 'リタイア（R）']];
+  return `<div class="wrapx"><table class="rgTbl"><tr><th>${recSide === 'd' ? 'ドライバー' : 'チーム'}</th>${head}<th class="n">PTS</th></tr>${rows}</table></div>
+    <div class="rgLeg">${L.map(([c, l]) => `<span><i class="rg ${c}"></i>${l}</span>`).join('')}${recSide === 'd' ? '<span><i class="lgDot pl"></i>ポール</span><span><i class="lgDot fl"></i>ファステストラップ</span>' : '<span class="muted">数字はその戦のポイント。色は2台のうち上の順位</span>'}</div>
+    ${D.rounds.some(r => r.log && !r.log.res) ? '<p class="note">「·」の回は、戦ごとの順位を記録するようになる前のレースです。</p>' : ''}`;
+}
+/* D：ポイント推移（ラウンドごとの累計） */
+function recChart(D){
+  const R = D.rounds.filter(r => r.log);
+  if(!R.length) return '<p class="note">まだレースがありません。レースを終えると、ここにポイントの推移が出ます。</p>';
+  if(R.some(r => !r.log.res)) return '<p class="note">このシーズンには、戦ごとの順位を記録するようになる前のレースが含まれているため、推移を描けません。次のシーズンからは表示されます。</p>';
+  const side = recSide, ents = side === 'd' ? D.drv.map(x => ({ id: x.code, team: x.team })) : D.tms.map(x => ({ id: x.id, team: x.id }));
+  const pick = ents.slice(0, 5); ents.forEach(e => { if(e.team === career.team && !pick.includes(e)) pick.push(e); });
+  const seen = {};
+  const ser = pick.map(e => { let s = 0; const v = [0];
+    R.forEach(r => { r.log.res.forEach(q => { if(side === 'd' ? q[0] === e.id : q[1] === e.id) s += q[3]; }); v.push(s); });
+    const k = seen[e.team] = (seen[e.team] || 0) + 1;
+    return { l: side === 'd' ? e.id : tShort(teamOf(e.id)), col: tColOf(e.team), dash: side === 'd' && k > 1, mine: e.team === career.team, v }; });
+  const N = Math.max(D.total, R.length), narrow = window.innerWidth < 560, W = narrow ? 360 : 640, H = narrow ? 230 : 250, ml = 34, mr = narrow ? 74 : 92, mt = 12, mb = 26, pw = W - ml - mr, ph = H - mt - mb;
+  const max = Math.max(1, ...ser.map(s => s.v[s.v.length - 1]));
+  const step = [5, 10, 20, 25, 50, 100, 200, 250, 500].find(s => max/s <= 5) || 1000, ymax = Math.ceil(max/step)*step;
+  const X = i => ml + i*pw/N, Y = v => mt + ph - v/ymax*ph;
+  let g = '';
+  for(let v = 0; v <= ymax; v += step) g += `<line class="gl" x1="${ml}" x2="${ml + pw}" y1="${Y(v)}" y2="${Y(v)}"/><text class="ax" x="${ml - 6}" y="${Y(v) + 3.5}" text-anchor="end">${v}</text>`;
+  for(let i = 0; i <= N; i++) g += `<text class="ax" x="${X(i)}" y="${H - 8}" text-anchor="middle">${i ? 'R' + i : ''}</text>`;
+  const order = ser.map((s, i) => i).sort((a, b) => (ser[a].mine - ser[b].mine));   // 自チームの線をいちばん上に描く
+  const lines = order.map(i => { const s = ser[i];
+    return `<polyline points="${s.v.map((v, k) => `${X(k)},${Y(v)}`).join(' ')}" fill="none" stroke="${s.col}" stroke-width="${s.mine ? 3 : 2}" stroke-linejoin="round" stroke-linecap="round"${s.dash ? ' stroke-dasharray="6 4"' : ''}/>
+      ${s.v.map((v, k) => k ? `<circle class="mk" cx="${X(k)}" cy="${Y(v)}" r="4" fill="${s.col}"/>` : '').join('')}`; }).join('');
+  // 線の右端の名前：重ならないように上下にずらす
+  const labs = ser.map(s => ({ s, y: Y(s.v[s.v.length - 1]) })).sort((a, b) => a.y - b.y);
+  labs.forEach((a, i) => { if(i && a.y - labs[i - 1].y < 13) a.y = labs[i - 1].y + 13; });
+  const over = labs.length ? labs[labs.length - 1].y - (mt + ph + 4) : 0; if(over > 0) labs.forEach(a => a.y -= over);
+  const lx = X(R.length) + 8;
+  const lab = labs.map(a => `<text class="lb${a.s.mine ? ' mine' : ''}" x="${lx}" y="${a.y + 4}">${esc(a.s.l)} <tspan class="lv">${a.s.v[a.s.v.length - 1]}</tspan></text>`).join('');
+  const hv = R.map((r, k) => `<rect class="hv" data-i="${k + 1}" x="${X(k + 1) - pw/N/2}" y="${mt}" width="${pw/N}" height="${ph}"/>`).join('');
+  const data = esc(JSON.stringify({ n: R.map(r => `R${r.round} ${r.name}`), s: ser.map(s => ({ l: s.l, c: s.col, v: s.v })), x: R.map((r, k) => X(k + 1)/W) }));
+  return `<div class="rcChart" data-ser="${data}">
+    <svg class="rcSvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="シーズン${D.sn}のポイント推移（上位${ser.length}${side === 'd' ? '人' : 'チーム'}）">
+      ${g}<line class="rcX" x1="0" x2="0" y1="${mt}" y2="${mt + ph}" visibility="hidden"/>${lines}${lab}${hv}</svg>
+    <div class="rcTip" hidden></div></div>
+    <div class="rcLeg">${ser.map(s => `<span><svg viewBox="0 0 18 6" aria-hidden="true"><line x1="1" y1="3" x2="17" y2="3" stroke="${s.col}" stroke-width="${s.mine ? 3 : 2}"${s.dash ? ' stroke-dasharray="4 3"' : ''}/></svg>${esc(s.l)}</span>`).join('')}</div>
+    <p class="note">上位5${side === 'd' ? '人' : 'チーム'}と自チームを表示。点にさわる（押す）と、その戦までのポイントが出ます。${side === 'd' ? '同じチームの2人目は破線です。' : ''}</p>`;
+}
+function bindRecChart(root){
+  root.querySelectorAll('.rcChart').forEach(w => {
+    let D; try{ D = JSON.parse(w.dataset.ser); }catch(e){ return; }
+    const tip = w.querySelector('.rcTip'), svg = w.querySelector('svg'), xl = svg.querySelector('.rcX');
+    const show = i => {
+      const vb = svg.viewBox.baseVal, x = D.x[i - 1]*vb.width;
+      xl.setAttribute('x1', x); xl.setAttribute('x2', x); xl.setAttribute('visibility', 'visible');
+      tip.innerHTML = `<b>${esc(D.n[i - 1])}</b>${D.s.slice().sort((a, b) => b.v[i] - a.v[i]).map(s => `<div><span><i style="background:${s.c}"></i>${esc(s.l)}</span><span class="v">${s.v[i]}<small>${s.v[i] - s.v[i - 1] ? ` +${s.v[i] - s.v[i - 1]}` : ''}</small></span></div>`).join('')}`;
+      tip.hidden = false;
+      const W = w.clientWidth, tw = tip.offsetWidth, px = D.x[i - 1]*W;
+      tip.style.left = Math.max(tw/2 + 2, Math.min(W - tw/2 - 2, px + (px > W*0.55 ? -tw/2 - 12 : tw/2 + 12))) + 'px';
+    };
+    const hide = () => { tip.hidden = true; xl.setAttribute('visibility', 'hidden'); };
+    svg.querySelectorAll('.hv').forEach(r => { r.addEventListener('pointerenter', () => show(+r.dataset.i)); r.addEventListener('click', () => show(+r.dataset.i)); });
+    w.addEventListener('pointerleave', hide);
+  });
+}
+/* F：自チームの歩み */
+function recMine(){
+  const id = career.team, t = teamOf(id), s = statT(id), N = career.teams.length, list = [];
+  for(let sn = 1; sn <= career.season; sn++){
+    const D = recSeasonData(sn), me = D.tms.find(x => x.id === id), H = (career.history || []).find(h => h.season === sn);
+    const pos = H ? H.myPos : (me && D.done ? me.pos : null);
+    if(!H && !me) continue;
+    list.push({ sn, pos, pts: me ? me.pts : null, wins: me ? me.wins : null, podiums: me ? me.podiums : null, live: D.cur && !D.over, drv: D.drv.filter(d => d.team === id) });
+  }
+  const nums = [['出走', s.starts], ['タイトル', s.titles], ['優勝', s.wins], ['表彰台', s.podiums], ['ポール', s.poles], ['ポイント', s.points], ['最高位', posTxt(s.bestPos)]];
+  const bars = list.map(x => `<div class="rmCol${x.pos === 1 ? ' gold' : ''}${x.live ? ' live' : ''}" title="シーズン${x.sn}：${x.pos ? x.pos + '位' : '開幕前'}${x.live ? '（暫定）' : ''}">
+      <div class="rmBarA"><span class="rmV">${x.pos ? 'P' + x.pos : '—'}</span><i style="height:${x.pos ? Math.round((N - x.pos + 1)/N*82) : 0}%"></i></div><span class="rmS">S${x.sn}${x.live ? '<small>暫定</small>' : ''}</span></div>`).join('');
+  const bestSn = list.filter(x => x.pos && !x.live).sort((a, b) => a.pos - b.pos)[0];
+  return `<div class="recDetail rmHead"><div class="recTitle">${t ? teamLogo(t, 22) : ''}<b>${t ? esc(t.name) : ''}</b>${bestSn ? `<span class="muted" style="font-size:12px">最高成績 シーズン${bestSn.sn}・${bestSn.pos}位</span>` : ''}</div>
+      <div class="recNums">${nums.map(([k, v]) => `<span><small>${k}</small><b>${v}</b></span>`).join('')}</div></div>
+    <div class="chartHead rmCap">コンストラクターズ順位の推移<span class="muted">（棒が高いほど上位。全${N}チーム）</span></div>
+    <div class="rmBars">${bars}</div>
+    <div class="wrapx"><table class="stand rmTbl"><tr><th>シーズン</th><th class="n">順位</th><th class="n">PTS</th><th class="n">優勝</th><th class="n">表彰台</th><th>ドライバー</th><th></th></tr>${list.slice().reverse().map(x => `<tr>
+      <td>シーズン${x.sn}${x.live ? ' <span class="rcBadge live">暫定</span>' : ''}</td><td class="n"><span class="rcP ${rcMedal(x.pos)}">${x.pos ?? '—'}</span></td><td class="n rcPts">${x.pts ?? '—'}</td><td class="n">${x.wins ?? '—'}</td><td class="n">${x.podiums ?? '—'}</td>
+      <td class="muted">${x.drv.map(d => `${d.code} <span class="rmDp">P${d.pos ?? '—'}</span>`).join(' / ') || '—'}</td><td><button type="button" class="b sm" data-rsn="${x.sn}">順位表</button></td></tr>`).join('')}</table></div>`;
+}
+/* E：並べ替えできる見出し */
+function recSortTh(tb, k, lab, opt){
+  const [sk, sd] = recSort[tb], on = sk === k;
+  return `<th class="n${opt ? ' opt' : ''}"><button type="button" class="sortH${on ? ' on' : ''}" data-rs="${tb}:${k}" aria-label="${lab}で並べ替え"${on ? ` aria-sort="${sd < 0 ? 'descending' : 'ascending'}"` : ''}>${lab}<i>${on ? (sd < 0 ? '▼' : '▲') : ''}</i></button></th>`;
+}
+const recRate = (a, b) => b ? Math.round(a/b*100) : null;
+const recPct = v => v == null ? '<span class="muted">—</span>' : v + '%';
+function recSortList(tb, list, val){
+  const [k, d] = recSort[tb];
+  return list.sort((a, b) => (val(a, k) - val(b, k))*d || b.s.titles - a.s.titles || b.s.wins - a.s.wins || b.s.points - a.s.points);
+}
 function renderRecords(){
   ensureStats();
-  const S = career.stats, tabs = [['champs','歴代チャンピオン'],['teams','チーム通算'],['drivers','ドライバー通算'],['races','レース履歴']];
+  const S = career.stats;
   let body = '';
-  if(recView === 'champs'){
+  if(recView === 'season'){
+    if(recSeason != null && (recSeason < 1 || recSeason > career.season)) recSeason = null;
+    const sn = recSeason ?? career.season, D = recSeasonData(sn), seasons = Array.from({ length: career.season }, (_, i) => i + 1);
+    const badge = D.cur ? (D.over ? '<span class="rcBadge fin">全戦終了</span>' : `<span class="rcBadge live">暫定・${D.done}/${D.total}戦</span>`) : '<span class="rcBadge">最終結果</span>';
+    body = `<div class="rcBar"><span class="muted rcLab">シーズン</span><div class="seg2 rcSeasons">${seasons.map(n => `<button type="button" data-rsn="${n}" class="${n === sn ? 'on' : ''}">S${n}${n === career.season ? '<small>今季</small>' : ''}</button>`).join('')}</div></div>
+      <div class="rcHead"><b>シーズン${sn}</b>${badge}</div>
+      ${recCards(D)}
+      <div class="rcTools"><div class="seg2" role="group" aria-label="選手権"><button type="button" data-rside="d" class="${recSide === 'd' ? 'on' : ''}">ドライバーズ</button><button type="button" data-rside="t" class="${recSide === 't' ? 'on' : ''}">コンストラクターズ</button></div>
+        <div class="seg2" role="group" aria-label="表示"><button type="button" data-rsub="table" class="${recSub === 'table' ? 'on' : ''}">順位表</button><button type="button" data-rsub="grid" class="${recSub === 'grid' ? 'on' : ''}">戦ごとの結果</button><button type="button" data-rsub="chart" class="${recSub === 'chart' ? 'on' : ''}">ポイント推移</button></div></div>
+      ${recSub === 'grid' ? recGrid(D) : recSub === 'chart' ? recChart(D) : `<div class="wrapx">${recStand(D)}</div>`}`;
+  } else if(recView === 'champs'){
     const H = career.history || [];
-    body = H.length ? `<table class="stand"><tr><th>シーズン</th><th>ドライバーズ</th><th>コンストラクターズ</th><th>自チーム</th></tr>${H.slice().reverse().map(h => { const t = teamOf(h.champTeam), d = career.drivers[h.champ];
-      return `<tr><td class="n" style="text-align:left">${h.season}</td><td>${h.champ ? natFlag(h.champ) : ''}<b>${h.champ || '—'}</b> <span class="muted">${d ? esc(d.name) : ''}</span></td><td>${t ? teamLogo(t, 18) + esc(t.name) : '—'}</td><td class="n" style="text-align:left">${h.myPos}位</td></tr>`; }).join('')}</table>`
+    body = H.length ? `<div class="wrapx"><table class="stand"><tr><th>シーズン</th><th>ドライバーズ</th><th>コンストラクターズ</th><th>自チーム</th><th></th></tr>${H.slice().reverse().map(h => { const t = teamOf(h.champTeam), d = career.drivers[h.champ];
+      return `<tr><td class="n" style="text-align:left">${h.season}</td><td>${h.champ ? natFlag(h.champ) : ''}<b>${h.champ || '—'}</b> <span class="muted">${d ? esc(d.name) : ''}</span></td><td>${t ? teamLogo(t, 18) + esc(t.name) : '—'}</td><td class="n" style="text-align:left"><span class="rcP ${rcMedal(h.myPos)}">${h.myPos}</span></td><td><button type="button" class="b sm" data-rsn="${h.season}">順位表</button></td></tr>`; }).join('')}</table></div>`
       : '<p class="note">まだ終わったシーズンがありません。シーズンを終えると、ここにチャンピオンが記録されます。</p>';
   } else if(recView === 'teams'){
-    const list = career.teams.map(t => ({ t, s: statT(t.id) })).sort((a, b) => b.s.titles - a.s.titles || b.s.wins - a.s.wins || b.s.points - a.s.points);
-    body = `<table class="stand"><tr><th>チーム</th><th class="n">タイトル</th><th class="n">優勝</th><th class="n">表彰台</th><th class="n">ポール</th><th class="n">FL</th><th class="n">ポイント</th></tr>${list.map(({ t, s }) =>
-      `<tr class="${t.id === career.team ? 'mine' : ''}"><td><button type="button" class="recLink" data-rp="t:${t.id}">${teamLogo(t, 18)}${esc(t.name)}</button></td><td class="n">${s.titles}</td><td class="n">${s.wins}</td><td class="n">${s.podiums}</td><td class="n">${s.poles}</td><td class="n">${s.fl}</td><td class="n">${s.points}</td></tr>`).join('')}</table>`;
+    const val = (x, k) => k === 'wr' ? (recRate(x.s.wins, x.s.starts) ?? -1) : k === 'avg' ? (x.s.starts ? x.s.points/x.s.starts : -1) : x.s[k];
+    const list = recSortList('teams', career.teams.map(t => ({ t, s: statT(t.id) })), val);
+    const th = (k, l, o) => recSortTh('teams', k, l, o);
+    body = `<div class="wrapx"><table class="stand"><tr><th class="n">#</th><th>チーム</th>${th('starts', '出走', 1)}${th('titles', 'タイトル')}${th('wins', '優勝')}${th('podiums', '表彰台')}${th('poles', 'ポール', 1)}${th('fl', 'FL', 1)}${th('points', 'ポイント')}${th('wr', '勝率')}${th('avg', '平均pts')}</tr>${list.map(({ t, s }, i) =>
+      `<tr class="${t.id === career.team ? 'mine' : ''}"><td class="n muted">${i + 1}</td><td><button type="button" class="recLink" data-rp="t:${t.id}">${teamLogo(t, 18)}${esc(t.name)}</button></td><td class="n opt">${s.starts}</td><td class="n">${s.titles}</td><td class="n">${s.wins}</td><td class="n">${s.podiums}</td><td class="n opt">${s.poles}</td><td class="n opt">${s.fl}</td><td class="n">${s.points}</td><td class="n">${recPct(recRate(s.wins, s.starts))}</td><td class="n">${s.starts ? (s.points/s.starts).toFixed(1) : '<span class="muted">—</span>'}</td></tr>`).join('')}</table></div>`;
   } else if(recView === 'drivers'){
-    const list = Object.entries(S.drivers).map(([code, s]) => ({ code, s, d: career.drivers[code] })).filter(x => x.d && x.s.starts > 0)
-      .sort((a, b) => b.s.titles - a.s.titles || b.s.wins - a.s.wins || b.s.points - a.s.points);
-    const teamNow = code => career.teams.find(t => t.drivers.includes(code));
-    body = list.length ? `<table class="stand"><tr><th>ドライバー</th><th>所属</th><th class="n">出走</th><th class="n">タイトル</th><th class="n">優勝</th><th class="n">表彰台</th><th class="n">ポール</th><th class="n">ポイント</th></tr>${list.map(({ code, s, d }) => { const t = teamNow(code);
-      return `<tr class="${t && t.id === career.team ? 'mine' : ''}"><td><button type="button" class="recLink" data-rp="d:${code}">${natFlag(code)}<b>${code}</b> <span class="muted">${esc(d.name)}</span></button></td><td>${d.retired ? '<span class="muted">引退</span>' : t ? teamLogo(t, 16) : '<span class="muted">移籍市場</span>'}</td><td class="n">${s.starts}</td><td class="n">${s.titles}</td><td class="n">${s.wins}</td><td class="n">${s.podiums}</td><td class="n">${s.poles}</td><td class="n">${s.points}</td></tr>`; }).join('')}</table>`
+    const val = (x, k) => k === 'wr' ? (recRate(x.s.wins, x.s.starts) ?? -1) : k === 'pr' ? (recRate(x.s.podiums, x.s.starts) ?? -1) : x.s[k];
+    const list = recSortList('drivers', Object.entries(S.drivers).map(([code, s]) => ({ code, s, d: career.drivers[code] })).filter(x => x.d && x.s.starts > 0), val);
+    const teamNow = code => career.teams.find(t => t.drivers.includes(code)), th = (k, l, o) => recSortTh('drivers', k, l, o);
+    body = list.length ? `<div class="wrapx"><table class="stand"><tr><th class="n">#</th><th>ドライバー</th><th>所属</th>${th('starts', '出走')}${th('titles', 'タイトル')}${th('wins', '優勝')}${th('podiums', '表彰台', 1)}${th('poles', 'ポール', 1)}${th('points', 'ポイント')}${th('wr', '勝率')}${th('pr', '表彰台率')}</tr>${list.map(({ code, s, d }, i) => { const t = teamNow(code);
+      return `<tr class="${t && t.id === career.team ? 'mine' : ''}"><td class="n muted">${i + 1}</td><td><button type="button" class="recLink" data-rp="d:${code}">${natFlag(code)}<b>${code}</b> <span class="muted">${esc(d.name)}</span></button></td><td>${d.retired ? '<span class="muted">引退</span>' : t ? teamLogo(t, 16) : '<span class="muted">移籍市場</span>'}</td><td class="n">${s.starts}</td><td class="n">${s.titles}</td><td class="n">${s.wins}</td><td class="n opt">${s.podiums}</td><td class="n opt">${s.poles}</td><td class="n">${s.points}</td><td class="n">${recPct(recRate(s.wins, s.starts))}</td><td class="n">${recPct(recRate(s.podiums, s.starts))}</td></tr>`; }).join('')}</table></div>`
       : '<p class="note">まだレースの記録がありません。</p>';
+  } else if(recView === 'mine'){
+    body = recMine();
   } else {
     const L = (career.raceLog || []).slice().reverse();
-    body = L.length ? `<table class="stand"><tr><th>レース</th><th>優勝</th><th>ポール</th><th>自チーム</th></tr>${L.map(r => { const t = teamOf(r.winTeam);
-      return `<tr><td><span class="muted">S${r.season} R${r.round}</span> ${gpFlag(r.name, 12)} ${esc(r.name)}</td><td>${t ? teamLogo(t, 16) : ''} <b>${r.winner || '—'}</b></td><td>${r.pole || '<span class="muted">—</span>'}</td><td>${(r.my || []).map(m => `${m.code} ${m.pos ? 'P' + m.pos : 'DNF'}`).join(' / ')}</td></tr>`; }).join('')}</table>`
+    body = L.length ? `<div class="wrapx"><table class="stand"><tr><th>レース</th><th>優勝</th><th>ポール</th><th>自チーム</th></tr>${L.map(r => { const t = teamOf(r.winTeam);
+      return `<tr><td><span class="muted">S${r.season} R${r.round}</span> ${gpFlag(r.name, 12)} ${esc(r.name)}</td><td>${t ? teamLogo(t, 16) : ''} <b>${r.winner || '—'}</b></td><td>${r.pole || '<span class="muted">—</span>'}</td><td>${(r.my || []).map(m => `${m.code} ${m.pos ? 'P' + m.pos : 'DNF'}`).join(' / ')}</td></tr>`; }).join('')}</table></div>`
       : '<p class="note">まだレースの記録がありません。</p>';
   }
   // 詳しく見る：シーズンごとの成績
   let detail = '';
   if(recPick){
     const [kind, id] = recPick.split(':');
-    if(kind === 'd' && S.drivers[id]){
+    const close = '<button type="button" class="b sm ghost recClose" data-rp="' + recPick + '">閉じる</button>';
+    if(kind === 'd' && S.drivers[id] && career.drivers[id]){
       const s = S.drivers[id], d = career.drivers[id];
       const seasons = Object.entries(s.seasons).sort((a, b) => b[0] - a[0]);
-      detail = `<div class="recDetail"><div class="recTitle">${natFlag(id, 13)}<b>${id}</b> ${esc(d.name)}（${d.age}歳${d.retired ? '・引退' : ''}）</div>
-        <div class="recNums">${[['出走', s.starts], ['タイトル', s.titles], ['優勝', s.wins], ['表彰台', s.podiums], ['ポール', s.poles], ['FL', s.fl], ['ポイント', s.points], ['リタイア', s.dnf], ['最高位', posTxt(s.bestPos)]].map(([k, v]) => `<span><small>${k}</small><b>${v}</b></span>`).join('')}</div>
-        <table class="stand"><tr><th>シーズン</th><th>チーム</th><th class="n">ポイント</th><th class="n">順位</th><th class="n">優勝</th><th class="n">表彰台</th></tr>${seasons.map(([sn, x]) => { const t = teamOf(x.team);
-          return `<tr><td>${sn}</td><td>${t ? teamLogo(t, 16) + esc(t.name) : '—'}</td><td class="n">${x.pts}</td><td class="n">${x.pos ? x.pos + '位' : '<span class="muted">途中</span>'}</td><td class="n">${x.wins || 0}</td><td class="n">${x.podiums || 0}</td></tr>`; }).join('')}</table></div>`;
-    } else if(kind === 't'){
+      detail = `<div class="recDetail"><div class="recTitle">${natFlag(id, 13)}<b>${id}</b> ${esc(d.name)}（${d.age}歳${d.retired ? '・引退' : ''}）${close}</div>
+        <div class="recNums">${[['出走', s.starts], ['タイトル', s.titles], ['優勝', s.wins], ['表彰台', s.podiums], ['ポール', s.poles], ['FL', s.fl], ['ポイント', s.points], ['リタイア', s.dnf], ['勝率', recPct(recRate(s.wins, s.starts))], ['最高位', posTxt(s.bestPos)]].map(([k, v]) => `<span><small>${k}</small><b>${v}</b></span>`).join('')}</div>
+        <div class="wrapx"><table class="stand"><tr><th>シーズン</th><th>チーム</th><th class="n">ポイント</th><th class="n">順位</th><th class="n">優勝</th><th class="n">表彰台</th></tr>${seasons.map(([sn, x]) => { const t = teamOf(x.team);
+          return `<tr><td><button type="button" class="recLink" data-rsn="${sn}">シーズン${sn}</button></td><td>${t ? teamLogo(t, 16) + esc(t.name) : '—'}</td><td class="n">${x.pts}</td><td class="n">${x.pos ? `<span class="rcP ${rcMedal(x.pos)}">${x.pos}</span>` : '<span class="muted">途中</span>'}</td><td class="n">${x.wins || 0}</td><td class="n">${x.podiums || 0}</td></tr>`; }).join('')}</table></div></div>`;
+    } else if(kind === 't' && teamOf(id)){
       const s = statT(id), t = teamOf(id);
       const seasons = Object.entries(s.seasons).sort((a, b) => b[0] - a[0]);
-      detail = `<div class="recDetail"><div class="recTitle">${teamLogo(t, 22)}<b>${esc(t.name)}</b></div>
-        <div class="recNums">${[['出走', s.starts], ['タイトル', s.titles], ['優勝', s.wins], ['表彰台', s.podiums], ['ポール', s.poles], ['FL', s.fl], ['ポイント', s.points], ['最高位', posTxt(s.bestPos)]].map(([k, v]) => `<span><small>${k}</small><b>${v}</b></span>`).join('')}</div>
-        ${seasons.length ? `<table class="stand"><tr><th>シーズン</th><th class="n">ポイント</th><th class="n">順位</th><th>ドライバー</th></tr>${seasons.map(([sn, x]) => `<tr><td>${sn}</td><td class="n">${x.pts}</td><td class="n">${x.pos}位</td><td class="muted">${(x.drivers || []).join(' / ')}</td></tr>`).join('')}</table>` : '<p class="note">シーズンを終えると、ここにシーズンごとの順位が記録されます。</p>'}</div>`;
+      detail = `<div class="recDetail"><div class="recTitle">${teamLogo(t, 22)}<b>${esc(t.name)}</b>${close}</div>
+        <div class="recNums">${[['出走', s.starts], ['タイトル', s.titles], ['優勝', s.wins], ['表彰台', s.podiums], ['ポール', s.poles], ['FL', s.fl], ['ポイント', s.points], ['勝率', recPct(recRate(s.wins, s.starts))], ['最高位', posTxt(s.bestPos)]].map(([k, v]) => `<span><small>${k}</small><b>${v}</b></span>`).join('')}</div>
+        ${seasons.length ? `<div class="wrapx"><table class="stand"><tr><th>シーズン</th><th class="n">ポイント</th><th class="n">順位</th><th>ドライバー</th></tr>${seasons.map(([sn, x]) => `<tr><td><button type="button" class="recLink" data-rsn="${sn}">シーズン${sn}</button></td><td class="n">${x.pts}</td><td class="n"><span class="rcP ${rcMedal(x.pos)}">${x.pos}</span></td><td class="muted">${(x.drivers || []).join(' / ')}</td></tr>`).join('')}</table></div>` : '<p class="note">シーズンを終えると、ここにシーズンごとの順位が記録されます。</p>'}</div>`;
     }
   }
+  const hint = { season: '名前を押すと通算の戦績、シーズンを押すとその年の順位表に切り替わります。', teams: '見出しを押すと並べ替えます（もう一度押すと逆順）。名前を押すとシーズンごとの成績を表示します。', drivers: '見出しを押すと並べ替えます（もう一度押すと逆順）。名前を押すとシーズンごとの成績を表示します。' }[recView];
   return `<div class="sec" id="records">
-    <h2>記録<button type="button" class="qm" data-guide="hq" aria-label="遊び方を見る">?</button><div class="seg2">${tabs.map(([k, l]) => `<button type="button" data-rv="${k}" class="${recView === k ? 'on' : ''}">${l}</button>`).join('')}</div></h2>
+    <h2>記録<button type="button" class="qm" data-guide="hq" aria-label="遊び方を見る">?</button><div class="seg2">${REC_TABS.map(([k, l]) => `<button type="button" data-rv="${k}" class="${recView === k ? 'on' : ''}">${l}</button>`).join('')}</div></h2>
     ${detail}
-    <div class="wrapx">${body}</div>
-    ${recView === 'teams' || recView === 'drivers' ? '<p class="note">名前を押すと、シーズンごとの成績を表示します。</p>' : ''}
+    ${body}
+    ${hint ? `<p class="note">${hint}</p>` : ''}
   </div>`;
 }
 
