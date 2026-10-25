@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<!-- サーキットマネージャー ver 1.4.0 -->
+<!-- サーキットマネージャー ver 1.4.1 -->
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="version" content="1.4.0">
+<meta name="version" content="1.4.1">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>サーキットマネージャー</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1066,6 +1066,7 @@ body.phoneRace .teamTel{left:8px;right:8px;width:auto;flex-direction:row;bottom:
 .tc.mine{box-shadow:inset 0 0 0 1.5px #00c8ff,0 3px 10px rgba(0,0,0,.3)}
 .tcHead{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;line-height:1.2;white-space:nowrap}
 .tcHead .dot{margin:0}
+.tcHead .tcSub{flex:none;font-size:9.5px;font-weight:700;padding:0 4px;border-radius:3px;background:#3a4049;color:#dfe4ea;letter-spacing:.02em}
 .tcHead .pp{margin-left:auto;color:#aab0b8;font-size:11px}
 .tcHead .pit{background:#ffc400;color:#15171a;border-radius:3px;padding:0 4px;font-size:10px}
 .tcHead .pit.stk{background:#ff7f11}   /* ダブルスタックの作業待ち */
@@ -1805,11 +1806,26 @@ body.career.pcRace .tc.pre .tcStart{grid-column:1}
 .tcStart .tsSeg.two{grid-template-columns:repeat(2,1fr)}
 .facCard.ren{box-shadow:inset 0 0 0 2px #e5323b}
 /* ===== ホームGP ===== */
-.facCard.homeCard{grid-column:1/-1}
+.facCard.homeCard,.facCard.sisCard{grid-column:1/-1}
+.facCard.sisCard.open{box-shadow:inset 0 0 0 2px var(--signal)}
 .facCard.homeCard.open{box-shadow:inset 0 0 0 2px var(--signal)}
+.sisList{display:flex;flex-direction:column;gap:6px}
+.sisRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 8px;border:1px solid var(--line);border-radius:8px}
+.sisRow .logo{margin:0;flex:none}
+.sisNm{flex:1 1 140px;min-width:0;display:flex;flex-direction:column;line-height:1.3}
+.sisSeats{display:flex;flex-direction:column;gap:6px}
+.sisSeat{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;padding:6px 8px;border:1px solid var(--line);border-radius:8px}
+.sisWho{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1 1 200px;min-width:0;font-size:12.5px}
+.sisWho .muted{font-size:11.5px}
+.sisActs{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.sisTag{display:inline-block;flex:none;font-size:10px;font-weight:700;padding:0 6px;border-radius:4px;background:#ffc400;color:#15171a;margin-left:6px;vertical-align:1px}
+.sisLast{font-size:12px;color:var(--muted)}
 .homeTag{flex:none;margin-left:auto;font:700 10.5px "Chakra Petch",sans-serif;letter-spacing:.08em;padding:2px 7px;border-radius:5px;background:#1b1f25;color:var(--signal)}
 .homeRow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:12.5px}
 .homeRow .hLab{flex:none;width:6.5em;font-size:11.5px;font-weight:700;color:var(--muted)}
+.homeNat{display:inline-flex;align-items:center;gap:7px;flex:1 1 200px;min-width:0;max-width:320px}
+.homeNat .flag,.homeNat .logo{margin:0;flex:none}
+.homeNat select{flex:1;min-width:0;min-height:32px;padding:3px 6px;border-radius:7px;border:1px solid var(--line);background:var(--btn);color:var(--text);font:inherit;font-size:13px}
 .homeRow .seg2{flex-wrap:wrap}
 .homeRow .seg2 button small{display:block;font-size:10.5px;opacity:.75}
 .homeRow input{flex:1 1 160px;min-width:0;max-width:280px;min-height:32px;padding:3px 9px;border-radius:7px;border:1px solid var(--line);background:var(--btn);color:var(--text);font:inherit;font-size:14px}
@@ -1817,7 +1833,7 @@ body.career.pcRace .tc.pre .tcStart{grid-column:1}
 .homeJudge .hjT{display:flex;flex-direction:column;gap:2px;flex:1 1 180px;min-width:0}
 .homeJudge .hjT b{font-size:14.5px}
 .homeJudge .hjT small{font-size:11px;color:var(--muted)}
-.homeMap{flex:none;border-radius:8px;background:#5f9748;display:block}
+.homeMap{flex:none;border-radius:8px;background:var(--tower);display:block}
 .homeStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .homeStats div{display:flex;flex-direction:column;padding:6px 8px;border-radius:8px;background:color-mix(in srgb,var(--muted) 10%,transparent)}
 .homeStats small{font-size:10.5px;color:var(--muted)}
@@ -2560,7 +2576,7 @@ body.phoneRace .wxPg{grid-template-columns:repeat(8,1fr)}
 </head>
 <body>
 <header>
-  <h1 id="appTitle" style="user-select:none">サーキットマネージャー<small class="appVer">ver 1.4.0</small></h1>
+  <h1 id="appTitle" style="user-select:none">サーキットマネージャー<small class="appVer">ver 1.4.1</small></h1>
   <div class="hdrTools">
   <button class="b sm" id="soundBtn" hidden aria-pressed="true" title="効果音のオン・オフ"></button>
   <label class="volWrap" id="volWrap" hidden title="音量"><span class="volLab">音量</span><input type="range" id="volume" min="0" max="150" step="5" aria-label="音量"><span class="num volV" id="volV"></span></label>
@@ -2607,7 +2623,7 @@ body.phoneRace .wxPg{grid-template-columns:repeat(8,1fr)}
       <button id="camLead" title="先頭の車を追いかける">先頭</button>
       <button id="camFree" title="フリーカメラ：ドラッグで移動、ホイール（スマホは2本指）で拡大縮小。ミニマップを押すとその場所へ。キー：F・矢印・＋−">フリー</button>
       <button id="camRot" title="追従視点：追いかけている車の進む向きが常に画面の上になるよう回転します">追従視点</button>
-      <button id="camTilt" title="斜め視点：コースを少し斜めから見ているように表示します（もう一度押すと真上からに戻ります）">斜め</button>
+      <button id="camTilt" title="3D視点：コースを少し斜めから見下ろしているように表示します（もう一度押すと真上からに戻ります）">3D</button>
       <span class="who" id="camWho"></span>
       <span class="sep"></span>
       <button id="camOut" aria-label="ズームアウト">−</button>
@@ -3969,7 +3985,7 @@ function screenToWorld(e, canvas = cv, cm = cam){
    ・押した位置は cvLocal() で傾きを戻してから、コース上の位置に直す
    ・レース中だけ。コース作成の画面は真上からのまま */
 const TILT = { ang: 28, d: 2.0, s: 1.22, res: 1.35, drop: 0.05, dropTall: 0.17 };   // 角度（度）、視点までの距離（キャンバスの高さに対する倍率）、拡大率、描く細かさの倍率、追う車を下へずらす量（横長・縦長の画面）
-let tiltOn = lsGet('circuitMaker.view3d.v1', true);
+let tiltOn = lsGet('circuitMaker.view3d.v1', false);   // 最初は真上から（「3D」ボタンで切り替え）
 const tiltActive = () => !!tiltOn && mode === 'race';
 function applyTilt(){
   const on = tiltActive();
@@ -12826,13 +12842,14 @@ function guideHtml(){
       ['スポンサー契約', '契約したスポンサーの条件による（安定型：毎戦定額／成績型：ポイント・表彰台・優勝／完走型：完走台数・上げた順位／予選型：予選の順位／露出型：オーバーテイクの数／若手育成型：23歳以下の起用／ペイドライバー型：持参金と、推しのドライバーの起用・活躍）'],
       ['賞金', `1ポイントごと ${M(PT_PRIZE)}、完走1台ごと ${M(FIN_PRIZE)}`],
       ['参戦分配金', `全チームに毎戦 ${M(DIST_PAY)}`],
+      ['セカンドチームの賞金の分配', `姉妹チームの賞金（ポイント・完走）の${Math.round(SIS_SHARE*100)}%`],
       ['スポンサー目標ボーナス', '毎戦2つの目標（例：2台とも完走、ポイント獲得）を達成すると、それぞれ $1〜3M'],
       ['シーズン賞金', `コンストラクターズの順位で決まる（1位 ${M(10*SEASON_PRIZE)} 〜 10位 ${M(SEASON_PRIZE)}）`],
       ['オーナーボーナス', `順位の目標なら、目標を2つ以上上回ると ${M(og(5,3).bonus)}、達成で ${M(og(5,5).bonus)}、大きく未達だと ${M(og(5,9).bonus)}（順位以外の目標も、大成功・達成・未達・大幅未達の4段階で同じ額）`]])}
     ${tbl(['支出', '内容'], [
       ['ドライバー年俸', '契約した年俸（リザーブを含む）'], ['運営費', `毎戦 ${M(OPS_COST)}`],
       ['トレーニング費', TRAIN_LV.slice(1).map(t => `${t.n} ${M(t.cost)}`).join('・') + '（1人・1戦あたり）'],
-      ['施設の維持費', `施設のレベルごとに ${M(facUpkeep(1))}/戦`], ['開発・施設・契約', 'その都度払う']])}
+      ['施設の維持費', `施設のレベルごとに ${M(facUpkeep(1))}/戦`], ['セカンドチームの運営費', `姉妹チームを持っていれば毎戦 ${M(SIS_OPS)}`], ['開発・施設・契約', 'その都度払う']])}
     ${sub('popular', '人気度と基本スポンサー収入')}
     <p>基本スポンサー収入は「チームの基本額 × 人気度」です。人気度（100が基準・${Math.round(POP_MIN*100)}〜${Math.round(POP_MAX*100)}）は毎戦の成績で少しずつ上下し、平均に少しずつ戻ります。</p>
     ${tbl(['結果（1台ごと）', '人気度'], [['優勝', '+3'], ['表彰台', '+1.5'], ['ポイント獲得', '+0.4'], ['ポイントなし', '−0.3'], ['リタイア', '−1'], ['ポールポジション', '+0.8']])}
@@ -12854,7 +12871,7 @@ function guideHtml(){
     <p><b>成長タイプ</b>：ドライバーごとに${GROW_TYPES.map(t => t.n).join('・')}のタイプがあり、伸びる時期・衰え始め・引退の時期がずれます（普通は${GT_GROW}歳ごろまで大きく伸び、${GT_PEAK + 1}歳ごろから衰える。早熟は4年早く、晩成は4年遅い。引退はその半分だけ前後）。カードの「成長」に、タイプと年齢ごとの伸び方のグラフ（縦線が今の年齢）が出ます。タイプは隠れていて、ふだんはスカウトの見立て（「？」付き・外れることがある）です。スカウト部門をLv4にするか、自チームに1シーズン在籍すると確実に分かります。</p>
     ${sub('pu', 'パワーユニット（PU）')}
     <p><b>ADUO</b>：シーズンの1/3と2/3が終わった時点で、PUメーカーの性能指数（出力50%・ドライバビリティ30%・信頼性20%）を比べます。トップから${ADUO_LV[1].min}%以上遅れたメーカーは、今季の残りでPU開発枠+1・PUの開発費−15%、${ADUO_LV[2].min}%以上なら+2・−30%になります（ライバルのメーカーにも効き、カスタマーのPUにも届きます）。</p>
-    <p>PUを自分で作る「ワークス」は4チームだけです。ほかのチームはワークスからPUを買う「カスタマー」で、PUの性能はメーカーと同じになります。カスタマーはPUを開発できず、毎戦 ${money(PU_FEE)} の供給料を払います。ワークスはPU専用の開発枠でPUを開発でき、カスタマーの数だけ供給料を受け取ります。新しい仕様はワークスが先に使い、カスタマーには1戦遅れで届きます。シーズンの終わりに、カスタマーは来季の供給元を選び直します（強いメーカーは前年の順位が良くないと供給してくれません）。資金を払えば、来季から自社PUのワークスにもなれます（参入1年目はPU開発枠が増え、開発費が少し安く、伸びも大きくなります。2年目は伸びの優遇だけが残ります）。ワークスは来季に受け入れるカスタマーの数（0〜3）を決められます。</p>
+    <p>PUを自分で作る「ワークス」は4チームだけです。ほかのチームはワークスからPUを買う「カスタマー」で、PUの性能はメーカーと同じになります。カスタマーはPUを開発できず、毎戦 ${money(PU_FEE)} の供給料を払います。ワークスはPU専用の開発枠でPUを開発でき、カスタマーの数だけ供給料を受け取ります。新しい仕様はワークスが先に使い、カスタマーには1戦遅れで届きます。シーズンの終わりに、カスタマーは来季の供給元を選び直します（強いメーカーは前年の順位が良くないと供給してくれません）。資金を払えば、来季から自社PUのワークスにもなれます（参入1年目はPU開発枠が1つ増えます。PUが遅れているあいだは、ADUOの認定も受けられます）。ワークスは来季に受け入れるカスタマーの数（0〜3）を決められます。</p>
     ${sub('contract', '契約・更改・引き抜き')}
     <p>契約には年数があります。満了したら、更改金（年俸の${RENEW_K}倍）を払って更改するか、移籍市場で入れ替えます。リザーブも同じく、満了したらシーズンの初めに更改するか放出するかを選びます（強く育ってリザーブを嫌がったり、チーム愛が低いと断られることがあります）。ライバルがリザーブをレギュラーとして引き抜きに来ることもあり、受けると違約金が入ります。決めるまでレースに進めません。成長した選手ほど、更改のときの年俸が上がります。シーズンの終わりに、ライバルが有望な選手の引き抜きを申し出ることがあり、違約金を受け取って放出するか断るかを選べます。放出するときは、移籍市場の選手（相手チームが代わりに放出する選手も含む）か自チームのリザーブから後任を選べます。</p>
     ${sub('market', '移籍市場')}
@@ -12880,13 +12897,14 @@ function guideHtml(){
     <p><b>開発枠</b>：1戦ごとに開発できる回数には上限があります。前年のコンストラクターズ順位が低いほど多く、1〜3位は2回、4〜7位は3回、8〜10位は4回です。</p>
     <p><b>開発の結果</b>：開発は「失敗（伸び×0.25）・成功（×1）・大成功（×1.75、攻めは×2）」のどれかになります。失敗しても値は下がりません。開発方針で確率が変わり、慎重＝失敗5%・大成功なし、標準＝失敗15%・大成功15%（平均すると以前と同じ伸び）、攻め＝失敗30%・大成功30%です。空力は風洞、パワーユニットとブレーキはシミュレーターのレベルが高いほど失敗しにくくなります（1レベルにつき失敗の10%が大成功に回ります。慎重は成功に回ります）。ライバルも同じ仕組みで開発し、ときどき開発枠を買い足します。</p>
     <p><b>開発枠の追加</b>：お金を払えば、1戦に1つだけ枠を足せます（その戦だけ有効）。値段は前年の順位が高いほど高く（1〜3位 $4.0M・4〜7位 $3.0M・8〜10位 $2.0M）、同じシーズンで買うたびに50%ずつ上がります。風洞のレベルが高いほど安くなります。</p>
-    <p><b>大規則変更</b>：2〜3シーズンごとに、空力・パワーユニット・全面のどれかの規則が大きく変わります。変わる部分は全チームが平均近くまで作り直しになり、勢力図がリセットされます。変更の前のシーズンの開幕に予告されます。</p>
-    <p><b>先行研究</b>：予告されたシーズンだけ、開発枠を使って来季の研究ができます（1回 ${M(RES_COST)}）。研究するほど来季の初期値が平均より高くなります（効果の上限は、変わる項目が少ないテーマほど1項目あたり大きく、空力 +${REG_THEMES.aero.max.toFixed(1)}・パワーユニット +${REG_THEMES.pu.max.toFixed(1)}・全面 +${REG_THEMES.all.max.toFixed(1)}。当たり外れ ±25%）。今季を強くするか、今季を捨てて来季に賭けるかの判断です。研究を${RES_EASE[0]}回以上すると、オーナーは目標より1つ下（${RES_EASE[1]}回以上で2つ下）の順位までを「達成」として扱います。ライバルもそれぞれの方針で研究します。</p>
+    <p><b>大規則変更</b>：2〜3シーズンごとに、空力か全面の規則が大きく変わります。パワーユニットの規則は、前の変更から3〜4シーズンで必ず変わります（ほかの変更と同じシーズンになれば、まとめて「空力＋パワーユニット」などになります）。変わる部分は全チームが平均近くまで作り直しになり、勢力図がリセットされます。変更の前のシーズンの開幕に予告されます。</p>
+    <p><b>先行研究</b>：予告されたシーズンだけ、開発枠を使って来季の研究ができます（1回 ${M(RES_COST)}。パワーユニットを含む変更のときは、PUのワークスはPU開発枠を使います）。研究するほど来季の初期値が平均より高くなります（効果の上限は、変わる項目が少ないテーマほど1項目あたり大きく、空力 +${REG_THEMES.aero.max.toFixed(1)}・パワーユニット +${REG_THEMES.pu.max.toFixed(1)}・空力＋パワーユニット +${REG_THEMES.aeropu.max.toFixed(1)}・全面 +${REG_THEMES.all.max.toFixed(1)}。当たり外れ ±25%）。今季を強くするか、今季を捨てて来季に賭けるかの判断です。研究を${RES_EASE[0]}回以上すると、オーナーは目標より1つ下（${RES_EASE[1]}回以上で2つ下）の順位までを「達成」として扱います。ライバルもそれぞれの方針で研究します。パワーユニットの規則変更のときは、PUのカスタマー（メーカーからPUを買っているチーム）は研究できません（来季のPUはメーカー製になり、メーカーの研究で決まるため）。</p>
     <p><b>新規則1年目</b>：変わった部分の開発は、1回あたり ×${REG_BOOST} 伸びます。</p>
     ${sub('fac', '施設')}
     <p>強化するとすぐに効きます（工期なし）。強化の費用は ${M(facCost(1))}（Lv1）〜 ${M(facCost(FAC_MAX))}（Lv${FAC_MAX}）。レベルごとに毎戦の維持費がかかり、高いレベルほど急に高くなります（Lv1 ${M(facUpkeep(1))}〜Lv5 ${M(facUpkeep(5))}/戦）。Lv4以上の施設は、シーズンの切り替えで「来季、改修が必要」と予告されることがあり（Lv4 25%・Lv5 40%）、予告された施設は次のシーズンの初めに改修する（強化費の半分）か、改修せずに1レベル下げるかを選びます。チームによって最初のレベルが違い、ライバルもシーズンの終わりに強化します。</p>
     ${tbl(['施設', 'Lv1', `Lv${FAC_MAX}`], FACS.map(f => [`<b>${f.n}</b><br><small>${esc(f.d)}</small>`, esc(f.eff(1)), esc(f.eff(FAC_MAX))]))}
-    <p><b>ホームGP</b>：施設タブで自チームのサーキットを計画して建設費（$90M〜$180M。コースのタイプと観客席の規模で変わる）を払うと、今季の終わりに完成し、来季から毎シーズン、選んだラウンドがホームGPになります。コースは自動で作るか、コース作成の画面で自分で作れます（自分で作ったコースのタイプは、直線の割合とコーナーの形から自動で判定）。開催費は毎シーズン $5M。ホームGPでは観客席の多くがチームカラーになり、レース後に地元スポンサーのボーナス（$3〜5M）とドライバーのチーム愛 +3 が入ります。マシンの速さには影響しません。</p>
+    <p><b>ホームGP</b>：施設タブで自チームのサーキットを計画して建設費（$90M〜$180M。コースのタイプと観客席の規模で変わる）を払うと、今季の終わりに完成し、来季から毎シーズン、選んだラウンドがホームGPになります。開催国は、今のGPの開催国とドライバーの出身国から選べます（表示がその国の国旗になり、同じ国のGPとは重なりません）。コースは自動で作るか、コース作成の画面で自分で作れます（自分で作ったコースのタイプは、直線の割合とコーナーの形から自動で判定）。開催費は毎シーズン $5M。ホームGPでは観客席の多くがチームカラーになり、レース後に地元スポンサーのボーナス（$3〜5M）とドライバーのチーム愛 +3 が入ります。マシンの速さには影響しません。</p>
+    <p><b>セカンドチーム</b>：PUのワークスなら、施設タブで、コンストラクターズの下位3チーム（PUメーカーを除く）から1つを買収して姉妹チームにできます（買収費はチームの強さで $170M〜$200M ほど）。毎戦、運営費 ${M(SIS_OPS)} を払い、姉妹チームの賞金（ポイント・完走）の${Math.round(SIS_SHARE*100)}%を受け取ります。自チームのリザーブを姉妹チームのシートに送り込んで実戦を積ませ（その席の選手は移籍市場へ）、いつでもリザーブに呼び戻せます（リザーブの枠に空きが必要）。送り込んだ選手の年俸は姉妹チームが払い、ほかのチームに引き抜かれることもありません。姉妹チームには自チームのPUを自動で供給します（供給料など、条件はほかのカスタマーと同じ。来季の受け入れ数には数えません）。開発などの運営はAIが行います。いまの買収費の${Math.round(SIS_SELL*100)}%で売却でき、送り込んでいた選手はそのまま売却先のチームに残ります。</p>
   `)}
   ${sec('quali', '予選', `
     <p>Q1（全車）→ Q2 → Q3（上位10台）のノックアウト方式で、Q1とQ2ではそれぞれ下位${qCut(20)}台が脱落します。各車2回アタックし、良いほうのタイムが残ります。</p>
@@ -13521,21 +13539,43 @@ function ensureFacilities(){
 /* ---------- 開発枠・大規則変更・先行研究 ----------
    ・開発枠：1戦ごとに開発（と先行研究）ができる回数。前年のコンストラクターズ順位が低いチームほど多い（実際のF1の風洞時間の制限に近い）
    ・値が8を超えると1回の伸びが小さくなる（8〜9：+0.3、9〜：+0.2）
-   ・2〜3シーズンごとに大規則変更。前のシーズンの開幕に予告し、そのシーズンだけ開発枠を「来季の先行研究」にも使える
+   ・2〜3シーズンごとに大規則変更（PUは3〜4シーズンごとに必ず）。前のシーズンの開幕に予告し、そのシーズンだけ開発枠を「来季の先行研究」にも使える（PUを含む変更は、ワークスはPU開発枠）
    ・変更の部分（テーマ）は平均近くまで作り直しになり、先行研究の量に応じて平均より少し高く始められる（上限と当たり外れあり）
    ・変更1年目は、変わった部分の開発がよく伸びる */
 const REG_THEMES = {
   aero: { n:'空力', max:2.0, keys:['df','eff'], d:'空力の規則が大きく変わります。ダウンフォース・空力効率が作り直しになります' },
   pu:   { n:'パワーユニット', max:1.6, keys:['power','drive','rel'], d:'パワーユニットの規則が大きく変わります。出力・ドライバビリティ・信頼性が作り直しになります' },
-  all:  { n:'全面', max:1.0, keys:['power','drive','rel','df','eff','bpow','bstab'], d:'マシン全体の規則が大きく変わります。全項目が作り直しになります' }
+  all:  { n:'全面', max:1.0, keys:['power','drive','rel','df','eff','bpow','bstab'], d:'マシン全体の規則が大きく変わります。全項目が作り直しになります' },
+  aeropu: { n:'空力＋パワーユニット', max:1.2, keys:['power','drive','rel','df','eff'], d:'空力とパワーユニットの規則が同時に大きく変わります。出力・ドライバビリティ・信頼性・ダウンフォース・空力効率が作り直しになります' }
 };
+/* PUの大規則変更は、前のPUの変更（PUを含む変更）から3〜4シーズンで必ず行う（career.puRegAt）。
+   ほかの変更（空力・全面）は今まで通り2〜3シーズンごと（career.regGen）。2つの予定が同じシーズンなら1回にまとめる
+   （空力と重なれば「空力＋パワーユニット」、全面と重なれば「全面」） */
+const regHasPU = th => !!(REG_THEMES[th] && REG_THEMES[th].keys.includes('power'));
+const puRegGap = () => 3 + (Math.random() < 0.5 ? 0 : 1);
+// S：いまのシーズン。S より後の、次の大規則変更を決める
+function regPlan(S){
+  if(!career.regGen || career.regGen.at <= S) career.regGen = { at: S + (Math.random() < 0.5 ? 2 : 3), theme: pickTheme() };
+  if(!career.puRegAt || career.puRegAt <= S) career.puRegAt = S + puRegGap();
+  const G = career.regGen, P = career.puRegAt;
+  if(G.at < P && regHasPU(G.theme) && G.at - (career.puRegLast ?? -99) < 3) G.theme = 'aero';   // 前のPUの変更から3シーズンたたないうちは、PUを含む「全面」にはしない（PUが続けて作り直しにならないように）
+  if(G.at < P) return { at: G.at, theme: G.theme };
+  if(G.at > P) return { at: P, theme: 'pu' };
+  return { at: G.at, theme: regHasPU(G.theme) ? G.theme : 'aeropu' };   // 同じシーズン：まとめて1回
+}
 const REG_KEEP = 0.25;                      // 変わる部分で、平均との差のうち引き継げる割合
 const RSC_K = 10, RES_COST = 4;              // 先行研究：効き方・1回の費用。効果の上限はテーマごと（変わる項目が少ないほど1項目あたりの効果が大きい。合計ではどれも開発と同じくらいの価値になるように）
 const RES_EASE = [8, 16];                   // 先行研究の回数がこれ以上なら、オーナー目標を1つ（2つ）ゆるめて評価する
 const REG_BOOST = 1.3;                      // 変更1年目、変わった部分の開発の伸び
 const AI_RES = { now: { n:'今季重視', pts:0.4, dev:1.15 }, bal: { n:'両にらみ', pts:1.2, dev:0.85 }, next: { n:'来季重視', pts:2.2, dev:0.55 } };
-const pickTheme = () => { const r = Math.random(); return r < 0.4 ? 'aero' : r < 0.75 ? 'pu' : 'all'; };
+const pickTheme = () => Math.random() < 0.65 ? 'aero' : 'all';   // ほかの変更の種類（PUだけの変更は、PUの予定 puRegAt で行う）
 const regAnnounced = () => !!(career && career.reg && career.season === career.reg.at - 1);
+// PUの規則変更では、カスタマー（PUをメーカーから買っているチーム）は先行研究できない。
+// カスタマーのPUはシーズン明けにメーカーのPUへそろえられるので、自分で研究しても効かないため（自社PUを始めるチームも、始める時点のPUは決まった値になる）
+const resBlocked = (t = career && myTeam()) => !!(t && regAnnounced() && career.reg.theme === 'pu' && career.pu && !puWorks(t));
+// 先行研究に使う枠：PUを含む変更なら、ワークスはPU開発枠（空力だけの変更・カスタマーは、空力・ブレーキの開発枠）
+const resUsesPU = (t = career && myTeam()) => !!(t && career.reg && regHasPU(career.reg.theme) && career.pu && puWorks(t));
+const resSlotsLeft = () => resUsesPU() ? puSlotsLeft() : slotsLeft();
 const regFirstYear = () => !!(career && career.reg && career.reg.cur && career.reg.cur.season === career.season);
 const resBonus = (pts, theme) => REG_THEMES[theme].max*(1 - Math.exp(-pts/RSC_K));
 const myRes = () => (career && career.reg && career.reg.res[career.team]) || 0;
@@ -13546,7 +13586,14 @@ function assignRegPol(){
 }
 function ensureReg(){
   if(!career) return;
-  if(!career.reg) career.reg = { at: career.season + 2, theme: pickTheme(), res: {}, pol: {} };
+  if(!career.reg){ career.puRegLast = career.season; career.reg = { ...regPlan(career.season), res: {}, pol: {} }; }
+  else if(career.puRegAt == null){                       // PUの予定を入れる前のキャリア：いまの予定を「ほかの変更」として引き継ぎ、PUの予定を足す
+    const R = career.reg, ann = regAnnounced();
+    if(R.cur && regHasPU(R.cur.theme)) career.puRegLast = R.cur.season;
+    if(regHasPU(R.theme)) career.puRegAt = R.at;
+    else { career.regGen = { at: R.at, theme: R.theme }; career.puRegAt = Math.max(career.season + (ann ? 2 : 1), (R.cur && regHasPU(R.cur.theme) ? R.cur.season : career.season) + puRegGap()); }
+    if(!ann && !regHasPU(R.theme) && career.puRegAt <= R.at){ const p = regPlan(career.season); R.at = p.at; R.theme = p.theme; }   // まだ予告前なら、PUの変更を含めた予定に組み直す
+  }
   if(regAnnounced() && !Object.keys(career.reg.pol || {}).length) assignRegPol();
 }
 // 前年のコンストラクターズ順位（1年目はオーナーの目標から見積もる）
@@ -13626,8 +13673,8 @@ const puFacLv = t => facLv(t, 'sim') + resDevLv(t) + loveDevLv(t);   // パワ�
 const aeroResLv = t => resSupport(t, 'dev')*RES_DEV_LV;   // 開発ドライバー：空力の開発に効くレベル
 const aeroFacLv = t => facLv(t, 'wind') + aeroResLv(t) + loveDevLv(t);
 function research(){
-  if(!regAnnounced() || slotsLeft() <= 0 || career.money < RES_COST) return;
-  career.money = r1(career.money - RES_COST); useSlot();
+  if(!regAnnounced() || resBlocked() || resSlotsLeft() <= 0 || career.money < RES_COST) return;
+  career.money = r1(career.money - RES_COST); if(resUsesPU()) usePuSlot(); else useSlot();
   career.reg.res[career.team] = myRes() + 1;
   saveCareer(); renderHQ();
 }
@@ -14417,7 +14464,7 @@ function flagSvg(code, h = 14, cls = 'flag'){
 }
 function gpFlag(name, h = 14){
   const key = String(name || '').replace(/\s*GP$/, '');
-  if(!GP_COUNTRY[key] && career && career.home && career.home.name === name) return teamLogo(myTeam(), h);   // ホームGP：国旗の代わりにチームのロゴ
+  if(!GP_COUNTRY[key] && career && career.home && career.home.name === name) return career.home.nat && FLAGS[career.home.nat] ? flagSvg(career.home.nat, h) : teamLogo(myTeam(), h);   // ホームGP：開催国を選んでいればその国旗、なければチームのロゴ
   return flagSvg(GP_COUNTRY[key], h);
 }
 /* ---------- ドライバーの国籍 ---------- */
@@ -14534,14 +14581,16 @@ function goRace(force){
   if(!track){ renderHQ('コースを作れませんでした。'); return; }
   evAuto();                                                 // 返事をしていない出来事は★の選択肢で処理
   const list = [];
-  { const L = lineupAll(); career.teams.forEach(t => L[t.id].forEach((x, slot) => { const m = machineFor(t, x.code); m.tcam = slot ? 'y' : 'k'; list.push(m); })); }   // Tカメラ：ファーストは黒、セカンドは黄色   // 負傷・起用で代役が走る
+  { const L = lineupAll(); career.teams.forEach(t => L[t.id].forEach((x, slot) => { const m = machineFor(t, x.code); m.tcam = slot ? 'y' : 'k'; m.slot = slot; list.push(m); })); }   // Tカメラ：ファーストは黒、セカンドは黄色   // 負傷・起用で代役が走る
   startQuali(list, rd);                                     // 予選（終わると enterRace にグリッド順で渡す）
 }
+// チームの中の枠（0＝ファースト、1＝セカンド）。リザーブや代役が走るときは、交代した選手の枠（goRace で m.slot に入れる）
+const teamSlot = m => m.slot != null ? m.slot : myTeam().drivers.indexOf(m.name);
 function enterRace(grid){
   const rd = career.calendar[career.round];
   machines = grid;
   machines.forEach(m => { delete m.mine; });
-  const slotOf = m => myTeam().drivers.indexOf(m.name);
+  const slotOf = teamSlot;
   const mine = machines.filter(m => m.team === career.team).sort((a, b) => slotOf(a) - slotOf(b))[0];   // 画面の左側のカード（チームのドライバー順の先頭）を担当にする
   if(mine) mine.mine = true;
   lapsSel.value = career.laps;
@@ -14553,6 +14602,7 @@ function enterRace(grid){
   setMode('race');
   syncTabs('race');
   phoneLayout();
+  if(mine) setCam('car', mine);                          // カメラは最初、自チームのファーストドライバー（担当マシン）を追う
 }
 function showRaceView(){
   $('#hq').hidden = true; $('#quali').hidden = true; document.querySelector('main').hidden = false;
@@ -14596,7 +14646,8 @@ function recordRace(){
   const ln = career.loan; led.loan = ln && ln.bal > 0 ? -Math.min(ln.bal, LOAN.pay) : 0;   // 借入の返済
   if(ln && ln.bal > 0) ln.bal = r1(ln.bal + led.loan);
   led.home = rd.home && career.home ? HOME_BONUS[career.home.seat || 0] : 0;   // ホームGP：地元スポンサーのボーナス
-  led.net = r1(led.spons + (led.sreq || 0) + (led.resApp || 0) + led.deal + led.prize + led.sal + led.ops + led.train + (led.fac || 0) + led.dist + led.goal + led.loan + (led.sub || 0) + (led.pu || 0) + led.home);
+  { const S = sisTeam(); if(S){ const sr = rows.filter(r => r.team === S.id); led.sisPrize = r1((sr.reduce((a, r) => a + r.pts, 0)*PT_PRIZE + sr.filter(r => r.pos).length*FIN_PRIZE)*SIS_SHARE); led.sisOps = -SIS_OPS; } }   // セカンドチーム：賞金の分配と運営費
+  led.net = r1(led.spons + (led.sreq || 0) + (led.resApp || 0) + led.deal + led.prize + led.sal + led.ops + led.train + (led.fac || 0) + led.dist + led.goal + led.loan + (led.sub || 0) + (led.pu || 0) + led.home + (led.sisPrize || 0) + (led.sisOps || 0));
   career.money = r1(career.money + led.net);
   ensureStats();
   const preSt = {}; order.forEach(c => { const s = statD(c.m.name); preSt[c.m.name] = { wins: s.wins, pod: s.podiums, best: s.bestPos, starts: s.starts }; });   // 覚醒の判定用（このレースより前の成績）
@@ -14612,20 +14663,20 @@ function recordRace(){
   career.teams.forEach(t => {
     if(t.id === career.team) return;
     const n = 2 + (Math.random() < (t.spons - 2.4)/4 ? 1 : 0) - (Math.random() < 0.5 ? 1 : 0);   // 1〜3項目（平均およそ2）。開発枠の導入に合わせて以前より少し多く
-    const pol = regAnnounced() ? AI_RES[career.reg.pol[t.id] || 'bal'] : null;     // 規則変更の前年：方針に応じて今季の開発と来季の研究を振り分ける
+    const pol = regAnnounced() && !resBlocked(t) ? AI_RES[career.reg.pol[t.id] || 'bal'] : null;   // PU規則変更の年のカスタマーは研究しない     // 規則変更の前年：方針に応じて今季の開発と来季の研究を振り分ける
     // 開発枠の追加購入：スポンサー収入が多いチームほど買いやすい（1戦に1枠まで）
     const buy = Math.random() < clamp((t.spons - 2.4)/8, 0.05, 0.4) ? 1 : 0;
     // 開発方針：チームごとに決めておく（下位ほど攻めやすい）。結果はプレイヤーと同じ確率で決まる
     if(!t.devPol){ const r = Math.random(), lowK = clamp((6.5 - t.spons)/4, 0, 1); t.devPol = r < 0.2 + lowK*0.3 ? 'risk' : r < 0.75 ? 'norm' : 'safe'; }
     const KEYS = CAR_KEYS.filter(k => !PU_KEYS.includes(k));          // 空力・ブレーキ（PUはワークスだけが、PU専用の枠で開発する）
     for(let k=0; k<n + buy; k++){ const key = Math.random() < 0.5 ? KEYS.slice().sort((a, b) => t.car[a] - t.car[b])[0] : KEYS[Math.floor(Math.random()*KEYS.length)];
-      const res = rollDev(t.devPol, facLv(t, devFacKey(key)), 0.3*devStep(key, t.car[key])/0.4*(pol ? pol.dev : 1));   // 0.3：以前のAIの1回の伸びの平均
+      const res = rollDev(t.devPol, facLv(t, devFacKey(key)), 0.3*devStep(key, t.car[key])/0.4*(pol && !resUsesPU(t) ? pol.dev : 1));   // 0.3：以前のAIの1回の伸びの平均。研究で抑えるのは、研究に使う枠の側
       t.car[key] = r1(Math.min(10, t.car[key] + Math.max(0.1, r1(res.add)))); }
     if(pol) career.reg.res[t.id] = r1((career.reg.res[t.id] || 0) + pol.pts*(0.7 + Math.random()*0.6)*clamp(0.85 + (t.spons - 2.8)*0.1, 0.6, 1.2));
     if(puWorks(t)){                                                  // ワークス：PU専用の枠で1回（スポンサー収入が多いほど2回になりやすい）
       const np = 1 + (Math.random() < clamp((t.spons - 3.5)/5, 0, 0.4) ? 1 : 0) + ((aduoOf(t.id) || {}).slots || 0);   // ADUO認定なら枠が増える
       for(let k = 0; k < np; k++){ const key = Math.random() < 0.5 ? PU_KEYS.slice().sort((a, b) => t.car[a] - t.car[b])[0] : PU_KEYS[Math.floor(Math.random()*PU_KEYS.length)];
-        const res = rollDev(t.devPol, facLv(t, devFacKey(key)), 0.3*devStep(key, t.car[key])/0.4);
+        const res = rollDev(t.devPol, facLv(t, devFacKey(key)), 0.3*devStep(key, t.car[key])/0.4*(pol && resUsesPU(t) ? pol.dev : 1));   // PUを含む変更の前年：研究に回すぶんPUの開発を抑える
         t.car[key] = r1(Math.min(10, t.car[key] + Math.max(0.1, r1(res.add)))); }
     }
   });
@@ -14817,6 +14868,7 @@ function aiContracts(rep){
   // ① 契約満了
   for(const t of AI) t.drivers.forEach((c, slot) => {
     const d = D(c); if(!d || !d.con || d.con.yrs > 0) return;
+    if(d.loan){ d.con = newCon(d); return; }                          // 自チームから送り込んだ選手（セカンドチーム）は入れ替えない
     const mate = D(t.drivers[1 - slot]), pts = career.dpts[c] || 0, mpts = mate ? (career.dpts[mate.code] || 0) : 0;
     const best = faTop()[0];
     let keep = 0.68;
@@ -14839,7 +14891,7 @@ function aiContracts(rep){
     const ws = top.drivers.indexOf(top.drivers.slice().sort((a, b) => appeal(D(a)) - appeal(D(b)))[0]), weak = D(top.drivers[ws]);
     const lower = rank.slice(rank.indexOf(top) + 1);
     const cands = [];
-    lower.forEach(t => t.drivers.forEach((c, slot) => { const d = D(c); if(d && appeal(d) > appeal(weak) + 0.3 && !rep.con.ai.some(x => x.in === c || x.out === c)) cands.push({ t, slot, d }); }));
+    lower.forEach(t => t.drivers.forEach((c, slot) => { const d = D(c); if(d && !d.loan && appeal(d) > appeal(weak) + 0.3 && !rep.con.ai.some(x => x.in === c || x.out === c)) cands.push({ t, slot, d }); }));
     if(!cands.length) continue;
     cands.sort((a, b) => appeal(b.d) - appeal(a.d));
     const pick = cands[Math.floor(Math.random()*Math.min(3, cands.length))];
@@ -14952,7 +15004,7 @@ function puPanelHtml(me){
     const ey = puEntryYear(), E = PU_ENTRY[ey];
     return `<div class="puPanel"><div class="ppHead"><b>パワーユニット：ワークス</b>${first ? '<span class="puTag">参入' + (career.season - P.selfSince + 1) + '年目</span>' : ''}</div>
       ${aduoRowHtml(me.id, true)}
-      ${ey ? `<div class="ppRow"><span class="puTag works">参入直後の優遇</span><span class="muted">${[E.slots ? `PU開発枠 +${E.slots}` : '', E.cost < 1 ? `PUの開発費 −${Math.round((1 - E.cost)*100)}%` : '', `1回の伸び ×${E.gain}`].filter(Boolean).join(' ・ ')}（${ey === 1 ? '来季は伸びの優遇だけが残り、3年目からはなくなります' : '今季まで'}）</span></div>` : ''}
+      ${ey ? `<div class="ppRow"><span class="puTag works">参入直後の優遇</span><span class="muted">${[E.slots ? `PU開発枠 +${E.slots}` : '', E.cost < 1 ? `PUの開発費 −${Math.round((1 - E.cost)*100)}%` : '', E.gain > 1 ? `1回の伸び ×${E.gain}` : ''].filter(Boolean).join(' ・ ')}（今季まで）</span></div>` : ''}
       <div class="ppRow"><span class="muted">カスタマー</span><span>${cs.length ? cs.map(t => `${teamLogo(t, 14)}${esc(t.name)}`).join('、') : 'なし'}</span><span class="muted">供給料 ${cs.length ? '+' + money(puLedger(me)) + '/戦' : '—'}</span></div>
       <div class="ppRow"><span class="muted">来季の受け入れ</span><div class="seg2" role="radiogroup" aria-label="来季に受け入れるカスタマーの数">${[0, 1, 2, 3].map(n => `<button type="button" data-pucap="${n}" class="${P.cap === n ? 'on' : ''}" aria-checked="${P.cap === n}">${n}チーム</button>`).join('')}</div></div>
       <p class="note" style="margin:4px 0 0">PUの開発はPU専用の開発枠で行います（空力・ブレーキの枠とは別）。新しい仕様は自チームが先に使い、カスタマーには1戦遅れで届きます。受け入れると供給料が入りますが、ライバルも同じPUで速くなります。</p></div>`;
@@ -14962,7 +15014,7 @@ function puPanelHtml(me){
     <div class="ppRow"><span class="muted">供給元</span><span>${teamLogo(m, 14)}${esc(m.name)}製</span><span class="muted">供給料 ${money(fee)}/戦</span></div>
     ${aduoRowHtml(m.id, false)}
     <p class="note" style="margin:4px 0 6px">PUの性能はメーカーと同じで、メーカーの新しい仕様は1戦遅れで届きます。供給元はシーズンの終わりに選び直せます。</p>
-    ${P.selfNext ? '<div class="ppRow"><span class="puTag works">来季から自社PU</span><span class="muted">準備中です。来季の最初はメーカーの平均より少し低い性能（信頼性はもう少し低め）から始まります。参入1年目はPU開発枠・開発費・伸びの優遇、2年目は伸びの優遇があります。</span></div>'
+    ${P.selfNext ? '<div class="ppRow"><span class="puTag works">来季から自社PU</span><span class="muted">準備中です。来季の最初はメーカーの平均より少し低い性能（信頼性はもう少し低め）から始まります。参入1年目はPU開発枠が1つ増えます（PUが遅れているあいだは、ADUOの認定も受けられます）。</span></div>'
       : `<div class="cActs"><button type="button" class="b sm ${on ? 'go' : ''}" id="puSelf" ${poor || inProg ? 'disabled' : ''}>${on ? `もう一度押して確定（${money(PU_SELF_COST)}）` : `自社PUを始める（来季から・${money(PU_SELF_COST)}）`}</button>${poor ? '<span class="muted" style="font-size:12px">資金が足りません</span>' : ''}</div>`}</div>`;
 }
 // ADUOの状況（PUのパネル）：認定の有無と、次の判定の時期・今の遅れ
@@ -15050,8 +15102,8 @@ function puLagUpdate(){
 // 自チームのPUの収支（カスタマーなら支払い、メーカーなら受け取り）
 const puLedger = t => puWorks(t) ? r1(puCustomers(t).reduce((a, c) => a + (career.pu.fee[c.id] ?? PU_FEE), 0)) : -(career.pu.fee[t.id] ?? PU_FEE);
 /* PU用の開発枠（ワークスだけ）：1戦に1回。シミュレーターLv3以上で2回 */
-/* 参入直後の優遇：1年目はPU開発枠+2・開発費−15%・伸び×1.4、2年目は伸び×1.2だけ */
-const PU_ENTRY = { 1: { slots: 2, cost: 0.85, gain: 1.4 }, 2: { slots: 0, cost: 1, gain: 1.2 } };   // 開発枠・開発費の優遇は1年目だけ（2年目は伸びだけ）
+/* 参入直後の優遇：1年目だけPU開発枠+1（伸びの倍率・開発費の割引はなし。遅れているあいだはADUOも受けられる） */
+const PU_ENTRY = { 1: { slots: 1, cost: 1, gain: 1 } };
 const puEntryYear = () => { const P = career && career.pu, y = P && P.selfSince && puWorks(myTeam()) ? career.season - P.selfSince + 1 : 0; return PU_ENTRY[y] ? y : 0; };
 const puSlots = () => puWorks(myTeam()) ? 1 + (myFac('sim') >= 3 ? 1 : 0) + (puEntryYear() ? PU_ENTRY[puEntryYear()].slots : 0) + ((aduoOf(career.team) || {}).slots || 0) : 0;   // ADUO認定で増える
 const puUsed = () => { const u = career.puUsed; return u && u.s === career.season && u.r === career.round ? u.n : 0; };
@@ -15068,13 +15120,15 @@ function puOffseason(){
     PU_KEYS.forEach(k => { const av = ms.reduce((a, t) => a + t.car[k], 0)/ms.length; me.car[k] = r1(clamp(av - (k === 'rel' ? 1.1 : 0.7), 1, 10)); });   // メーカーの平均より少し低く、信頼性はもう少し低い
     P.selfNext = false; P.selfSince = career.season + 1;
   }
-  const makers = puMakers(), cnt = id => career.teams.filter(t => !puWorks(t) && P.sup[t.id] === id).length;
+  const sis = career.sister && puWorks(me) ? teamOf(career.sister.id) : null;
+  if(sis){ P.sup[sis.id] = me.id; }                                    // セカンドチームには自チームのPUを供給し続ける
+  const makers = puMakers(), cnt = id => career.teams.filter(t => !puWorks(t) && P.sup[t.id] === id && t !== sis).length;   // 姉妹チームは受け入れ数に数えない
   const capOf = id => id === me.id ? P.cap : PU_CAP;
   // 受け入れ数を超えた分は、ほかのメーカーへ
-  makers.forEach(m => { const cs = puCustomers(m).filter(t => t.id !== me.id); while(cs.length + (P.sup[me.id] === m.id ? 1 : 0) > capOf(m.id) && cs.length){ const t = cs.pop(); const alt = makers.filter(x => x !== m && cnt(x.id) < capOf(x.id)).sort((a, b) => puSum(b) - puSum(a))[0]; if(alt) P.sup[t.id] = alt.id; else break; } });
+  makers.forEach(m => { const cs = puCustomers(m).filter(t => t.id !== me.id && t !== sis); while(cs.length + (P.sup[me.id] === m.id ? 1 : 0) > capOf(m.id) && cs.length){ const t = cs.pop(); const alt = makers.filter(x => x !== m && cnt(x.id) < capOf(x.id)).sort((a, b) => puSum(b) - puSum(a))[0]; if(alt) P.sup[t.id] = alt.id; else break; } });
   // AIのカスタマー：ときどき、より強いPUのメーカーへ乗り換える
   career.teams.forEach(t => {
-    if(t === me || puWorks(t) || Math.random() > 0.3) return;
+    if(t === me || t === sis || puWorks(t) || Math.random() > 0.3) return;
     const cur = teamOf(P.sup[t.id]), best = makers.filter(m => m.id !== P.sup[t.id] && cnt(m.id) < capOf(m.id)).sort((a, b) => puSum(b) - puSum(a))[0];
     if(best && (!cur || puSum(best) > puSum(cur) + 0.3)) P.sup[t.id] = best.id;
   });
@@ -15248,7 +15302,7 @@ function openIncome(){
   const sg = v => (v >= 0 ? '+' : '') + money(r1(v));
   const row = (a, b, cls = '', note = '') => `<tr class="${cls}"><td>${a}${note ? `<small>${note}</small>` : ''}</td><td>${b}</td></tr>`;
   const sp = career.sponsor, L = career.last && career.last.led, pd = career.last && career.last.pop ? career.last.pop.d : 0;
-  const inc = L ? [['基本スポンサー収入', L.spons], ['スポンサーの依頼による上乗せ・減額', L.sreq], ['スポンサー契約', L.deal], ['スポンサー目標ボーナス', L.goal], ['賞金（ポイント・完走）', L.prize], ['参戦分配金', L.dist], ['ホームGP：地元スポンサーのボーナス', L.home], ['PUの供給料（受け取り）', L.pu > 0 ? L.pu : 0]].filter(x => x[1]) : [];
+  const inc = L ? [['基本スポンサー収入', L.spons], ['スポンサーの依頼による上乗せ・減額', L.sreq], ['スポンサー契約', L.deal], ['スポンサー目標ボーナス', L.goal], ['賞金（ポイント・完走）', L.prize], ['参戦分配金', L.dist], ['ホームGP：地元スポンサーのボーナス', L.home], ['セカンドチーム：賞金の分配', L.sisPrize], ['PUの供給料（受け取り）', L.pu > 0 ? L.pu : 0]].filter(x => x[1]) : [];
   $('#incBody').innerHTML = `
     <h4>基本スポンサー収入（毎戦）</h4>
     <table class="ledger">
@@ -15290,7 +15344,9 @@ function nextSeason(){
       regRep.teams[t.id] = { pts: r1(pts), b: r1(b), avg: r1(th.keys.reduce((a, k) => a + t.car[k], 0)/th.keys.length) };
     });
     const S = career.season + 1;
-    career.reg = { at: S + (Math.random() < 0.5 ? 2 : 3), theme: pickTheme(), res: {}, pol: {}, cur: { season: S, theme: regRep.theme } };
+    if(career.regGen && career.regGen.at <= S) career.regGen = null;            // ほかの変更の予定を使い終えた
+    if(regHasPU(regRep.theme)){ career.puRegLast = S; career.puRegAt = S + puRegGap(); }   // PUを含む変更をしたので、次のPUの変更は3〜4シーズン後
+    career.reg = { ...regPlan(S), res: {}, pol: {}, cur: { season: S, theme: regRep.theme } };
   }
   // ライバルも施設を強化する（スポンサー収入が多いチームほど上げやすい）
   career.teams.forEach(t => { if(t.id === career.team || !t.fac) return; if(Math.random() < 0.35 + (t.spons - 2.8)*0.1){ const cand = FACS.filter(f => f.k !== 'hosp' && f.k !== 'scout' && t.fac[f.k] < FAC_MAX); if(cand.length){ const f = cand[Math.floor(Math.random()*cand.length)]; t.fac[f.k]++; } } });
@@ -15755,6 +15811,117 @@ function renderSponsorPick(msg){
     saveCareer(); renderHQ(note); window.scrollTo(0, 0);
   };
 }
+/* ---------- セカンドチーム（姉妹チーム） ----------
+   ・自チームがPUワークスのときだけ、施設タブで、コンストラクターズの下位3チーム（PUメーカーを除く）から1つを買収できる（シーズン中いつでも。レース中を除く）
+   ・姉妹チームには自チームのPUを自動で供給する（条件はほかのカスタマーと同じ：供給料・1戦遅れの仕様。来季の受け入れ数には数えない）
+   ・売却：いまの買収費の SIS_SELL で売れる。送り込んでいた選手は、そのまま売却先のチームの選手になる
+   ・買収費：$80M＋マシンの平均×$15M＋基本スポンサー料×$10M（下位チームでおよそ$170M〜$200M）
+   ・毎戦：運営費 SIS_OPS を払い、姉妹チームの賞金（ポイント・完走）の SIS_SHARE を受け取る（recordRace の led.sisPrize / led.sisOps）
+   ・自チームのリザーブを、姉妹チームのシートに送り込める（その席の選手は移籍市場へ）。いつでもリザーブに呼び戻せる
+     （リザーブの枠に空きが必要。空いた席は移籍市場の選手で埋める）
+   ・送り込んだ選手（d.loan）は姉妹チームの選手として走り、年俸は姉妹チームが払う。AIの契約整理・引き抜きの対象にしない（契約は自動で延びる）
+   ・開発・PUなどの運営は今まで通りAIが行う。マシンの速さは買収で変わらない */
+const SIS_OPS = 2.0, SIS_SHARE = 0.5, SIS_SELL = 0.7;   // 運営費（毎戦）・賞金の分配の割合・売却額（いまの買収費に対する割合）
+const sisTeam = () => career && career.sister ? (teamOf(career.sister.id) || null) : null;
+const isSis = id => !!(career && career.sister && career.sister.id === id);
+const isLoan = code => { const S = sisTeam(), d = career && career.drivers[code]; return !!(S && d && d.loan && S.drivers.includes(code)); };
+function sisCost(t){ const avg = CAR_KEYS.reduce((a, k) => a + t.car[k], 0)/CAR_KEYS.length; return Math.round(80 + avg*15 + (t.spons || 3)*10); }
+// 買収できるチーム：いまのコンストラクターズの下位3チーム（自チーム・PUメーカーを除く）
+function sisCands(){ const tbl = teamTable(), n = tbl.length; return tbl.filter((x, i) => i >= n - 3 && x.id !== career.team && !puWorks(x.t)).map(x => x.t); }
+const sisBusy = () => !!(careerRace && !careerRace.done) || !!Q;   // レース・予選の途中は動かせない
+function sisBuy(id){
+  const t = teamOf(id); if(career.sister || !t || !sisCands().includes(t) || !puWorks(myTeam())) return;
+  if(sisBusy()){ renderHQ('レースの途中は買収できません。レースが終わってから買収してください。'); return; }
+  const cost = sisCost(t); if(career.money < cost) return;
+  if(!confirmTwice('sisbuy' + id, cost)) return;
+  career.money = r1(career.money - cost);
+  career.sister = { id, since: career.season, round: career.round, paid: cost };
+  const P = career.pu, prev = P && teamOf(P.sup[id]), mine = !!P && P.sup[id] === career.team;
+  if(P){ P.sup[id] = career.team; P.fee[id] = puFeeFor(career.team); syncPU(); }   // 自チームのPUを供給する（条件はほかのカスタマーと同じ）
+  saveCareer(); renderHQ(`${t.name}を買収し、セカンドチームにしました（${money(cost)}）。${mine ? '' : `PUは${prev ? prev.name + '製から' : ''}自チームのPUに切り替わります。`}次のレースから、運営費の支払いと賞金の分配が始まります。`);
+}
+function sisSell(){
+  const S = sisTeam(); if(!S) return;
+  if(sisBusy()){ renderHQ('レースの途中は売却できません。'); return; }
+  const price = Math.round(sisCost(S)*SIS_SELL);
+  if(!confirmTwice('sissell', -price)) return;
+  const loaned = S.drivers.filter(c => isLoan(c));
+  loaned.forEach(c => { delete career.drivers[c].loan; });                    // 送り込んでいた選手は、売却先のチームの選手になる
+  career.money = r1(career.money + price);
+  delete career.sister;
+  saveCareer(); renderHQ(`${S.name}を売却しました（+${money(price)}）。${loaned.length ? `送り込んでいた${loaned.join('・')}は、そのまま${S.name}の選手になります。` : ''}PUの供給は今季はそのまま続き、来季からは${S.name}が供給元を選び直します。`);
+}
+function sisSend(code, slot){
+  const S = sisTeam(), me = myTeam(); if(!S || !isRes(me, code)) return;
+  if(sisBusy()){ renderHQ('レースの途中はドライバーを動かせません。'); return; }
+  const out = S.drivers[slot]; if(!out || isLoan(out)) return;               // 送り込んだ選手の席には送れない（先に呼び戻す）
+  if(!confirmTwice('sissend' + code + slot)) return;
+  const d = career.drivers[code], od = career.drivers[out];
+  me.reserves = me.reserves.filter(r => r.code !== code);
+  if(career.sub && (career.sub.res === code || career.sub.code === code)) career.sub = null;
+  if(career.train) delete career.train[code];
+  S.drivers[slot] = code; d.loan = { since: career.season*100 + career.round }; d.rival = false;
+  if(!d.con) d.con = { yrs: 1, sal: d.sal };
+  delete od.con; od.rival = false; career.fa.push(out);
+  saveCareer(); renderHQ(`${code}（${d.name}）を${S.name}に送り込みました。${out}（${od.name}）は移籍市場に出ました。`);
+}
+function sisRecall(code){
+  const S = sisTeam(), me = myTeam(); if(!S || !isLoan(code)) return;
+  if(sisBusy()){ renderHQ('レースの途中はドライバーを動かせません。'); return; }
+  if(resList(me).length >= MAX_RES){ renderHQ(`リザーブの枠に空きがありません（最大${MAX_RES}人）。先にリザーブを放出するか、レギュラーに上げてください。`); return; }
+  const pick = career.fa.filter(c => career.drivers[c] && !career.drivers[c].retired && !isInj(c)).sort((a, b) => ovr(career.drivers[b]) - ovr(career.drivers[a]))[0];
+  if(!pick){ renderHQ('空いた席を埋める選手が移籍市場にいません。'); return; }
+  if(!confirmTwice('sisrec' + code)) return;
+  const slot = S.drivers.indexOf(code), d = career.drivers[code], pd = career.drivers[pick];
+  S.drivers[slot] = pick; career.fa = career.fa.filter(c => c !== pick); pd.con = { yrs: 1 + Math.floor(Math.random()*2), sal: pd.sal }; pd.rival = false;
+  delete d.loan;
+  const role = Object.keys(RES_ROLES).find(k => !me.reserves.some(r => r.role === k)) || Object.keys(RES_ROLES)[0];
+  me.reserves.push({ code, role, since: career.season*100 + career.round });
+  d.con = { yrs: Math.max(1, d.con ? d.con.yrs : 1), sal: d.sal };
+  saveCareer(); renderHQ(`${code}（${d.name}）をリザーブに呼び戻しました。${S.name}の空いた席には${pick}（${pd.name}）が入りました。`);
+}
+function sisCard(me){
+  const S = sisTeam(), ico = '<span class="facIco"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M5 20V10l5-3v13M10 20V7l5 3v10M15 20v-7l4-2v9"/></svg></span>';
+  const eff = `毎戦、運営費 <b>${money(SIS_OPS)}</b> を払い、姉妹チームの賞金（ポイント・完走）の <b>${Math.round(SIS_SHARE*100)}%</b> を受け取ります。自チームのリザーブを送り込んで、実戦を積ませられます`;
+  if(!S && !puWorks(me)){
+    return `<div class="facCard sisCard">
+      <div class="facHead">${ico}<div style="min-width:0"><b>セカンドチーム</b><div class="muted" style="font-size:11.5px">下位のチームを買収して、姉妹チームにする</div></div></div>
+      <p class="facD">セカンドチームを持てるのは、PUを自分で作る<b>ワークス</b>のチームだけです（姉妹チームには自チームのPUを供給します）。上の「パワーユニット」の施設から、自社PUのワークスになれます。</p>
+      <div class="facEff"><span class="muted">効果</span><span>${eff}</span></div>
+    </div>`;
+  }
+  if(!S){
+    const C = sisCands(), tbl = teamTable();
+    return `<div class="facCard sisCard">
+      <div class="facHead">${ico}<div style="min-width:0"><b>セカンドチーム</b><div class="muted" style="font-size:11.5px">下位のチームを買収して、姉妹チームにする</div></div></div>
+      <p class="facD">コンストラクターズの下位3チーム（PUメーカーを除く）から1つを買収できます。姉妹チームには自チームのPUを自動で供給します（条件はほかのカスタマーと同じ）。開発などの運営はそのままAIが行います。</p>
+      <div class="facEff"><span class="muted">効果</span><span>${eff}</span></div>
+      <div class="sisList">${C.length ? C.map(t => { const cost = sisCost(t), on = armed.key === 'sisbuy' + t.id, poor = career.money < cost, pos = tbl.findIndex(x => x.id === t.id) + 1;
+        return `<div class="sisRow">${teamLogo(t, 22)}<div class="sisNm"><b>${esc(t.name)}</b><small class="muted">今季${pos}位・${t.drivers.join(' / ')}</small></div><button class="b sm ${on ? 'go' : ''}" type="button" data-sisbuy="${t.id}" ${poor || sisBusy() ? 'disabled' : ''}>${poor ? `資金が足りません（${money(cost)}）` : on ? 'もう一度押して確定' : `買収する ${money(cost)}`}</button></div>`; }).join('') : '<p class="muted" style="font-size:12px;margin:0">いま買収できるチームはありません（下位3チームがPUメーカーのときなど）。</p>'}</div>
+    </div>`;
+  }
+  const tbl = teamTable(), pos = tbl.findIndex(x => x.id === S.id) + 1, rs = resList(me), L = career.last && career.last.led, busy = sisBusy();
+  const seat = (code, slot) => { const d = career.drivers[code], loan = isLoan(code);
+    const acts = loan
+      ? `<button class="b sm ${armed.key === 'sisrec' + code ? 'go' : ''}" type="button" data-sisrec="${code}" ${rs.length >= MAX_RES || busy ? 'disabled' : ''}${rs.length >= MAX_RES ? ' title="リザーブの枠に空きがありません"' : ''}>${armed.key === 'sisrec' + code ? 'もう一度押して確定' : 'リザーブに呼び戻す'}</button>`
+      : rs.length ? rs.map(r => `<button class="b sm ${armed.key === 'sissend' + r + slot ? 'go' : ''}" type="button" data-sissend="${r}:${slot}" ${busy ? 'disabled' : ''}>${armed.key === 'sissend' + r + slot ? 'もう一度押して確定' : `${r}を送り込む`}</button>`).join('')
+      : '<span class="muted" style="font-size:11px">送り込めるリザーブがいません</span>';
+    return `<div class="sisSeat"><span class="sisWho">${natFlag(code, 12)}<b>${code}</b><span class="muted">${esc(d.name)}・総合${pt100(ovr(d))}・${d.age}歳</span>${loan ? '<span class="sisTag">自チームから</span>' : ''}</span><span class="sisActs">${acts}</span></div>`; };
+  return `<div class="facCard sisCard open">
+    <div class="facHead">${ico}<div style="min-width:0"><b>${esc(S.name)}</b><div class="muted" style="font-size:11.5px">セカンドチーム ・ 今季${pos}位（${career.cpts[S.id] || 0}pts）・ シーズン${career.sister.since}に買収</div></div><span class="homeTag">SISTER</span></div>
+    <div class="facEff"><span class="muted">効果</span><span>${eff}</span></div>
+    ${L && L.sisPrize != null ? `<div class="sisLast">前戦：賞金の分配 <b class="gainT">+${money(L.sisPrize)}</b> ・ 運営費 <b class="lossT">${money(L.sisOps)}</b></div>` : ''}
+    <div class="sisSeats">${S.drivers.map(seat).join('')}</div>
+    <p class="note" style="margin:4px 0 0">送り込むと、その席の選手は移籍市場に出ます。送り込んだ選手は姉妹チームの選手として走り（年俸は姉妹チームが負担）、いつでもリザーブに呼び戻せます（リザーブの枠に空きが必要。空いた席は移籍市場の選手で埋めます）。PUは自チームのものを供給しています。</p>
+    <div class="facFoot"><span class="muted">売却額はいまの買収費の${Math.round(SIS_SELL*100)}%。送り込んでいる選手は、売却先のチームに残ります</span><span class="facBtns"><button class="b sm ${armed.key === 'sissell' ? 'go' : ''}" type="button" data-sissell ${busy ? 'disabled' : ''}>${armed.key === 'sissell' ? 'もう一度押して売却' : `売却する +${money(Math.round(sisCost(S)*SIS_SELL))}`}</button></span></div>
+  </div>`;
+}
+function sisBind(el){
+  el.querySelectorAll('[data-sisbuy]').forEach(b => b.onclick = () => sisBuy(b.dataset.sisbuy));
+  el.querySelectorAll('[data-sissend]').forEach(b => b.onclick = () => { const [c, s] = b.dataset.sissend.split(':'); sisSend(c, +s); });
+  el.querySelectorAll('[data-sisrec]').forEach(b => b.onclick = () => sisRecall(b.dataset.sisrec));
+  el.querySelectorAll('[data-sissell]').forEach(b => b.onclick = sisSell);
+}
 function facHtml(){
   const me = myTeam(), up = facUpkeepSum(me);
   const rivalBest = k => Math.max(...career.teams.filter(t => t.id !== me.id).map(t => facLv(t, k)));
@@ -15771,7 +15938,7 @@ function facHtml(){
         <div class="facEff"><span class="muted">今</span>${lv ? f.eff(lv) : '効果なし'}</div>
         ${max ? '' : `<div class="facEff nx"><span class="muted">Lv${lv + 1}</span>${f.eff(lv + 1)}</div>`}
         <div class="facFoot"><span class="muted">維持費 ${money(facUpkeep(lv))}/戦${max ? '' : ` → ${money(facUpkeep(lv + 1))}`}</span><span class="facBtns">${lv > 0 && !ren ? `<button class="b sm ghost" type="button" data-facsell="${f.k}" title="1段階下げて、建設費の半分を受け取る">${armed.key === 'facsell' + f.k ? 'もう一度押して売却' : `売却 +${money(r1(facCost(lv)*0.5))}`}</button>` : ''}<button class="b sm ${can ? 'go' : ''}" type="button" data-fac="${f.k}" ${can ? '' : 'disabled'}>${max ? '最大' : armed.key === 'fac' + f.k ? 'もう一度押して確定' : `強化 ${money(cost)}`}</button></span></div>
-      </div>`; }).join('')}${puFacCard(me)}${homeCard(me)}</div>
+      </div>`; }).join('')}${puFacCard(me)}${homeCard(me)}${sisCard(me)}</div>
     <div class="legend" style="margin-top:8px"><span><i style="background:var(--blue)"></i>自チームのレベル</span><span><em style="position:static;display:inline-block;width:10px;height:10px;border-radius:2px;box-shadow:inset 0 0 0 2px #e5323b;background:transparent"></em>ライバルの最高レベル</span></div>
   </div>`;
 }
@@ -15813,6 +15980,23 @@ function homeCheck(t){
   if(trackSelfOverlap(t, judgeCourse(t).type === 'street' ? 1.6 : 1)) return 'コース同士が近すぎる所があります（立体交差のほかは離してください）';
   return '';
 }
+/* ホームGPの開催国：今のカレンダーにあるGPの開催国と、ドライバーの出身国から選ぶ（国旗があるものだけ）。
+   選ぶと、ホームGPの表示がその国の国旗になり、同じ国のGPはカレンダーに重ならないようにする（マシンの速さには影響しない） */
+const natName = c => (FLAGS[c] && FLAGS[c].name) || Object.keys(GP_COUNTRY).find(k => GP_COUNTRY[k] === c) || c;
+function homeNatList(){
+  const gp = [...new Set(GP_NAMES.map(n => GP_COUNTRY[n]).filter(c => c && FLAGS[c]))];
+  const all = {}; Object.keys(career.drivers || {}).forEach(code => { const d = career.drivers[code], n = natOf(code); if(n && FLAGS[n] && d && !d.retired) (all[n] = all[n] || []).push(code); });
+  const drv = Object.keys(all).filter(c => !gp.includes(c)).sort((a, b) => natName(a).localeCompare(natName(b), 'ja'));
+  return { gp, drv };
+}
+function homeNatRow(id, cur){
+  const L = homeNatList(), mine = myTeam().drivers;
+  const opt = c => { const my = mine.filter(code => natOf(code) === c); return `<option value="${c}"${c === cur ? ' selected' : ''}>${esc(natName(c))}${my.length ? `（自チーム：${my.join('・')}）` : ''}</option>`; };
+  return `<div class="homeRow"><span class="hLab">開催国</span><span class="homeNat">${cur && FLAGS[cur] ? flagSvg(cur, 16) : teamLogo(myTeam(), 16)}<select id="${id}" aria-label="ホームGPの開催国">
+    <option value=""${!cur ? ' selected' : ''}>指定しない（チームのロゴ）</option>
+    <optgroup label="GPの開催国">${L.gp.map(opt).join('')}</optgroup>${L.drv.length ? `<optgroup label="ドライバーの出身国">${L.drv.map(opt).join('')}</optgroup>` : ''}</select></span>
+    <span class="muted" style="font-size:11px">国旗が変わり、同じ国のGPとは重ならなくなります</span></div>`;
+}
 const homeCostOf = (type, seat) => type ? HOME_BASE[type] + HOME_SEAT[seat || 0] : null;
 // 計画中の建設費（自分で作る場合は、コースを決めるまで分からない）
 function homePlanCost(P){ return homeCostOf(P.mode === 'self' ? (P.judge && P.course ? P.judge.type : null) : P.type, P.seat); }
@@ -15822,6 +16006,14 @@ function homeInsert(cal){
   const rd = { name: H.name, type: H.type, weather: r < 0.62 ? 'dry' : r < 0.85 ? 'mixed' : 'wet', points: H.course.points.map(p => ({ x: p.x, y: p.y })), startPos: H.course.startPos, size: H.course.size, city: H.course.city || null, gen: 2, home: 1, res: null };
   ensureForecast(rd);
   cal[i] = rd;
+  if(H.nat){                                              // 同じ国のGPが別のラウンドにあれば、まだ入っていない国のGPに差し替える（市街地の回は市街地のGPから）
+    cal.forEach((o, j) => {
+      if(j === i || o.home || GP_COUNTRY[String(o.name).replace(/GP$/, '')] !== H.nat) return;
+      const used = new Set(cal.map(r => String(r.name).replace(/GP$/, '')));
+      const pool = (o.type === 'street' ? STREET_GPS : GP_NAMES.filter(n => !STREET_GPS.includes(n))).filter(n => !used.has(n) && GP_COUNTRY[n] !== H.nat);
+      if(pool.length){ o.name = pool[Math.floor(Math.random()*pool.length)] + 'GP'; o.points = null; ensureForecast(o); }
+    });
+  }
   return i;
 }
 // 自動でコースを作る（ホームGPの名前では国別の特別なコースを作らない）
@@ -15845,7 +16037,7 @@ function homeSvg(c, w = 132, h = 78){
     d = pts.map((p, i) => (i ? 'L' : 'M') + ((p.x - x0)*k + ox).toFixed(1) + ' ' + ((p.y - y0)*k + oy).toFixed(1)).join('') + 'Z';
     homeSvgCache.set(c.points, d);
   }
-  return `<svg class="homeMap" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><path d="${d}" fill="none" stroke="#2c3036" stroke-width="6" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="#f4f4f2" stroke-width="0.8" stroke-dasharray="3 4"/></svg>`;
+  return `<svg class="homeMap" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><path d="${d}" fill="none" stroke="#3a414b" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#f4f4f2" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></svg>`;   // 概要タブのコース図（drawMini）と同じ描き方：暗い地に、灰色の太線＋白い線
 }
 const homeSeg = (data, items, cur) => `<div class="seg2" role="radiogroup">${items.map(([v, label, sub]) => `<button type="button" role="radio" data-${data}="${v}" class="${String(v) === String(cur) ? 'on' : ''}" aria-checked="${String(v) === String(cur)}">${label}${sub ? `<small>${sub}</small>` : ''}</button>`).join('')}</div>`;
 const homeRoundSeg = (data, cur) => homeSeg(data, Array.from({ length: ROUNDS }, (_, i) => [i, 'R' + (i + 1)]), cur);
@@ -15858,13 +16050,14 @@ function homeCard(me){
     const ty = COURSE_TYPES[H.type];
     const prog = clamp(career.round/cal.length, 0, 1);
     return `<div class="facCard homeCard${open ? ' open' : ''}">
-      <div class="facHead">${ico}<div style="min-width:0"><b>${esc(H.name)}</b><div class="muted" style="font-size:11.5px">ホームGP ・ ${ty.name} ・ 観客席：${HOME_SEAT_N[H.seat]}</div></div>${open ? '<span class="homeTag">HOME GP</span>' : '<span class="homeTag">建設中</span>'}</div>
+      <div class="facHead">${ico}<div style="min-width:0"><b>${esc(H.name)}</b><div class="muted" style="font-size:11.5px">ホームGP${H.nat ? ` ・ ${esc(natName(H.nat))}` : ''} ・ ${ty.name} ・ 観客席：${HOME_SEAT_N[H.seat]}</div></div>${open ? '<span class="homeTag">HOME GP</span>' : '<span class="homeTag">建設中</span>'}</div>
       <div class="homeJudge">${homeSvg(H.course)}<div class="hjT">${open
         ? `<span>開催 <b class="num">${H.races || 0}</b> 回 ・ ホームでの最高位 <b class="num">${H.best && H.best < 99 ? 'P' + H.best : '—'}</b> ・ ホーム優勝 <b class="num">${H.wins || 0}</b> 回</span>
            <small>${ci < 0 ? '今季のカレンダーにはありません（来季から開催）' : nextIn > 0 ? `今季は第${ci + 1}戦（あと${nextIn}戦）` : nextIn === 0 ? `次のレースがホームGPです（第${ci + 1}戦）` : `今季のホームGPは終わりました（第${ci + 1}戦）`}</small>`
         : `<span>今季の終わりに完成し、来季の第${(H.round || 0) + 1}戦から開催します</span><div class="homeBar"><i style="width:${Math.round(prog*100)}%"></i></div><small>工事の進み：第${Math.min(career.round, cal.length)}戦 / 全${cal.length}戦</small>`}
         ${H.mode === 'self' && H.judge ? `<small>判定：${homeJudgeTxt(H.judge)}</small>` : ''}</div></div>
       <div class="facEff"><span class="muted">効果</span><span>${effTxt(H.seat)}</span></div>
+      ${homeNatRow('homeNat2', H.nat || '')}
       <div class="homeRow"><span class="hLab">開催する時期</span>${homeRoundSeg('hround2', H.round || 0)}<span class="muted" style="font-size:11px">${open ? '変えると来季から' : ''}</span></div>
       <div class="facFoot"><span class="muted">開催費 ${money(HOME_FEE)}/シーズン（開幕に支払い）</span><span class="facBtns">${open ? '' : `<button class="b sm" type="button" data-hedit="build">コースを作り直す</button>`}</span></div>
     </div>`;
@@ -15887,6 +16080,7 @@ function homeCard(me){
   return `<div class="facCard homeCard">
     <div class="facHead">${ico}<div style="min-width:0"><b>ホームGPの建設を計画する</b><div class="muted" style="font-size:11.5px">選ぶ内容で建設費が変わります</div></div></div>
     <div class="homeRow"><span class="hLab">サーキットの名前</span><input type="text" id="homeName" maxlength="16" value="${esc(P.name)}" aria-label="サーキットの名前"></div>
+    ${homeNatRow('homeNat', P.nat || '')}
     <div class="homeRow"><span class="hLab">コースの作り方</span>${homeSeg('hmode', [['self', '自分で作る'], ['auto', '自動で作る']], P.mode)}</div>
     ${typeRow}
     <div class="homeRow"><span class="hLab">観客席の規模</span>${homeSeg('hseat', HOME_SEAT.map((c, i) => [i, HOME_SEAT_N[i], `+${money(c)} ・ ボーナス ${money(HOME_BONUS[i])}`]), P.seat)}</div>
@@ -15897,10 +16091,12 @@ function homeCard(me){
 }
 function homeBind(el){
   const P = career.homePlan, H = career.home;
-  el.querySelectorAll('[data-hplan]').forEach(b => b.onclick = () => { const me = myTeam(); career.homePlan = { name: `${me.name}サーキット`.slice(0, 16), mode: 'self', type: 'flow', seat: 0, round: Math.min(3, ROUNDS - 1), course: null, judge: null }; saveCareer(); renderHQ(); });
+  el.querySelectorAll('[data-hplan]').forEach(b => b.onclick = () => { const me = myTeam(); const n0 = natOf(me.drivers[0]); career.homePlan = { name: `${me.name}サーキット`.slice(0, 16), nat: n0 && FLAGS[n0] ? n0 : '', mode: 'self', type: 'flow', seat: 0, round: Math.min(3, ROUNDS - 1), course: null, judge: null }; saveCareer(); renderHQ(); });
   el.querySelectorAll('[data-hcancel]').forEach(b => b.onclick = () => { delete career.homePlan; saveCareer(); renderHQ(); });
   const nm = el.querySelector('#homeName'); if(nm && P) nm.onchange = () => { P.name = nm.value.trim().slice(0, 16) || P.name; saveCareer(); renderHQ(); };
   el.querySelectorAll('[data-hmode]').forEach(b => b.onclick = () => { P.mode = b.dataset.hmode; saveCareer(); renderHQ(); });
+  { const s1 = el.querySelector('#homeNat'); if(s1 && P) s1.onchange = () => { P.nat = s1.value; saveCareer(); renderHQ(); }; }
+  { const s2 = el.querySelector('#homeNat2'); if(s2 && H) s2.onchange = () => { H.nat = s2.value; saveCareer(); renderHQ(H.nat ? `ホームGPの開催国を${natName(H.nat)}にしました。${H.stage === 'open' ? '同じ国のGPと重ならないのは、来季のカレンダーからです。' : ''}` : 'ホームGPの開催国の指定をやめました。'); }; }
   el.querySelectorAll('[data-htype]').forEach(b => b.onclick = () => { P.type = b.dataset.htype; saveCareer(); renderHQ(); });
   el.querySelectorAll('[data-hseat]').forEach(b => b.onclick = () => { P.seat = +b.dataset.hseat; saveCareer(); renderHQ(); });
   el.querySelectorAll('[data-hround]').forEach(b => b.onclick = () => { P.round = +b.dataset.hround; saveCareer(); renderHQ(); });
@@ -15916,7 +16112,7 @@ function homeBuild(){
   let course = P.course, type = P.mode === 'self' ? P.judge.type : P.type;
   if(P.mode === 'auto'){ course = homeAutoCourse(type); if(!course){ renderHQ('コースを作れませんでした。もう一度押してください'); return; } }
   career.money = r1(career.money - cost);
-  career.home = { stage: 'build', name: P.name.trim(), mode: P.mode, type, seat: P.seat, round: P.round, course, judge: P.mode === 'self' ? P.judge : null, paid: cost, since: career.season, races: 0, best: 99, wins: 0 };
+  career.home = { stage: 'build', name: P.name.trim(), nat: P.nat || '', mode: P.mode, type, seat: P.seat, round: P.round, course, judge: P.mode === 'self' ? P.judge : null, paid: cost, since: career.season, races: 0, best: 99, wins: 0 };
   delete career.homePlan;
   saveCareer(); renderHQ(`ホームサーキット「${career.home.name}」の建設を始めました（${money(cost)}）。今季の終わりに完成し、来季の第${P.round + 1}戦から開催します。`);
 }
@@ -16032,7 +16228,7 @@ function puFacCard(me){
     <div class="facHead"><span class="facIco">${PART_ICO.pu}</span><div style="min-width:0"><b>PUワークス</b><div class="facPips" aria-label="Lv${lv}"><i class="${lv ? 'on' : ''} ${rivals ? 'rv' : ''}"></i><span class="num">Lv${lv}</span></div></div></div>
     <p class="facD">パワーユニットを自社で作る工場。ワークスになると、PU専用の開発枠でPUを開発でき、ほかのチームにPUを供給して供給料を受け取れます。</p>
     <div class="facEff"><span class="muted">今</span>${now}</div>
-    ${works || soon ? '' : `<div class="facEff nx"><span class="muted">Lv1</span>来季からワークス。最初はメーカーの平均より少し低い性能・信頼性から始まり、参入1〜2年目は開発の優遇があります</div>`}
+    ${works || soon ? '' : `<div class="facEff nx"><span class="muted">Lv1</span>来季からワークス。最初はメーカーの平均より少し低い性能・信頼性から始まり、参入1年目はPU開発枠が1つ増えます</div>`}
     <div class="facFoot"><span class="muted">${inProg && !works && !soon ? 'レース中は建設できません' : poor && !works && !soon ? '資金が足りません' : 'ワークスは全部で' + (rivals + (works ? 1 : 0)) + 'チーム'}</span><span class="facBtns"><button class="b sm ${can ? 'go' : ''}" type="button" data-puself ${can ? '' : 'disabled'}>${btn}</button></span></div>
   </div>`;
 }
@@ -16193,6 +16389,7 @@ function renderHQ(msg){
         ${career.last.led.resApp ? `<tr><td>リザーブの出場給（市場価値との差額）</td><td class="lossT">${money(career.last.led.resApp)}</td></tr>` : ''}
         ${career.last.led.dist ? `<tr><td>参戦分配金</td><td class="gainT">+${money(career.last.led.dist)}</td></tr>` : ''}
         ${career.last.led.home ? `<tr><td>ホームGP：地元スポンサーのボーナス</td><td class="gainT">+${money(career.last.led.home)}</td></tr>` : ''}
+        ${career.last.led.sisOps ? `<tr><td>セカンドチーム：賞金の分配（${Math.round(SIS_SHARE*100)}%）</td><td class="gainT">+${money(career.last.led.sisPrize || 0)}</td></tr><tr><td>セカンドチーム：運営費</td><td class="lossT">${money(career.last.led.sisOps)}</td></tr>` : ''}
         ${career.last.led.goal ? `<tr><td>スポンサー目標ボーナス</td><td class="gainT">+${money(career.last.led.goal)}</td></tr>` : ''}
         ${career.last.led.loan ? `<tr><td>借入の返済</td><td class="lossT">${money(career.last.led.loan)}</td></tr>` : ''}
         ${career.last.led.fac ? `<tr><td>施設の維持費</td><td class="lossT">${money(career.last.led.fac)}</td></tr>` : ''}
@@ -16313,10 +16510,12 @@ function renderHQ(msg){
       </div>`;
     })();
     // ④ 規則変更：先行研究ができる年だけカードで、ほかは1行
-    const reg = regAnnounced() ? (() => { const R = career.reg, th = REG_THEMES[R.theme], pts = myRes(), b = resBonus(pts, R.theme), canR = slotsLeft() > 0 && career.money >= RES_COST && career.round < career.calendar.length;
-        const rum = Object.entries(R.pol || {}).filter(([, v]) => v === 'next').map(([id]) => (teamOf(id) || {}).name).filter(Boolean).slice(0, 2);
+    const reg = regAnnounced() && resBlocked() ? (() => { const R = career.reg, th = REG_THEMES[R.theme], m = teamOf(puMakerOf(me));
+        return `<div class="devLine"><b>来季の${esc(th.n)}規則</b>（シーズン${R.at}から）：PUはメーカー製（${m ? esc(m.name) : 'メーカー'}）のため、先行研究はできません。来季のPUは、メーカーの先行研究で決まります。</div>`; })()
+      : regAnnounced() ? (() => { const R = career.reg, th = REG_THEMES[R.theme], pts = myRes(), b = resBonus(pts, R.theme), canR = resSlotsLeft() > 0 && career.money >= RES_COST && career.round < career.calendar.length;
+        const rum = Object.entries(R.pol || {}).filter(([id, v]) => v === 'next' && !resBlocked(teamOf(id))).map(([id]) => (teamOf(id) || {}).name).filter(Boolean).slice(0, 2);
         return `<details class="regCard regFold" data-fold="reg" ${hqOpen.has('reg') ? 'open' : ''}><summary><b>来季の${esc(th.n)}規則</b><span class="rcMini"><span class="rcMeter"><i style="width:${Math.round(b/th.max*100)}%"></i></span>研究 <b class="num">${pts}</b>回 ・ 見込み <b class="num">+${b.toFixed(1)}</b></span><button class="b sm go" type="button" id="resBtn" ${canR ? '' : 'disabled'}>先行研究 ${money(RES_COST)}</button></summary>
-          <div class="muted" style="font-size:12.5px;margin-top:6px">${esc(th.d)}（シーズン${R.at}から）。研究は今季だけでき、開発枠を1つ使います。研究するほど来季の初期値が平均より高くなりますが、伸びは少しずつ鈍り、当たり外れもあります（上限+${th.max.toFixed(1)}・±25%）。</div>
+          <div class="muted" style="font-size:12.5px;margin-top:6px">${esc(th.d)}（シーズン${R.at}から）。研究は今季だけでき、${resUsesPU() ? '<b>PU開発枠</b>' : '開発枠'}を1つ使います。研究するほど来季の初期値が平均より高くなりますが、伸びは少しずつ鈍り、当たり外れもあります（上限+${th.max.toFixed(1)}・±25%）。</div>
           <div class="rum">${rum.length ? `噂：${rum.map(esc).join('・')}は今季の開発を抑えて来季に集中しているらしい。` : '今のところ、来季に集中しているチームの噂はありません。'}</div></details>`; })()
       : regFirstYear() ? `<div class="devLine ok"><b>新規則1年目</b>（${esc(REG_THEMES[career.reg.cur.theme].n)}）：変わった部分の開発は ×${REG_BOOST} 伸びます</div>`
       : `<div class="devLine">次の大規則変更：シーズン${career.reg.at}（シーズン${career.reg.at - 1}の開幕に予告）</div>`;
@@ -16354,7 +16553,7 @@ function renderHQ(msg){
   })();
   const tbl = standView === 'drivers'
     ? `<table class="stand"><tr><th>POS</th><th>ドライバー</th><th>チーム</th><th style="text-align:right">PTS</th></tr>${driverTable().map((x, i) => `<tr class="${x.team && x.team.id === career.team ? 'mine' : ''}"><td class="n" style="text-align:left">${i + 1}</td><td><button type="button" class="recLink" data-spk="d:${x.code}">${natFlag(x.code)}<b>${x.code}</b> <span class="muted">${esc(career.drivers[x.code].name)}</span></button></td><td>${x.team ? `<button type="button" class="recLink" data-spk="t:${x.team.id}">${teamLogo(x.team, 18)}${esc(x.team.name)}</button>` : '<span class="muted">—</span>'}</td><td class="n">${x.pts}</td></tr>`).join('')}</table>`
-    : `<table class="stand"><tr><th>POS</th><th>チーム</th><th>ドライバー</th><th style="text-align:right">PTS</th></tr>${cons.map((x, i) => `<tr class="${x.id === career.team ? 'mine' : ''}"><td class="n" style="text-align:left">${i + 1}</td><td><button type="button" class="recLink" data-spk="t:${x.id}">${teamLogo(x.t, 18)}${esc(x.t.name)}</button></td><td class="muted">${x.t.drivers.map(c => `<button type="button" class="recLink" data-spk="d:${c}">${c}</button>`).join(' / ')}</td><td class="n">${x.pts}</td></tr>`).join('')}</table>`;
+    : `<table class="stand"><tr><th>POS</th><th>チーム</th><th>ドライバー</th><th style="text-align:right">PTS</th></tr>${cons.map((x, i) => `<tr class="${x.id === career.team ? 'mine' : ''}"><td class="n" style="text-align:left">${i + 1}</td><td><button type="button" class="recLink" data-spk="t:${x.id}">${teamLogo(x.t, 18)}${esc(x.t.name)}${isSis(x.id) ? '<span class="sisTag">姉妹</span>' : ''}</button></td><td class="muted">${x.t.drivers.map(c => `<button type="button" class="recLink" data-spk="d:${c}">${c}</button>`).join(' / ')}</td><td class="n">${x.pts}</td></tr>`).join('')}</table>`;
   const stand = `
     <div class="sec">
       <h2>選手権<button type="button" class="qm" data-guide="hq" aria-label="遊び方を見る">?</button><div class="seg2"><button type="button" data-sv="drivers" class="${standView === 'drivers' ? 'on' : ''}">ドライバー</button><button type="button" data-sv="teams" class="${standView === 'teams' ? 'on' : ''}">コンストラクター</button></div></h2>
@@ -16508,14 +16707,14 @@ function renderHQ(msg){
       <div class="hc hcNum"><span class="kick">選手権</span><b>P${myPos}</b><small class="muted">${career.cpts[me.id] || 0} ポイント</small></div>
       <button type="button" class="hc hcNum hcPop" id="popCard" aria-haspopup="dialog" aria-label="人気度と収入の詳細を見る"><span class="kick">人気度<span class="hcMore">詳しく ›</span></span><b>${Math.round(P*100)}${pd ? `<i class="${pd > 0 ? 'up' : 'down'}">${pd > 0 ? '▲' : '▼'}${Math.abs(Math.round(pd*1000)/10)}</i>` : ''}</b><small class="muted">基本収入 ${money(r1(baseSpons(me) + (career.sadj || 0)))}/戦</small></button>
       <div class="hc hcOwner"><span class="kick">オーナー</span><div class="hoGoal">目標 <b>${esc(GS.short)}</b>${GS.g.kind === 'rank' || GS.g.kind === 'rival' ? '' : `<small class="hoProg">${esc(GS.p)}</small>`}${career.round > 0 && !seasonOver ? `<b class="hoPace ${ok ? 'ok' : 'ng'}">${GS.ok ? '達成' : ok ? '達成ペース' : '目標未達'}</b>` : ''}</div><div class="trust" title="オーナーの信頼度。シーズンの目標の達成度で増減し、0になると解任されます">信頼度 <span class="tmeter"><i style="width:${o.trust}%;background:${tc}"></i></span><b>${o.trust}</b></div>
-        ${regAnnounced() && GS.g.kind !== 'rank' ? `<small class="hbNote">来季への投資：先行研究${RES_EASE[0]}回以上で、主目標に少し届かなくても達成扱い${resEase(myRes()) ? `・現在 <b>${resEase(myRes())}段ゆるめ</b>` : ''}</small>` : ''}${regAnnounced() && GS.g.kind === 'rank' ? `<small class="hbNote">来季への投資：先行研究${RES_EASE[0]}回で${Math.min(10, o.target + 1)}位、${RES_EASE[1]}回で${Math.min(10, o.target + 2)}位までを達成扱い${resEase(myRes()) ? `・現在 <b>${Math.min(10, o.target + resEase(myRes()))}位まで</b>` : ''}</small>` : ''}</div>
+        ${regAnnounced() && !resBlocked() && GS.g.kind !== 'rank' ? `<small class="hbNote">来季への投資：先行研究${RES_EASE[0]}回以上で、主目標に少し届かなくても達成扱い${resEase(myRes()) ? `・現在 <b>${resEase(myRes())}段ゆるめ</b>` : ''}</small>` : ''}${regAnnounced() && !resBlocked() && GS.g.kind === 'rank' ? `<small class="hbNote">来季への投資：先行研究${RES_EASE[0]}回で${Math.min(10, o.target + 1)}位、${RES_EASE[1]}回で${Math.min(10, o.target + 2)}位までを達成扱い${resEase(myRes()) ? `・現在 <b>${Math.min(10, o.target + resEase(myRes()))}位まで</b>` : ''}</small>` : ''}</div>
       ${sp ? `<div class="hc hcSp"><span class="kick">スポンサー</span><div class="hsHead">${sponsorLogo(sp.name, 26)}<span class="tier">${SPONSOR_TYPES[sp.type].n}</span></div><small class="muted hsTerms">契約：${sponsorTerms(sp)}</small></div>` : ''}
     </div>`; })()}
     ${sp ? '' : sponsorCard}
     ${!guideSeen() && hqTab === 'ov' ? `<div class="guideHint"><span class="gq" aria-hidden="true">?</span><div><b>はじめてですか？</b><span>チーム本部・予選・レース中の操作を、約3分で読める「遊び方」にまとめています。</span></div><button type="button" class="b sm go" data-guide="start">遊び方を見る</button><button type="button" class="b sm ghost" id="guideDismiss">閉じる</button></div>` : ''}
     ${msg ? `<p class="warn">${esc(msg)}</p>` : ''}
     ${career.money < 0 ? '<p class="warn">資金がマイナスです。開発や契約はできません。ポイントを取って賞金を稼ぎましょう。</p>' : ''}
-    ${regAnnounced() ? `<div class="regBar"><span class="kick">REGULATIONS</span><span>来季（シーズン${career.reg.at}）に<b>${esc(REG_THEMES[career.reg.theme].n)}の大規則変更</b>。マシン開発タブで先行研究ができます（今季 ${myRes()}回）。</span></div>`
+    ${regAnnounced() ? `<div class="regBar"><span class="kick">REGULATIONS</span><span>来季（シーズン${career.reg.at}）に<b>${esc(REG_THEMES[career.reg.theme].n)}の大規則変更</b>。${resBlocked() ? 'PUはメーカー製のため、先行研究はできません（来季のPUはメーカーの研究で決まります）' : `マシン開発タブで先行研究ができます（今季 ${myRes()}回）`}。</span></div>`
       : regFirstYear() ? `<div class="regBar now"><span class="kick">NEW REGULATIONS</span><span>新規則1年目（${esc(REG_THEMES[career.reg.cur.theme].n)}）。変わった部分の開発がよく伸びます（×${REG_BOOST}）。</span></div>` : ''}
     ${(() => { const pend = pendingContracts().length;
       return `<nav class="hqTabs" role="tablist" aria-label="チーム本部の表示">${HQ_TABS.map(([k, l]) => `<button type="button" role="tab" data-hqt="${k}" class="${hqTab === k ? 'on' : ''}" aria-selected="${hqTab === k}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${HQ_TAB_ICO[k]}"/></svg><span>${l}</span>${k === 'drv' && pend ? '<i class="tDot" title="契約の手続きが残っています"></i>' : ''}</button>`).join('')}</nav>`; })()}
@@ -16542,7 +16741,7 @@ function renderHQ(msg){
   el.querySelectorAll('[data-fac]').forEach(b => b.onclick = () => upgradeFac(b.dataset.fac));
   el.querySelectorAll('[data-facsell]').forEach(b => b.onclick = () => sellFac(b.dataset.facsell));
   el.querySelectorAll('[data-puself]').forEach(b => b.onclick = puStartSelf);
-  homeBind(el);
+  homeBind(el); sisBind(el);
   el.querySelectorAll('[data-facren]').forEach(b => b.onclick = () => renovateFac(b.dataset.facren));
   el.querySelectorAll('[data-facdown]').forEach(b => b.onclick = () => skipRenovateFac(b.dataset.facdown));
   const lb = $('#loanBtn'); if(lb) lb.onclick = borrow;
@@ -16993,13 +17192,13 @@ function syncTel(){
   }
   const order = ranking();
   // 並び順はチームのドライバー順で固定（担当を切り替えても位置は変えず、枠の色だけを移す）
-  const slot = c => myTeam().drivers.indexOf(c.m.name);
+  const slot = c => teamSlot(c.m);
   const cars = race.cars.filter(c => c.m.team === career.team).sort((a, b) => slot(a) - slot(b));
   // カードの骨組みは、並ぶマシンが変わったときだけ作り直す。中身は部分ごとに、変わったところだけ書き換える
   const skel = cars.map(c => c.m.id + ':' + machines.indexOf(c.m)).join(',');
   if(telKey !== skel){
     telKey = skel;
-    box.innerHTML = cars.map(c => `<div class="tc" data-mi="${machines.indexOf(c.m)}" role="button" tabindex="0"><div class="secBar" aria-hidden="true"><i><b>S1</b></i><i><b>S2</b></i><i><b>S3</b></i></div><div class="tcHead"><span class="dot" style="background:${swatchBg(c.m)}"></span>${esc(c.m.name)}<span class="abAct"></span><span class="tag"></span></div><div class="tcRow t1"></div><div class="tcRow t2"></div><div class="tcRow t3"></div><div class="tcPace" role="group" aria-label="${esc(c.m.name)}のペース">${['save','norm','push'].map(p => `<button type="button" data-p="${p}" class="pc-${p}" aria-label="${esc(c.m.name)}のペース：${PACE[p].name}" title="${PACE[p].name}">${PACE_ICO[p]}</button>`).join('')}</div><div class="tcStart" role="group" aria-label="${esc(c.m.name)}のスタートタイヤ"></div><div class="tcBoxW"><button type="button" class="tcBox" aria-label="${esc(c.m.name)}をピットに入れる"><b>BOX</b></button><div class="tcPick" role="group" aria-label="${esc(c.m.name)}に履かせるタイヤ" hidden><span class="tpLab">タイヤを選ぶ</span>${TYRE_KEYS_ALL.map(k => `<button type="button" data-tc="${k}"><span class="tring" style="border-color:${TYRES[k].color}"></span>${k}</button>`).join('')}<button type="button" class="tpX" aria-label="閉じる">×</button></div></div></div>`).join('');
+    box.innerHTML = cars.map(c => `<div class="tc" data-mi="${machines.indexOf(c.m)}" role="button" tabindex="0"><div class="secBar" aria-hidden="true"><i><b>S1</b></i><i><b>S2</b></i><i><b>S3</b></i></div><div class="tcHead"><span class="dot" style="background:${swatchBg(c.m)}"></span>${esc(c.m.name)}${myTeam().drivers.includes(c.m.name) ? '' : `<span class="tcSub" title="${esc(career.drivers[c.m.name] ? career.drivers[c.m.name].name : '')}が代わりに走ります">${isRes(myTeam(), c.m.name) ? 'リザーブ' : '代役'}</span>`}<span class="abAct"></span><span class="tag"></span></div><div class="tcRow t1"></div><div class="tcRow t2"></div><div class="tcRow t3"></div><div class="tcPace" role="group" aria-label="${esc(c.m.name)}のペース">${['save','norm','push'].map(p => `<button type="button" data-p="${p}" class="pc-${p}" aria-label="${esc(c.m.name)}のペース：${PACE[p].name}" title="${PACE[p].name}">${PACE_ICO[p]}</button>`).join('')}</div><div class="tcStart" role="group" aria-label="${esc(c.m.name)}のスタートタイヤ"></div><div class="tcBoxW"><button type="button" class="tcBox" aria-label="${esc(c.m.name)}をピットに入れる"><b>BOX</b></button><div class="tcPick" role="group" aria-label="${esc(c.m.name)}に履かせるタイヤ" hidden><span class="tpLab">タイヤを選ぶ</span>${TYRE_KEYS_ALL.map(k => `<button type="button" data-tc="${k}"><span class="tring" style="border-color:${TYRES[k].color}"></span>${k}</button>`).join('')}<button type="button" class="tpX" aria-label="閉じる">×</button></div></div></div>`).join('');
   }
   // innerHTML は、ブラウザが書き直した形（属性の書き方など）で返ってくるので、書いた文字列と比べると毎回ちがって見える。
   // （レース画面では説明文の title を消す見張りもあり、中身はさらに変わる）。そのため書いた文字列を覚えておいて比べる
