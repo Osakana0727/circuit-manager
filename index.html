@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- サーキットマネージャー ver 1.4.1 -->
+<!-- レーシングチームマネージャー ver 1.5.0 -->
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="version" content="1.4.1">
+<meta name="version" content="1.5.0">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>サーキットマネージャー</title>
+<title>レーシングチームマネージャー</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=M+PLUS+1p:wght@500;700;900&display=swap" rel="stylesheet">
@@ -56,6 +56,14 @@ main{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:14px;padding:14p
 .stage{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#5f9748}
 canvas{display:block;width:100%;aspect-ratio:10/7}
 /* コース画面の左上：ラップ数と、その下の旗の状態 */
+.redSkip{position:absolute;left:50%;bottom:118px;transform:translateX(-50%);z-index:9;display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border:0;border-radius:999px;background:#e4092a;color:#fff;font:700 14px "M PLUS 1p",system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35);cursor:pointer;white-space:nowrap}
+.redSkip svg{width:18px;height:18px}
+.redSkip:hover{background:#c50723}
+.redSkip:disabled{opacity:.85;cursor:default}
+.redSkip:focus-visible{outline:3px solid #fff;outline-offset:2px}
+/* スマホ：画面下の操作パネルの一番上の行に入れる（コースやカードに重ならない） */
+body.career.phoneRace .dock .redSkip,body.phoneRace .dock .redSkip{background:#e4092a!important;color:#fff!important}
+.redSkip.inDock{position:static;transform:none;grid-column:1/-1;justify-content:center;min-height:38px;padding:8px 12px;border-radius:9px;box-shadow:none;font-size:13px}
 .hud{position:absolute;left:8px;top:8px;display:flex;flex-direction:column;align-items:flex-start;gap:5px;pointer-events:none;max-width:calc(100% - 16px);z-index:7}
 .flagchip:empty{display:none}
 .flagchip span.red{background:#e4092a;color:#fff}
@@ -934,6 +942,11 @@ body.guideOpen{overflow:hidden}
 .stand tr.mine td{background:rgba(0,200,255,.1);font-weight:700}
 .stand tr.mine td:first-child{box-shadow:inset 3px 0 0 #00c8ff}
 /* 移籍市場 */
+.mktBar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:0 0 10px}
+.mktSort button i{font-style:normal;font-size:8px;margin-left:3px;vertical-align:1px}
+.mktAff.on{background:var(--signal);color:var(--signalText);border-color:var(--signal)}
+.mktCnt{margin-left:auto;font-size:12px}
+@media (max-width:560px){ .mktCnt{margin-left:0;flex-basis:100%} }
 .fa{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:8px 0}
 .fa+.fa{border-top:1px solid var(--line)}
 .fa .acts{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
@@ -977,7 +990,7 @@ body.guideOpen{overflow:hidden}
 .champ p{margin:4px 0;line-height:1.6}
 button.b:focus-visible,.tySeg button:focus-visible,.seg2 button:focus-visible,.pick button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 /* キャリア中はレース画面の設定（周回数・天候・マシン編集）を隠す。チーム本部で決めるため */
-body.career #machineSec,body.career #setupSec>.setGrid,body.career #setupSec>.ttNote{display:none}
+body.career #machineSec,body.career #setupSec{display:none}   /* キャリアのレース画面には、レース設定（詳細設定・エンジン音）を出さない。設定の部品は処理が参照するので残す（初期値のまま） */
 body.career #againBtn{display:none}
 /* ドライバーの6項目と特殊能力 */
 .dst{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,auto minmax(0,1fr) 2.2em);gap:5px 8px;align-items:center;margin-top:6px}
@@ -1820,6 +1833,11 @@ body.career.pcRace .tc.pre .tcStart{grid-column:1}
 .sisActs{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
 .sisTag{display:inline-block;flex:none;font-size:10px;font-weight:700;padding:0 6px;border-radius:4px;background:#ffc400;color:#15171a;margin-left:6px;vertical-align:1px}
 .sisLast{font-size:12px;color:var(--muted)}
+.sisTech{display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--line);padding-top:8px}
+.sisTech .seg2 button small{display:block;font-size:10.5px;opacity:.75}
+.sisTbl{width:auto;min-width:320px}
+.sisTbl th{font-size:11px;color:var(--muted);font-weight:500;text-align:left;padding-right:12px}
+.sisTbl td{padding-right:12px}
 .homeTag{flex:none;margin-left:auto;font:700 10.5px "Chakra Petch",sans-serif;letter-spacing:.08em;padding:2px 7px;border-radius:5px;background:#1b1f25;color:var(--signal)}
 .homeRow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:12.5px}
 .homeRow .hLab{flex:none;width:6.5em;font-size:11.5px;font-weight:700;color:var(--muted)}
@@ -1854,6 +1872,34 @@ body.career.pcRace .tc.pre .tcStart{grid-column:1}
 .homeEdBox .hjRes small{font-size:11.5px;color:var(--muted)}
 .homeEdBox .hjCost{margin-top:6px;font-size:12.5px}
 .homeEdBox .acts{margin-top:8px}
+.homeEdBox .heHead{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.homeEdBox .heHead h2{margin:0}
+.homeEdBox .heName{font-size:12.5px;color:var(--muted);font-weight:700}
+.heStatus{padding:7px 10px;border-radius:9px;font-size:12.5px;font-weight:700;background:var(--btn);border:1px solid var(--line)}
+.heStatus.ok{background:rgba(26,154,85,.12);border-color:rgba(26,154,85,.45);color:#13703e}
+.heStatus.ng{background:rgba(215,38,61,.1);border-color:rgba(215,38,61,.45);color:#b01d31}
+.heJudge{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+.heJudge .heType{font-weight:800;font-size:14px}
+.heJudge small{font-size:11.5px;color:var(--muted)}
+.heStart{margin-top:10px;padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:var(--bg)}
+.heSH{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.heSH b{font-size:13px}
+.heSt{font-size:11.5px;font-weight:700;color:var(--muted)}
+.heSt.ok{color:#1a9a55}.heSt.ng{color:#d7263d}
+#heSlot .startSl{margin:8px 0 6px}
+#heSlot .startSl>span:first-child{display:none}
+#heSlot .startSl{grid-template-columns:1fr 40px!important}
+.heSB{display:flex;gap:6px;flex-wrap:wrap}
+.heSB .b{min-width:44px}
+.heSB #heFit{margin-left:auto}
+.heSN{margin:6px 0 0;font-size:11px;color:var(--muted)}
+.homeEdBox .hjCost{margin-top:10px}
+.heActs{display:grid;grid-template-columns:1fr 1.4fr;gap:8px;margin-top:10px}
+.heActs .b{white-space:nowrap;min-height:40px;justify-content:center}
+.heBack{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
+.heBack .muted{font-size:11px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .heStatus.ok{color:#4ade80}:root:not([data-theme="light"]) .heStatus.ng{color:#ff6b7d}}
+:root[data-theme="dark"] .heStatus.ok{color:#4ade80}:root[data-theme="dark"] .heStatus.ng{color:#ff6b7d}
 body.homeEd #toRace{display:none!important}
 body.homeEd:not(.homeTrial) #dock{display:none!important}
 .homeTrialBar{position:absolute;left:50%;top:58px;transform:translateX(-50%);z-index:6;display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;max-width:calc(100% - 20px);padding:7px 10px;border-radius:10px;background:rgba(20,22,26,.88);color:#f1f3f5;font-size:12px;box-shadow:0 2px 10px rgba(0,0,0,.3)}
@@ -2006,6 +2052,51 @@ body.career.pcRace .radio .rw{font-size:11px;padding:2px 6px}
 .devBar i.f{color:#d7263d}.devBar i.s{color:#1a9a55}.devBar i.g{color:#c026d3}
 .devBar .dbKey i{margin:0 4px 0 0;font-size:10.5px}
 .devBar .dbMult{color:var(--muted)}
+/* 設計責任者（開発タブ・移籍市場） */
+.devBar .dbDs{display:flex;align-items:center;gap:8px;min-width:0}
+.dbDs .face,.dbDs svg{flex:none}
+.dbDs .dsTxt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.dbDs .dsTxt small{font-size:10.5px;color:var(--muted);font-weight:700}
+.dbDs .dsTxt>b{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsNone{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--btn);color:var(--muted);font-weight:800}
+.dsWarn{font-size:11.5px}
+.dsTags{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.dsType{font-size:11px;font-weight:800;padding:1px 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.dsType.t-safe{color:#1a7f4b}.dsType.t-bal{color:#2563eb}.dsType.t-inno{color:#c2410c}.dsType.t-gray{color:#6d28d9}
+.dsChip{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:1px 7px;border-radius:6px;background:var(--btn);border:1px solid var(--line);white-space:nowrap}
+.dsChip.tr{border-color:#c58f00;color:#8a6400}
+.dsChip .gd{transform:scale(.9)}
+.dsCard .dsTags{margin:4px 0 6px}
+.dsCard .dsDesc{margin:0 0 6px;font-size:12px;color:var(--muted)}
+.dsCard.mine{box-shadow:inset 3px 0 0 #00c8ff}
+.dsCur{margin-bottom:10px}
+.dsCard .cTag{white-space:nowrap;margin-left:auto}
+.mktViewSeg{margin:0 0 10px}
+/* 抜け穴（グレーゾーン型） */
+.grayCard{border:1px solid #8b5cf6;border-radius:12px;padding:9px 11px;margin:0 0 10px;background:linear-gradient(0deg,rgba(139,92,246,.06),rgba(139,92,246,.06)),var(--bg)}
+.gcHead{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+.gcHead>b{font-size:14px;color:#6d28d9}
+.gcHead>.muted{font-size:12px}
+.gcSus{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700}
+.susBar{display:inline-block;width:90px;height:7px;border-radius:4px;background:var(--btn);overflow:hidden;border:1px solid var(--line)}
+.susBar i{display:block;height:100%;background:#1a9a55}
+.gcSus.s-mid .susBar i{background:#e5a100}.gcSus.s-hi .susBar i{background:#d7263d}
+.gcProp{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--panel);border:1px dashed #8b5cf6}
+.gcPT{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 260px}
+.gcPT span{font-size:12px;color:var(--muted)}
+.gcProp .cActs{display:flex;gap:6px;flex-wrap:wrap}
+.gcNone{margin:6px 0 0;font-size:12px}
+.gcList{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.gcTrick{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:3px 8px;border-radius:8px;border:1px solid var(--line);background:var(--panel)}
+.gcTrick i{font-style:normal;font-size:10.5px;font-weight:800;padding:0 6px;border-radius:999px;background:#ede9fe;color:#5b21b6}
+.gcTrick i.warn{background:#fef3c7;color:#92400e}.gcTrick i.good{background:#dcfce7;color:#166534}
+.gcLog{margin-top:8px;display:flex;flex-direction:column;gap:2px;font-size:12px}
+.gcLog small{color:var(--muted);margin-right:6px;font-family:"Chakra Petch",sans-serif}
+.gcLog .bad{color:#d7263d}.gcLog .good{color:#1a9a55}.gcLog .warn{color:#b45309}
+.gcNote{margin:8px 0 0!important;font-size:11.5px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .gcHead>b{color:#c4b5fd}:root:not([data-theme="light"]) .dsType.t-gray{color:#c4b5fd}:root:not([data-theme="light"]) .dsType.t-safe{color:#4ade80}:root:not([data-theme="light"]) .dsType.t-bal{color:#93c5fd}:root:not([data-theme="light"]) .dsType.t-inno{color:#fdba74}:root:not([data-theme="light"]) .dsChip.tr{color:#fcd34d}}
+:root[data-theme="dark"] .gcHead>b,:root[data-theme="dark"] .dsType.t-gray{color:#c4b5fd}
+:root[data-theme="dark"] .dsType.t-safe{color:#4ade80}:root[data-theme="dark"] .dsType.t-bal{color:#93c5fd}:root[data-theme="dark"] .dsType.t-inno{color:#fdba74}:root[data-theme="dark"] .dsChip.tr{color:#fcd34d}
 .devInfo{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
 .devLine{font-size:12px;color:var(--muted);padding:6px 10px;border:1px dashed var(--line);border-radius:9px}
 .devLine.ok{border-color:#1f9d5a;color:var(--text)}
@@ -2252,6 +2343,19 @@ body.career.pcRace .radio .rw{font-size:11px;padding:2px 6px}
 .chNext{font-size:10.5px;font-weight:800;padding:1px 8px;border-radius:999px;background:var(--signal);color:var(--signalText)}
 .ch.now{border-color:var(--signal);box-shadow:0 0 0 2px var(--signal) inset}
 .ch.done{background:var(--bg)}
+.ch.link{padding:0}
+.chBtn{all:unset;box-sizing:border-box;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px 6px;border-radius:10px;cursor:pointer;min-width:0}
+.chBtn:hover{background:var(--btnh)}
+.chBtn:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.rrSum{margin-bottom:8px}
+.rrTbl td{vertical-align:middle}
+.rrTbl tr.mine td{background:rgba(0,200,255,.08)}
+.rrTbl tr.mine td:first-child{box-shadow:inset 3px 0 0 #00c8ff}
+.rrDnf{font:700 11px "Chakra Petch",sans-serif;color:#d7263d}
+.rrGrid{display:block;font-size:10.5px;margin-left:2px}
+.rrTm{margin-left:4px}
+.rrNav{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+@media (max-width:560px){ .rrNm{display:none} }
 @media (max-width:480px){ .calH{grid-template-columns:repeat(3,minmax(0,1fr))} }
 .loanSec{margin-top:14px}
 .loanRow{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px}
@@ -2576,7 +2680,7 @@ body.phoneRace .wxPg{grid-template-columns:repeat(8,1fr)}
 </head>
 <body>
 <header>
-  <h1 id="appTitle" style="user-select:none">サーキットマネージャー<small class="appVer">ver 1.4.1</small></h1>
+  <h1 id="appTitle" style="user-select:none">レーシングチームマネージャー<small class="appVer">ver 1.5.0</small></h1>
   <div class="hdrTools">
   <button class="b sm" id="soundBtn" hidden aria-pressed="true" title="効果音のオン・オフ"></button>
   <label class="volWrap" id="volWrap" hidden title="音量"><span class="volLab">音量</span><input type="range" id="volume" min="0" max="150" step="5" aria-label="音量"><span class="num volV" id="volV"></span></label>
@@ -2599,6 +2703,7 @@ body.phoneRace .wxPg{grid-template-columns:repeat(8,1fr)}
   <div class="stage" id="stage">
     <canvas id="cv"></canvas>
     <div class="hud"><div class="hint" id="hint"></div><div class="flagchip" id="flag"></div></div>
+    <button type="button" class="redSkip" id="redSkip" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l8 7-8 7z" fill="currentColor"/><path d="M13 5l8 7-8 7z" fill="currentColor"/></svg><span>レース再開までスキップ</span></button>
     <div class="homeTrialBar" id="homeTrialBar" hidden></div>
     <div class="edtools" id="edtools" role="toolbar" aria-label="編集">
       <button id="undo" title="元に戻す（Ctrl+Z）" aria-label="元に戻す"><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
@@ -2883,6 +2988,7 @@ body.phoneRace .wxPg{grid-template-columns:repeat(8,1fr)}
 </div>
 
 <script>
+const MS_N = 15;                                  // イエローフラッグのミニセクター（マーシャルの受け持ち区間）の数
 (function(){
 'use strict';
 const $ = s => document.querySelector(s);
@@ -4848,12 +4954,12 @@ function buildDecor(T){
     flush();
   }
 
-  // --- マーシャルポスト：1周に9か所。ピットやスタンドを避けて外側に置く ---
-  const posts = [], nPost = 9;
+  // --- マーシャルポスト：ミニセクターごとに1か所（1周に15か所）。ピットやスタンドを避けて外側に置く ---
+  const posts = [], nPost = MS_N;
   for(let p=0;p<nPost;p++){
     const base = (T.startIdx + Math.round(N*(p + 0.5)/nPost)) % N;
     let placed = null;
-    for(let o=0;o<Math.round(60/sp) && !placed;o++){
+    for(let o=0;o<Math.max(Math.round(60/sp), Math.floor(N/nPost/2) - 1) && !placed;o++){   // 受け持ちのミニセクターの中で探す
       for(const i of [(base+o)%N, (base-o+N)%N]){
         for(const side of [outSide[i], -outSide[i]]){
           if(side === PS && inPit(i)) continue;
@@ -4864,7 +4970,7 @@ function buildDecor(T){
           if(!clearAt(i, side, POST_D, w/2 + GRAVEL + 3)) continue;
           const q = K[i];
           placed = { idx: i, side, x: q.x + q.nx*side*POST_D, y: q.y + q.ny*side*POST_D, a: q.a,
-                     sec: Math.min(2, Math.floor(((i - T.startIdx + N) % N) / (N/3))) };
+                     ms: p };                      // 受け持つミニセクター
           break;
         }
         if(placed) break;
@@ -5059,15 +5165,23 @@ function postFlag(p){
   if(mode !== 'race' || (race.state !== 'racing' && race.state !== 'finished')) return null;
   if(race.red) return '#e4092a';
   if((race.sc && race.sc.until > race.t) || race.vsc) return '#ffc400';
-  if(race.yellow && race.yellow.until > race.t && race.yellow.sec === p.sec) return '#ffc400';
-  if(race.greenUntil > race.t && (race.greenSec < 0 || race.greenSec === p.sec)) return '#1fbf6a';
+  if(yLevelMs(p.ms)) return '#ffc400';
+  if(race.greenUntil > race.t && race.greenSec < 0) return '#1fbf6a';
+  if((race.greens || []).some(g => g.ms === p.ms && g.until > race.t)) return '#1fbf6a';
+  if(blueMs().has(p.ms)) return '#1e6fff';                 // ブルーフラッグ：道を譲っている周回遅れの車がいるミニセクター
   return null;
+}
+// 道を譲っている（ブルーフラッグが出ている）車がいるミニセクター。旗を描くたびに数えないよう、時刻ごとに覚えておく
+function blueMs(){
+  if(race.blueAt !== race.t){ race.blueAt = race.t; race.blueSet = new Set(race.cars.filter(c => c.blue && !c.out && !c.inPit).map(c => miniOf(c.idx))); }
+  return race.blueSet;
 }
 function drawPostFlags(T){
   const { posts } = decorOf(T);
   const t = performance.now()/1000;
   for(const p of posts){
     const col = postFlag(p); if(!col) continue;
+    const dbl = col === '#ffc400' && yLevelMs(p.ms) === 2 && !race.sc && !race.vsc;   // ダブルイエロー：2本の旗を振る
     // 小屋からコース側へ旗を出し、左右に振る
     const q = T.pts[p.idx], tx = -q.nx*p.side, ty = -q.ny*p.side;          // コースへ向かう向き
     const bx = p.x + tx*5, by = p.y + ty*5;
@@ -5080,6 +5194,15 @@ function drawPostFlags(T){
     ctx.fillStyle = col; ctx.fill();
     ctx.strokeStyle = 'rgba(0,0,0,.55)'; ctx.lineWidth = 0.6; ctx.stroke();
     ctx.restore();
+    if(dbl){                                                               // 2本目：少しずらして逆の位相で振る
+      const a2 = Math.atan2(ty, tx) - sw*0.6;
+      ctx.save(); ctx.translate(bx - ty*3, by + tx*3); ctx.rotate(a2);
+      ctx.strokeStyle = '#2b2f34'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(9,0); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(9,0); ctx.lineTo(9 - wv*0.4, -7); ctx.lineTo(1.5 - wv, -7.5); ctx.lineTo(2, -0.5); ctx.closePath();
+      ctx.fillStyle = col; ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,.55)'; ctx.lineWidth = 0.6; ctx.stroke();
+      ctx.restore();
+    }
   }
 }
 /* チェッカーフラッグ：先頭が最終周回でゴールラインに近づいてきたところから振り始め、
@@ -5101,14 +5224,22 @@ function drawChequered(T){
   ctx.save();
   // 台（ピットウォールの上に張り出したフラッグスタンド）
   ctx.save(); ctx.translate(bx, by); ctx.rotate(q.a);
-  ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.fillRect(-4 + 1, -2.6 + 1.2, 8, 5.2);
-  ctx.fillStyle = '#e9ebee'; ctx.fillRect(-4, -2.6, 8, 5.2);
-  ctx.strokeStyle = 'rgba(0,0,0,.5)'; ctx.lineWidth = 0.6; ctx.strokeRect(-4, -2.6, 8, 5.2);
+  ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.fillRect(-2.8 + 0.7, -1.8 + 0.8, 5.6, 3.6);
+  ctx.fillStyle = '#e9ebee'; ctx.fillRect(-2.8, -1.8, 5.6, 3.6);
+  ctx.strokeStyle = 'rgba(0,0,0,.5)'; ctx.lineWidth = 0.4; ctx.strokeRect(-2.8, -1.8, 5.6, 3.6);
   ctx.restore();
   // 旗：コース側へ向けて左右に大きく振る
   const base = Math.atan2(-q.ny*PS, -q.nx*PS);
   const sw = Math.sin(t*7.5) * 0.85;
-  ctx.translate(bx, by); ctx.scale(1.4, 1.4); ctx.rotate(base + sw);   // 全体表示でも見えるよう少し大きめに
+  ctx.translate(bx, by);
+  // マーシャル（上から見た体と頭）：事故現場の係員（recDrawMarshal）と同じ大きさ。旗より先に描く（旗が手の先に来るように）
+  ctx.save(); ctx.rotate(base);
+  ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.arc(0.3, 0.4, 1.5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#ff7b00'; ctx.beginPath(); ctx.ellipse(0, 0, 1.1, 1.5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#f4f4f4'; ctx.fillRect(-0.25, -1.45, 0.5, 2.9);
+  ctx.fillStyle = '#e8c9a4'; ctx.beginPath(); ctx.arc(0.2, 0, 0.62, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+  ctx.scale(0.85, 0.85); ctx.rotate(base + sw);                      // 旗：ポストの旗より少し大きいくらい（2026-10：1.4倍から縮めた）
   const L = 15;                                                      // ポールの長さ
   ctx.strokeStyle = '#2b2f34'; ctx.lineWidth = 1.1; ctx.lineCap = 'round';
   ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(L,0); ctx.stroke();
@@ -5127,11 +5258,7 @@ function drawChequered(T){
   }
   const o0 = pt(0,0), o1 = pt(cols,0), o2 = pt(cols,rows), o3 = pt(0,rows);
   ctx.beginPath(); ctx.moveTo(o0[0],o0[1]); ctx.lineTo(o1[0],o1[1]); ctx.lineTo(o2[0],o2[1]); ctx.lineTo(o3[0],o3[1]); ctx.closePath();
-  ctx.strokeStyle = 'rgba(0,0,0,.6)'; ctx.lineWidth = 0.5; ctx.stroke();
-  // マーシャル（上から見た頭と肩）
-  ctx.fillStyle = '#ff7f11'; ctx.beginPath(); ctx.ellipse(-1.2, 0, 2.2, 3, 0, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#f4f4f2'; ctx.beginPath(); ctx.arc(-1.2, 0, 1.5, 0, Math.PI*2); ctx.fill();
-  ctx.strokeStyle = 'rgba(0,0,0,.5)'; ctx.lineWidth = 0.5; ctx.stroke();
+  ctx.strokeStyle = 'rgba(0,0,0,.6)'; ctx.lineWidth = 0.6; ctx.stroke();
   ctx.restore();
 }
 
@@ -5373,8 +5500,22 @@ function drawEdSimple(){
   ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a);
   for(let r = 0; r < 2; r++) for(let c = 0; c < cnt; c++){ ctx.fillStyle = (r + c) % 2 ? '#161616' : '#ffffff'; const y = -w/2 + c*sq; ctx.fillRect(-sq + r*sq, y, sq, Math.min(sq, w/2 - y)); }
   ctx.restore();
+  // ホームGPのコース作り：スタート位置を大きく目立たせる（輪と「START」の札）。グリッドの枠は直線の上なら緑、コーナーにかかれば赤
+  const heOk = homeEd ? homeStartOk(track) : true;
+  if(homeEd){
+    const u = 1/Math.max(0.05, (scale || 1)*(cam.z || 1));                // 画面上で一定の大きさにする（1 = 画面の1px）
+    ctx.save(); ctx.strokeStyle = heOk ? 'rgba(46,204,113,.9)' : 'rgba(255,77,77,.95)'; ctx.lineWidth = 3*u; ctx.setLineDash([7*u, 5*u]);
+    const rr = Math.max(w*1.5 + 10, 26*u);
+    ctx.beginPath(); ctx.arc(p.x, p.y, rr, 0, Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+    const ox = p.x + p.nx*(rr + 16*u), oy = p.y + p.ny*(rr + 16*u);
+    ctx.font = `800 ${13*u}px "Chakra Petch",sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const tw = ctx.measureText('START').width + 12*u;
+    ctx.fillStyle = heOk ? '#1a9a55' : '#d7263d'; roundRectPath(ox - tw/2, oy - 10*u, tw, 20*u, 5*u); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.fillText('START', ox, oy + u);
+    ctx.restore();
+  }
   // スターティンググリッドの枠（レースと同じ台数ぶん）
-  ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 1.2; ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
+  ctx.save(); ctx.strokeStyle = homeEd ? (heOk ? 'rgba(80,230,140,.95)' : 'rgba(255,100,100,.95)') : 'rgba(255,255,255,.9)'; ctx.lineWidth = homeEd ? 1.8 : 1.2; ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
   for(const sl of gridSlots(track, Math.max(machines.length, career ? career.teams.length*2 : 0, 2))){
     ctx.save(); ctx.translate(sl.x, sl.y); ctx.rotate(sl.a);
     const f = 11.5, bk = 6, hw = 7; ctx.beginPath(); ctx.moveTo(f - bk, -hw); ctx.lineTo(f, -hw); ctx.lineTo(f, hw); ctx.lineTo(f - bk, hw); ctx.stroke();
@@ -5601,13 +5742,17 @@ function drawViewInner(cm){
     ctx.fillRect(-W,-H,W*3,H*3);                 // 画面の外側に描き足した芝生も同じく暗く
   }
   // イエローフラッグ区間（時間で変わるのでキャッシュしない）
-  if(track && mode === 'race' && race.yellow && race.yellow.until > race.t){
+  // ミニセクター単位：ダブルイエローは濃く、シングルイエロー（事故の手前の区間など）は薄く
+  if(track && mode === 'race' && yZones().length){
     const K = track.pts, KN = track.N;
-    const a = (track.startIdx + Math.round(KN*race.yellow.sec/3)) % KN, len = Math.round(KN/3);
-    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-    ctx.beginPath();
-    for(let o=0;o<=len;o++){ const q = K[(a+o)%KN]; o===0 ? ctx.moveTo(q.x,q.y) : ctx.lineTo(q.x,q.y); }
-    ctx.strokeStyle = 'rgba(255,196,0,.35)'; ctx.lineWidth = track.width + 12; ctx.stroke();
+    ctx.lineJoin = 'round'; ctx.lineCap = 'butt';
+    for(let m=0;m<MS_N;m++){
+      const lv = yLevelMs(m); if(!lv) continue;
+      const a = (track.startIdx + Math.round(KN*m/MS_N)) % KN, len = Math.round(KN*(m+1)/MS_N) - Math.round(KN*m/MS_N);
+      ctx.beginPath();
+      for(let o=0;o<=len;o++){ const q = K[(a+o)%KN]; o===0 ? ctx.moveTo(q.x,q.y) : ctx.lineTo(q.x,q.y); }
+      ctx.strokeStyle = lv === 2 ? 'rgba(255,196,0,.48)' : 'rgba(255,196,0,.24)'; ctx.lineWidth = track.width + 12; ctx.stroke();
+    }
   }
 
   if(mode === 'edit'){
@@ -7858,7 +8003,7 @@ function pwFlag(kind, label, sub){
   else if(label === 'VIRTUAL SAFETY CAR' && S === 'DEPLOYED') pwEvt('vsc', [[['eng', 'VSC。デルタタイムを守って']]], { pri: true, cd: 5 });
   else if(label === 'VIRTUAL SAFETY CAR' && S === 'ENDING') pwEvt('vscend', [[['eng', 'VSCが終わる。準備して']]], { cd: 5, p: 0.8 });
   else if(kind === 'red') pwEvt('red', [[['eng', '赤旗、赤旗。ピットレーンに戻って'], ['drv', '何があったの？']], [['eng', 'レースは中断だ。ゆっくりピットへ']]], { pri: true, cd: 5 });
-  else if(kind === 'yellow' && (m => m && [sectorOf(c.idx), (sectorOf(c.idx) + 1) % 3].includes(+m[1] - 1))(/SECTOR (\d)/.exec(S)) && !S.includes(MY.name)) pwEvt('yellow', [[['eng', 'イエローフラッグ、この先で事故だ。気をつけて']]], { cd: 20 });
+  else if(kind === 'yellow' && (m => m && (+m[1] - 1 - miniOf(c.idx) + MS_N) % MS_N <= 3)(/MINI SECTOR (\d+)/.exec(S)) && !S.includes(MY.name)) pwEvt('yellow', [[['eng', 'イエローフラッグ、この先で事故だ。気をつけて']]], { cd: 20 });
 }
 // 天気の見込みが変わったとき（数周先の予報）
 document.addEventListener('click', e => {
@@ -8345,7 +8490,7 @@ function tyreLenK(){ return clamp(TYRE_LREF / Math.max(1, race.laps || TYRE_LREF
 function tyreCliff(ty, wear){ const o = Math.max(0, Math.min(wear, 1.15) - 0.7); return (ty.cliff || 0) * o*o/0.09; }
 // AIがタイヤを交換しに入る摩耗の目安（車ごとに少しばらつかせて、ピットの時期を分散させる）
 const pitAtOf = c => c.pitAt ?? (c.pitAt = 0.8 + Math.random()*0.14);
-const race = { state:'idle', t:0, cars:[], laps:20, timeScale:1, firstFinish:null, cdT:0, lights:0, holdUntil:Infinity, sc:null, vsc:null, scCar:null, yellow:null,
+const race = { state:'idle', t:0, cars:[], laps:20, timeScale:1, firstFinish:null, cdT:0, lights:0, holdUntil:Infinity, sc:null, vsc:null, scCar:null, yellows:[],
                wmode:'dry', rain:0, wet:0, wTarget:0, wNext:Infinity, bestLap:null, raining:false, heavyRain:false };
 
 /* ---------- 天候 ---------- */
@@ -8510,9 +8655,13 @@ const WX = {
 };
 function stepWeather(dt){
   // イエローの時間切れ（SC中はSC明けのグリーンで知らせるので出さない）
-  if(race.yellow && !race.yellow.noted && race.yellow.until <= race.t){
-    race.yellow.noted = true;
-    if(!race.sc && !race.vsc) showFlag('green', 'GREEN FLAG', `SECTOR ${race.yellow.sec+1} CLEAR`);
+  // 区間ごとに解除。まだ別の事故で黄旗が残っているミニセクターでは緑旗を出さない
+  if(race.yellows && race.yellows.length){
+    for(const z of race.yellows) if(!z.noted && z.until <= race.t){
+      z.noted = true;
+      if(!race.sc && !race.vsc && !yLevelMs(z.ms)) showFlag('green', 'GREEN FLAG', `MINI SECTOR ${z.ms+1} CLEAR`);
+    }
+    race.yellows = race.yellows.filter(z => !z.noted || z.until > race.t);
   }
   stepTrackTemp(dt);
   if(race.wmode === 'dry') return;
@@ -9093,8 +9242,9 @@ function showFlag(kind, label, sub){
   if(!box || (race.state !== 'racing' && race.state !== 'finished')) return;
   if(MY && kind !== 'radio') pwFlag(kind, label, sub);
   if(kind === 'green'){                                   // マーシャルポストで数秒だけ緑旗を振る
-    const m = /^SECTOR (\d)/.exec(sub || '');
-    race.greenSec = m ? +m[1] - 1 : -1; race.greenUntil = race.t + 5;
+    const m = /^MINI SECTOR (\d+)/.exec(sub || '');
+    if(m){ (race.greens = (race.greens || []).filter(g => g.until > race.t)).push({ ms: +m[1] - 1, until: race.t + 5 }); }
+    else { race.greenSec = -1; race.greenUntil = race.t + 5; }
   }
   if(kind === 'radio') SFX.radio(); else if(kind !== 'chk') SFX.flag(kind);                     // チェッカーはゴールの音を別に鳴らす
   // 同じ種類の通知は新しいほうに置き換える
@@ -9165,8 +9315,8 @@ function startComp(comp){
 function prepareGrid(keepWx){                         // keepWx：天気と路面温度を決め直さない（スタート前に見せた条件のまま決勝を始める）
   pwReset(); tcPickFor = null;
   if(race.state === 'idle') race.laps = +lapsSel.value || race.laps;   // スタート前は選んでいる周回数を使う
-  race.cars = []; race.inv = []; race.pitBusy = {}; race.inc = null; race.contacts = []; race.ctCD = {}; race.to = {}; race.toLog = []; toKey = ''; race.t = 0; race.firstFinish = null; race.sc = null; race.vsc = null; race.scCar = null; race.yellow = null; intT = -99; intCache = new Map();
-  race.bestLap = null; race.bestSplits = null; race.lapDone = []; race.sparks = []; race.dust = []; race.spray = []; race.smoke = []; race.debris = []; race.recov = []; race.wind = null; race.skids = []; race.greenUntil = 0; race.greenSec = -1; race.red = null; race.form = null; hideRecord(); clearFlags(); race.leader = null; race.leadCand = null;
+  race.cars = []; race.inv = []; race.pitBusy = {}; race.inc = null; race.contacts = []; race.ctCD = {}; race.to = {}; race.toLog = []; toKey = ''; race.t = 0; race.firstFinish = null; race.sc = null; race.vsc = null; race.scCar = null; race.yellows = []; intT = -99; intCache = new Map();
+  race.bestLap = null; race.bestSplits = null; race.lapDone = []; race.sparks = []; race.dust = []; race.spray = []; race.smoke = []; race.debris = []; race.recov = []; race.wind = null; race.skids = []; race.greenUntil = 0; race.greenSec = -1; race.greens = []; race.red = null; race.form = null; race.redSkip = false; hideRecord(); clearFlags(); race.leader = null; race.leadCand = null;
   DIR.events = []; DIR.shot = null; DIR.next = 0; DIR.fade = null; DIR.fadeA = 0; DIR.pan = null;
   RP.buf = []; RP.pbuf = []; RP.lastRec = -1; RP.pending = null; stopReplay();
   if(!keepWx || !race.wPlan || race.trackT == null) setupWeather();
@@ -9271,6 +9421,7 @@ const PIT_SKIP_LAPS = 2; // 残りがこの周回数以下なら、タイヤが�
    ・それより前は、摩耗が進んでいれば交換する */
 function scPitWorth(c, remain, rate, minWear){
   if(needStop(c)) return true;
+  if(c.wear < 0.12) return false;                       // 履き替えたばかり：最後までもたなくても、今入ると1回増えるだけ
   const lastsToEnd = c.wear + rate*remain*1.05 < 0.92;
   if(!lastsToEnd) return true;
   const late = remain <= Math.max(4, Math.ceil(race.laps*0.35));
@@ -9326,10 +9477,17 @@ function planCompound(c, remain, lapWear){
    ・タイヤを替えたら（SCで入ったとき、赤旗中に新品に替えたときも）そこから組み直す。雨のときは使わず、これまでの判断（摩耗を見て入る）に任せる */
 const LAP_PER_GRIP = 0.29;
 function tyreLapCost(k, w, c){ const ty = TYRES[k]; return (1 - ty.grip * ttEstGrip(k, race.trackT) * Math.max(0.3, 1 - (ty.deg*Math.min(w, 1.3) + tyreCliff(ty, w))*(c.degMul ?? 1))) * LAP_PER_GRIP; }
-function planRace(c){
-  c.planKey = (c.fits || 0) + '|' + c.comp; c.plan = null;
+/* now：「今すぐ入る」前提で、次のタイヤとその先の作戦を決める（SC・VSC中のピット用）。値は今回のピットの損失の倍率（SC中は小さい）。
+   peek：入らずに今のタイヤを続けた場合の一番速い作戦のタイムだけを返す（SC中に入るかどうかの比較用）。
+   どちらも c.plan は変えない。SC中に選んだタイヤと、履き替えたあとに組み直す作戦が同じ計算になるように、履き替えたらその作戦（pendPlan）をそのまま使う */
+function planRace(c, now, peek){
+  if(!now && !peek){
+    const pp = c.pendPlan; c.pendPlan = null;
+    c.planKey = (c.fits || 0) + '|' + c.comp; c.plan = null;
+    if(pp && pp.comp === c.comp && (c.fits || 0) === pp.fits + 1 && c.laps.length - pp.lap <= 3){ c.plan = pp.plan; c.planTxt = pp.txt; return; }
+  }
   const done = c.laps.length, remain = race.laps - done;
-  if(!$('#pitOn').checked || remain <= PIT_SKIP_LAPS || race.wet > 0.2 || race.rain > 0.15 || !isSlick(c.comp)) return;
+  if(!$('#pitOn').checked || remain <= PIT_SKIP_LAPS || race.wet > 0.2 || race.rain > 0.15 || !isSlick(c.comp)) return null;
   const ref = lapEst(), loss = pitLoss(ref), K = ['S','M','H'];
   const rate = k => TYRES[k].wear*1.3*(c.wearMul ?? 1)*tyreLenK()*ttEstWear(k, race.trackT);
   // 各タイヤで n 周走ったときの損失（秒）と、そのときの摩耗。今のタイヤは今の摩耗から
@@ -9340,7 +9498,7 @@ function planRace(c){
   const ruleNeed = tyreRuleOn() && !c.waived;
   const maxStops = Math.min(3, remain - 1, remain > 24 ? 2 : 3), WMAX = 1.0;
   const cands = [];
-  if(cur.w[remain] <= WMAX && !(ruleNeed && !ruleMet(c))) cands.push({ t: cur.t[remain], stops: [] });
+  if(!now && cur.w[remain] <= WMAX && !(ruleNeed && !ruleMet(c))) cands.push({ t: cur.t[remain], stops: [] });
   const rec = (pos, stopsLeft, used, acc, stops) => {        // pos：今までに決めた周回、used：使ったドライタイヤ
     for(const k of K){
       const f = freshAt(k, pos);
@@ -9359,24 +9517,86 @@ function planRace(c){
     }
   };
   for(let s = 1; s <= maxStops; s++){
+    if(now){ rec(0, s, new Set([...c.usedSlick, c.comp]), loss*now + (s - 1)*loss, []); continue; }   // 今の周で入る（1回目のスティントが新しいタイヤ）
     for(let n = 1; n < remain; n++){                          // 今のタイヤで走る周回
       if(cur.w[n] > WMAX) break;
       rec(n, s, new Set([...c.usedSlick, c.comp]), cur.t[n] + s*loss, []);
     }
   }
-  if(!cands.length) return;
+  if(!cands.length) return null;
   cands.sort((a, b) => a.t - b.t);
+  if(peek) return { best: cands[0].t };
+  if(now){                                                  // SC・VSC中に入るとき：ほぼ同じタイム（0.8秒以内）なら、止まる回数が少なく、新しいタイヤで長く走れる作戦
+    const b0 = cands[0].t, len1 = x => (x.stops[1] ? x.stops[1].at : race.laps) - x.stops[0].at;
+    const pk = cands.filter(x => x.t - b0 <= 0.8).sort((a, b) => a.stops.length - b.stops.length || len1(b) - len1(a) || a.t - b.t)[0];
+    return Object.assign({ best: b0 }, pk);
+  }
   const best = cands[0].t, pool = cands.filter(x => x.t - best <= 1.2), wts = pool.map(x => Math.exp(-(x.t - best)/0.45));
   let r = Math.random()*wts.reduce((a, b) => a + b, 0), pick = pool[0];
   for(let i = 0; i < pool.length; i++){ r -= wts[i]; if(r <= 0){ pick = pool[i]; break; } }
+  if(now) return Object.assign({ best }, pick);
   // at：その周回数を走り終えたところでピットに入る → ひとつ前の周の終わりに指示を出す
   c.plan = pick.stops.map(x => ({ at: x.at - 1, comp: x.comp }));
   c.planTxt = [c.comp].concat(pick.stops.map(x => x.comp)).join('-');
 }
+/* AIが今の周で（SC・VSC中に）入るときのタイヤ選び。作戦（planRace）と同じ計算で選び、その先の作戦も一緒に決めておく。
+   雨などで作戦を立てないときは、これまでの見積もり（planCompound）で選ぶ */
+function aiStopComp(c, remain, rate, pk){
+  if(pk === undefined) pk = planRace(c, 1);
+  if(pk && pk.stops.length){
+    const k = pk.stops[0].comp, rest = pk.stops.slice(1);
+    c.pendPlan = { comp: k, fits: c.fits || 0, lap: c.laps.length, plan: rest.map(x => ({ at: x.at - 1, comp: x.comp })), txt: [k].concat(rest.map(x => x.comp)).join('-') };
+    return k;
+  }
+  c.pendPlan = null;
+  return planCompound(c, remain, rate);
+}
+/* SC・VSC中に入るかどうか。作戦を立てられるとき（ドライ）は「今入る作戦」と「入らずに続ける作戦」のタイムを比べる
+   （今回のピットの損失は SC 45%・VSC 60% として計算）。入るなら、その作戦（pk）を返す。作戦を立てられないときは、これまでの目安（scPitWorth）
+   返り値：false＝入らない、null＝目安で入る、作戦＝その作戦で入る */
+const SC_PIT_K = 0.45, VSC_PIT_K = 0.6;
+function aiNeutralPit(c, remain, rate, k, minWear){
+  if(c.wear < 0.12 && race.laps - c.laps.length > RULE_FORCE_LAPS + 2) return false;   // 履き替えたばかり（タイヤ規定のための交換も、まだ先の予定に任せる）
+  if(needStop(c)) return planRace(c, k) || null;          // タイヤ規定：損失の小さい今のうちに
+  const pk = planRace(c, k);
+  if(!pk) return scPitWorth(c, remain, rate, minWear) ? null : false;
+  const stay = planRace(c, 0, true);
+  return !stay || pk.best < stay.best - 0.5 ? pk : false;  // 入らない作戦がない（このタイヤでは最後までもたず、予定もない）か、0.5秒以上得なら入る
+}
+/* AIの摩耗ペースの見込み。SC・VSCの周は減り方が小さく、そのまま使うと「最後までもつ」と見誤るので、標準の減り方を下限にする */
+function aiWearRate(c){ return Math.max(c.lapWearLast || 0, TYRES[c.comp].wear*1.3*(c.wearMul ?? 1)*tyreLenK()*ttEstWear(c.comp, race.trackT)); }
 function sectorOf(idx){
   const N = track.N, r = (idx - track.startIdx + N) % N;
   return Math.min(2, Math.floor(r / (N/3)));
 }
+/* ---------- ミニセクター方式のイエローフラッグ ----------
+   1周を MS_N のミニセクター（マーシャルの受け持ち区間）に分ける。事故の起きたミニセクターにダブルイエロー（軽いものはシングル）、
+   その1つ手前（近づいてくる側）にシングルイエローを出す。離れた場所の事故は、それぞれ別の区間として同時に出せる。
+   ダブル：最高速の70%まで減速、シングル：90%。どちらもDRS・ブースト・OTモード禁止、追い越し禁止 */
+const YEL_V2 = 0.70, YEL_V1 = 0.90;
+function miniOf(idx){
+  const N = track.N, r = (idx - track.startIdx + N) % N;
+  return Math.min(MS_N - 1, Math.floor(r / (N/MS_N)));
+}
+function yZones(){ return (race.yellows || []).filter(z => z.until > race.t); }
+function yLevelMs(ms){                                   // 0：なし、1：シングル、2：ダブル
+  let l = 0;
+  for(const z of race.yellows || []){
+    if(z.until <= race.t) continue;
+    if(z.ms === ms) l = Math.max(l, z.dbl ? 2 : 1);
+    else if((z.ms - 1 + MS_N) % MS_N === ms) l = Math.max(l, 1);
+  }
+  return l;
+}
+function yAt(idx){ return track && race.yellows && race.yellows.length ? yLevelMs(miniOf(idx)) : 0; }
+function addYellow(ms, until, dbl){                      // 同じミニセクターにまだ出ていればまとめる（長いほう・重いほう）
+  race.yellows = race.yellows || [];
+  let z = race.yellows.find(o => o.ms === ms && o.until > race.t);
+  if(z){ z.until = Math.max(z.until, until); z.dbl = z.dbl || dbl; z.noted = false; }
+  else { z = { ms, until, dbl: !!dbl, noted: false }; race.yellows.push(z); }
+  return z;
+}
+function yLabel(ms){ return `MINI SECTOR ${ms+1}`; }
 /* ---------- レッドフラッグ ----------
    ① 全車が減速・追い越し禁止でピットレーンへ向かい、出口側から順に並んで止まる（タイヤ交換は無料）
    ② 全車が並んだら（または一定時間たったら）残骸を撤去し、数秒後に
@@ -9419,6 +9639,22 @@ function assignRedSpot(c){
   if(c.garageIdx === undefined) c.garageIdx = c.boxIdx;
   c.boxIdx = (first - k + N) % N; c.served = false; c.redSpot = true;
 }
+/* 赤旗中だけ「レース再開までスキップ」のボタンを出す。押すと、再開のシグナルまで高速で進める */
+function syncRedSkip(){
+  const b = document.getElementById('redSkip'); if(!b) return;
+  const show = mode === 'race' && race.state === 'racing' && !!(race.red || race.form);
+  if(race.redSkip && !(race.red || race.form)) race.redSkip = false;
+  const phone = document.body.classList.contains('phoneRace'), dock = document.getElementById('dock');
+  const key = show + '|' + !!race.redSkip + '|' + phone;
+  if(b.dataset.k === key) return; b.dataset.k = key;
+  if(phone && dock && b.parentNode !== dock) dock.insertBefore(b, dock.firstChild);           // スマホ：操作パネルの一番上の行
+  else if(!phone && b.parentNode === dock) document.getElementById('stage').appendChild(b);   // PC：コースの上（操作パネルの上）
+  b.classList.toggle('inDock', phone);
+  b.hidden = !show; b.disabled = !!race.redSkip;
+  b.querySelector('span').textContent = race.redSkip ? 'スキップ中…' : 'レース再開までスキップ';
+  if(phone) try{ syncTel(); }catch(e){}                                                     // パネルの高さが変わったぶん、カードなどを上へずらす
+}
+document.getElementById('redSkip').onclick = () => { if(race.state === 'racing' && (race.red || race.form)){ race.redSkip = true; race.paused = false; syncRedSkip(); } };
 function stepRed(){
   const r = race.red; if(!r) return;
   const running = race.cars.filter(c => !c.out && c.finish === null);
@@ -9432,7 +9668,7 @@ function stepRed(){
     r.parkedAt = race.t; r.resumeAt = race.t + 8;
     for(const c of race.cars) if(c.out){ c.gone = true; c.clearAt = 0; }   // 残骸を撤去
     for(const p of race.debris || []) p.fade = true;
-    race.yellow = null; dirty = true;
+    race.yellows = []; dirty = true;
     if(running.every(c => c.redParked)) orderRedQueue(running);
   }
   if(r.resumeAt !== null && race.t >= r.resumeAt) startFormation(running);
@@ -9551,6 +9787,7 @@ const CAR_R = 7.5;        // 当たり判定：車の中心どうしの距離
 /* 車の大きさ（上から見た長方形）。全長は約17.4、幅は約7。
    FOLLOW_MIN：同じ車線で前の車に近づける限度（中心どうし）。全長より少し長くして、前の車にめり込まないようにする */
 const CAR_LEN = 17.4, CAR_WID = 7.2, FOLLOW_MIN = 18;
+const PASS_SIDE_LD = 6, PASS_SIDE_V = 1.04;            // 追い抜き：前の車から横にこれ以上出たら、真後ろでも前の車の1.04倍まで速く走れる（並びかけやすく）
 function crashIncident(c, also, hitV){
   const v = hitV ?? c.v;
   crashCar(c, v);
@@ -9559,7 +9796,7 @@ function crashIncident(c, also, hitV){
 function crashCar(c, hitV){
   if(c.out) return;
   let inc = race.inc;
-  if(!inc || inc.done){ inc = race.inc = { cars: [], last: race.t, done: false, sec: sectorOf(c.idx) }; queueReplay(c); }
+  if(!inc || inc.done){ inc = race.inc = { cars: [], last: race.t, done: false, ms: miniOf(c.idx) }; queueReplay(c); }
   for(const o of race.cars) o.stuckAt = null;
   c.impact = clamp((hitV - 50)/260, 0, 1);               // 衝撃の強さ（0〜1）：当たった速さで決まる
   c.fire = c.impact > 0.72;                               // 強い衝撃のときは火が出る
@@ -9572,8 +9809,8 @@ function crashCar(c, hitV){
   inc.cars.push(c); inc.last = race.t;
   c.clearAt = Infinity;
   crowdCheer(c.x, c.y, multi ? 1.0 : 0.8);
-  showFlag('yellow', 'YELLOW FLAG', `SECTOR ${inc.sec+1} · ${inc.cars.map(o => o.m.name).join(' / ')} CRASH`);
-  race.yellow = { sec: inc.sec, until: Infinity, noted: false };
+  showFlag('yellow', 'DOUBLE YELLOW', `${yLabel(inc.ms)} · ${inc.cars.map(o => o.m.name).join(' / ')} CRASH`);
+  inc.z = addYellow(inc.ms, Infinity, true);
 }
 // 残骸の動き：回りながら滑って減速し、フェンスに当たると跳ね返る（コースへ戻ってくることもある）
 function stepWreck(c, dt, T){
@@ -9751,7 +9988,8 @@ function stepIncident(){
   const hard = Math.max(...inc.cars.map(o => o.impact || 0));
   const leadLaps = Math.max(...race.cars.map(o => o.laps.length));
   const remain = race.laps - leadLaps > 1;
-  race.yellow = { sec: inc.sec, until: race.t + (n >= 2 ? 24 : 20), noted: false };
+  inc.z = inc.z || addYellow(inc.ms, Infinity, true);
+  inc.z.until = race.t + (n >= 2 ? 24 : 20); inc.z.dbl = true; inc.z.noted = false;
   if(n >= 2) SFX.multiCrash(n);
   const bl = !race.red ? trackBlocked() : null;
   if(bl){ blockedRed(bl, inc); }                         // コースがふさがった：仕切り直し
@@ -9765,7 +10003,7 @@ function stepIncident(){
       showFlag('sc', 'VIRTUAL SAFETY CAR', 'DEPLOYED');
     }
   }
-  for(const o of inc.cars) o.clearAt = race.red ? Infinity : Math.max(race.yellow.until, race.vsc ? race.vsc.until + 4 : 0);
+  for(const o of inc.cars) o.clearAt = race.red ? Infinity : Math.max(inc.z.until, race.vsc ? race.vsc.until + 4 : 0);
 }
 // 通り抜けられないときのレッドフラッグ。残り周回が少なくても、まだチェッカーが出ていなければ出す
 function blockedRed(bl, inc){
@@ -9822,12 +10060,13 @@ function retireCar(c, kind, multi, nth, inPlace){
   if(!inPlace){ c.x = p.x + p.nx*side*off; c.y = p.y + p.ny*side*off; c.lane = side*off; }   // inPlace：自分でグラベルに止めた車はその場所のまま
   if(multi || kind === 'crash') return;                      // クラッシュの旗は事故がおさまってから決める（stepIncident）                                           // 旗やSCの判断はまとめて行う
   if(kind !== 'mech') crowdCheer(c.x, c.y, 0.8);             // どよめき
-  const sec = sectorOf(c.idx);
+  const ms = miniOf(c.idx);
   // トラブル車がグラベルにしっかり収まった（車体がコースから出ている）なら、SC・VSCはほとんど出さずイエローフラッグで済ませる
   const clearOff = kind === 'mech' && inPlace && Math.abs(c.lat ?? c.lane) >= track.width/2 + TROUBLE_CLEAR;
   const who = `${c.m.name} ${clearOff ? 'STOPPED IN GRAVEL' : (({ crash:'CRASH', mech:'STOPPED', burst:'TYRE FAILURE' })[kind] || 'STOPPED')}`;
-  showFlag('yellow', 'YELLOW FLAG', `SECTOR ${sec+1} · ${who}`);
-  race.yellow = { sec, until: race.t + (kind === 'mech' ? 14 : 22), noted: false };
+  // グラベルにしっかり収まった車はシングルイエロー、コースの近くに止まった車はダブルイエロー
+  showFlag('yellow', clearOff ? 'YELLOW FLAG' : 'DOUBLE YELLOW', `${yLabel(ms)} · ${who}`);
+  const yz = addYellow(ms, race.t + (kind === 'mech' ? 14 : 22), !clearOff);
   // 止まった車が路上に近いほど、また残り周回があるほどセーフティカーが出やすい
   const chance = clearOff ? 0.04 : kind === 'crash' ? 0.7 : (kind === 'burst' ? 0.5 : 0.4);
   if(race.laps - c.laps.length > 1 && (!race.sc || race.sc.until <= race.t) && Math.random() < chance){
@@ -9842,7 +10081,7 @@ function retireCar(c, kind, multi, nth, inPlace){
     showFlag('sc', 'VIRTUAL SAFETY CAR', 'DEPLOYED');
   }
   // 残骸は、この車の区間の黄旗（とSC・VSC）が解除されると同時に撤去される
-  c.clearAt = Math.max(race.yellow.until, race.vsc ? race.vsc.until + 4 : 0);   // SC中は撤去側でSCの終了を待つ
+  c.clearAt = Math.max(yz.until, race.vsc ? race.vsc.until + 4 : 0);   // SC中は撤去側でSCの終了を待つ
 }
 // 点 idx の位置に引いた線を、車がどれだけ通り過ぎているか（距離）。コースの点の間隔より細かく測るために使う
 function pastLine(c, idx){
@@ -10138,7 +10377,7 @@ function stepCar(c, dt){
     }
     if(!c.gone && race.t >= c.clearAt){        // 黄旗・SCの解除と同時に撤去する
       const scNow = race.sc && race.sc.until > race.t;
-      const yellowHere = race.yellow && race.yellow.until > race.t && sectorOf(c.idx) === race.yellow.sec;
+      const yellowHere = yAt(c.idx) > 0;
       if(!scNow && !race.vsc && !yellowHere){ c.gone = true; dirty = true; }
     }
     return;
@@ -10193,31 +10432,33 @@ function stepCar(c, dt){
   const scNow = race.sc && race.sc.until > race.t;
   // ピット入口までの到達時間を先読みして、SCが続いているうちに入れるときだけ飛び込む
   const pitEta = (((T.pit.entry - best + N) % N) * T.sp) / Math.max(c.v, 40);
-  if(scNow && !race.sc.ending && $('#pitOn').checked && c.finish === null && !c.inPit && !c.pitReq && c.scPitKey !== race.sc.until){
-    c.scPitKey = race.sc.until;
+  if(scNow && !race.sc.ending && $('#pitOn').checked && c.finish === null && !c.inPit && !c.pitReq && c.scPitKey !== race.sc){
+    c.scPitKey = race.sc;                                      // 1回のSCで判断は1度だけ（解除時刻は合流したときに決まるので、時刻では見分けない）
     const remain = race.laps - c.laps.length;
-    const rate = c.lapWearLast || TYRES[c.comp].wear*1.35*c.wearMul*tyreLenK();
+    const rate = aiWearRate(c);
     const inTime = (race.sc.until - race.t) > pitEta + 2;      // 解除までに入口へ着けるか
     const must = needStop(c);                                  // タイヤ規定をまだ守れていない車は、損失の小さいSC中に入りやすい
-    if(inTime && remain > PIT_SKIP_LAPS && scPitWorth(c, remain, rate, 0.3) && Math.random() < (must ? 0.95 : 0.75)){
+    const pk = inTime && remain > PIT_SKIP_LAPS ? aiNeutralPit(c, remain, rate, SC_PIT_K, 0.3) : false;
+    if(pk !== false && Math.random() < (must ? 0.95 : 0.85)){
       c.pitReq = true; c.scPit = true;
-      c.nextComp = planCompound(c, remain, rate);
+      c.nextComp = aiStopComp(c, remain, rate, pk);
     }
   }
   // VSC中もピットの損失が小さいので、摩耗が進んだ車は交換に入ることがある
-  if(race.vsc && !race.vsc.ending && !scNow && $('#pitOn').checked && c.finish === null && !c.inPit && !c.pitReq && c.vscKey !== race.vsc.until){
-    c.vscKey = race.vsc.until;
-    const remain = race.laps - c.laps.length;
+  if(race.vsc && !race.vsc.ending && !scNow && $('#pitOn').checked && c.finish === null && !c.inPit && !c.pitReq && c.vscKey !== race.vsc){
+    c.vscKey = race.vsc;
+    const remain = race.laps - c.laps.length, rate = aiWearRate(c);
     const must = needStop(c);
-    if(remain > PIT_SKIP_LAPS && (must ? c.wear > 0.15 : scPitWorth(c, remain, c.lapWearLast || TYRES[c.comp].wear*1.35*c.wearMul*tyreLenK(), 0.45)) && Math.random() < (must ? 0.8 : 0.5)){
+    const pk = remain > PIT_SKIP_LAPS && (!must || c.wear > 0.15) ? aiNeutralPit(c, remain, rate, VSC_PIT_K, 0.45) : false;
+    if(pk !== false && Math.random() < (must ? 0.8 : 0.6)){
       c.pitReq = true;
-      c.nextComp = planCompound(c, remain, c.lapWearLast || TYRES[c.comp].wear*1.35*c.wearMul*tyreLenK());
+      c.nextComp = aiStopComp(c, remain, rate, pk);
     }
   }
   // SC狙いで決めたピットは、解除が先に来そうなら取りやめてコース上に残る
   if(c.scPit && c.pitReq && !c.inPit){
     const scLeft = (race.sc && !race.sc.ending && race.sc.until > race.t) ? race.sc.until - race.t : 0;
-    if(scLeft < pitEta + 1 && c.wear < 0.9){ c.pitReq = false; c.scPit = false; }
+    if(scLeft < pitEta + 1 && c.wear < 0.9){ c.pitReq = false; c.scPit = false; c.pendPlan = null; }
   }
 
   // 作戦・摩耗で決めたスリックへの交換を、ピットに入る前に雨が近づいてきたら取りやめる（1秒ごとに予報を確かめる）
@@ -10348,7 +10589,7 @@ function stepCar(c, dt){
       c.otPool = c.otArmed ? OT_POOL : 0;                          // OTモードの追加エネルギー
     }
     const scOnNow = (race.sc && race.sc.until > race.t) || race.vsc || race.red;
-    const yellowHere = race.yellow && race.yellow.until > race.t && sectorOf(best) === race.yellow.sec;
+    const yellowHere = yAt(best) > 0;
     const canPower = !scOnNow && !yellowHere && !c.inPit && !c.pitReq && !c.trouble && !c.spin && race.state === 'racing' && race.t > 3;
     const wasOT = c.otWas;
     c.ot = canPower && c.otArmed && c.otPool > 0 && zones.some(z => inArc(best, z.start, z.end, N));
@@ -10383,6 +10624,7 @@ function stepCar(c, dt){
   const vscOn = !!race.vsc && !scOn;                 // VSC中は追い抜き禁止・一律に減速
   const redOn = !!race.red;                          // レッドフラッグ：ゆっくりピットへ、追い抜き禁止
   const noPass = vscOn || redOn;                     // 追い抜き禁止（隊列を作らずに走る）区間
+  const yNoPass = !noPass && yAt(best) > 0;          // イエローフラッグ区間：追い抜き禁止（トラブルで遅い車は抜いてよい）
   c.spinAvoid = false;
   const tgt0 = lineAt(liA) + c.laneT + (c.cornerErr ? c.cornerErr.side*c.cornerErr.amt : 0) + packB*(onCurb(T, liA) ? 0.6 : 1);   // 何もなければ自分のラインをなぞる
   let tgt = tgt0, blockV = Infinity, slip = 0, blue = false, blueSide = 0, dirtyAir = 0, threat = null, avoidD = Infinity;
@@ -10459,17 +10701,19 @@ function stepCar(c, dt){
     if(dr === 0 || dd > 70) continue;
     // VSC・赤旗：追い抜き禁止。前の車（横にずれていても）との間隔を20以上に保ち、抜くために横へ出ることもしない。
     // 横に並んでいる場合は、少しでも後ろにいる側が下がる
-    if((noPass || holdBlocks(c, o)) && !o.spin){
+    if((noPass || holdBlocks(c, o) || (yNoPass && !o.trouble && c.finish === null)) && !o.spin){
       if(dd < 45) blockV = Math.min(blockV, Math.max(0, o.v + (dd - 20)*1.5));
       continue;
     }
     // 抜きに行くために横へ出始める距離：近づく速さが大きいほど手前から（高速で迫るときに、よけきれず追突しないように）
     const cut = c.lostTo === o && race.t - (c.lostT || 0) < 4;   // 抜かれた直後：立ち上がりでやり返す（クロスライン）
-    if(dd <= 30 + clamp((c.v - o.v)*0.35, 0, 50) + (cut ? 12 : 0) && Math.abs(ld) < 8 && !blind){
+    // 並びかけている途中（同じ相手を狙って2.5秒以内）は、横に8以上出ても狙いを続ける（以前は8を超えると狙いを外し、ラインへ戻りかけて並びきれなかった）
+    const engaged = c.passO === o && race.t - c.passT < 2.5;
+    if(dd <= 30 + clamp((c.v - o.v)*0.35, 0, 50) + (cut ? 12 : 0) && (Math.abs(ld) < 8 || (engaged && Math.abs(ld) < 20)) && !blind){
       const lapping = c.cross > o.cross;                        // 自分が周回遅れの車を抜く側
       const gw = c.drs || lapping ? 14 : 13;                    // 抜くときは車1台分以上横へ
       let side = ld > 0 ? -1 : 1;
-      if(c.passO === o && race.t - c.passT < 2.5) side = c.passSide;   // 一度決めた側はしばらく変えない（左右にふらつかない）
+      if(engaged){ side = c.passSide; c.passT = race.t; }       // 並びかけている間は同じ側を保つ（途中で反対側へ切り替えない）
       else {
         // 次のコーナーが近ければ、そのイン側に並ぶ（ブレーキングで飛び込む）。相手がイン側を締めていれば、アウトから回る
         const ca = !lapping ? cornerAhead(T, best, dd + 170) : null;
@@ -10479,12 +10723,12 @@ function stepCar(c, dt){
       }
       tgt = o.lat + side*gw;
       if(o.spin) blockV = Math.min(blockV, 130);                // スピンした車の横は減速して避ける
-      else if(dd < FOLLOW_MIN) blockV = Math.min(blockV, o.v*(scOn || vscOn || redOn ? 0.95 : (lapping ? 1.0 : (c.drs ? 1.08 : FOLLOW_V))));   // 周回遅れの真後ろでも、横へよけるまでは前の車より速くしない
+      else if(dd < FOLLOW_MIN) blockV = Math.min(blockV, o.v*(scOn || vscOn || redOn ? 0.95 : (lapping ? (Math.abs(ld) >= PASS_SIDE_LD ? PASS_SIDE_V : 1.0) : (c.drs ? 1.08 : Math.abs(ld) >= PASS_SIDE_LD ? PASS_SIDE_V : FOLLOW_V))));   // 周回遅れの真後ろでも、横へよけるまでは前の車より速くしない。横に出始めたら（周回遅れを抜くときも）少し速く走れる
     }
     // 同じ車線の前の車には、間隔FOLLOW_MINの位置までに前の車の速さへ落とせる速さでしか近づかない（高速で迫って追突しないように）。
     // 前の車がブレーキ中で、しかも自分よりブレーキが強いときだけ、その差の分だけ早めに減速する（真後ろにいるときだけ）。
     // 同じくらいのブレーキなら真後ろまで詰めてよい（ブレーキングで仕掛けられる）。横へ出始めた車には効かせない
-    if(!o.spin && Math.abs(ld) < 9 && dd < 90 && !c.gridding){
+    if(!o.spin && Math.abs(ld) < (c.passO === o && race.t - c.passT < 0.2 && !scOn && !vscOn && !redOn ? PASS_SIDE_LD : 9) && dd < 90 && !c.gridding){   // 並びかけている車は、横に PASS_SIDE_LD 以上出ていれば効かせない
       const room = Math.max(0, dd - FOLLOW_MIN), ac = c.brake*0.7;
       const k = o.brakeUntil > race.t && Math.abs(ld) < 5 && o.brake > c.brake ? c.brake/o.brake : 1;
       blockV = Math.min(blockV, k < 1 ? Math.sqrt(o.v*o.v*k + 2*ac*room) : o.v + Math.sqrt(2*ac*room));
@@ -10738,8 +10982,8 @@ function stepCar(c, dt){
   if(scOn){ vt = Math.min(vt, c.scCap, gridCap); c.drs = false; }                        // セーフティカー
   else if(vscOn && c.finish === null){ vt = Math.min(vt, noPassSpeed(0.58)); c.drs = false; }   // VSC：全車同じ速度まで落とす
   if(redOn && c.finish === null){ vt = Math.min(vt, noPassSpeed(0.45)); c.drs = false; }           // レッドフラッグ：低速でピットへ（全車同じ速度）
-  else if(race.yellow && race.yellow.until > race.t && sectorOf(best) === race.yellow.sec){
-    vt = Math.min(vt, vmax*0.62); c.drs = false;                                 // イエローフラッグ区間
+  else if(yAt(best)){
+    vt = Math.min(vt, vmax*(yAt(best) === 2 ? YEL_V2 : YEL_V1)); c.drs = false;   // イエローフラッグ区間（ダブル70%・シングル90%）
   }
   if(c.blue) vt = Math.min(vt, vmax*0.93);   // 譲るために少し緩める
   if(c.celebrate){ vt = Math.min(vt, c.vmax*(c.vmul || 1)*0.66); c.drs = false; }   // ウイニングウィーブ中はアクセルを緩める（DRS・ブーストも使わない）
@@ -10992,7 +11236,7 @@ function handlingCheck(c, T, best, p, neutral){
   if(neutral || c.inPit || c.finish !== null || c.trouble || c.spin || c.gridding || race.t < 3 || c.overrunUntil > race.t) return;
   if(inC === was) return;
   const rate = ($('#crashOn').checked ? 0.5 + (+$('#crashRate').value)/6 : 0.5) * paceP(c).m;   // プッシュ中はミスが増え、セーブ中は減る   // 「事故の起きやすさ」でミスも増減
-  const wet = race.wet * (isSlick(c.comp) ? 1.6 : 0.6);
+  const wet = race.wet * (isSlick(c.comp) ? 1.6 : WET_MIST.tyre);   // 雨用タイヤなら濡れた路面のミスの増え方は小さい
   const worn = 1 + Math.max(0, c.wear - 0.6)*3;
   const push = ((c.defend || c.slip > 0.4) ? 1.5 : 1) * trMist(c, c.m.handK);
   if(inC && c.v > 110){                                                   // コーナーの入口
@@ -11186,7 +11430,7 @@ function syncTO(){
    ・2台が並んで（前後の差が車1台分以内・横の差が車幅くらい）コーナーのブレーキングに入ったときだけ判定する
    ・確率は小さい（基本1%）。1周目・雨・プッシュ・「短気」・速度差で上がり、2人の「バトル」「安定性」が高いと下がる
    ・同じ2台は数秒のあいだ判定しない
-   ・結果：軽い接触（減速）／ウイング破損（ピットで交換するまで遅い）／スピン（当てられた側）／まれに両者リタイア
+   ・結果：ウイング破損（ピットで交換するまで遅い）／スピン（当てられた側）／まれに両者リタイア（軽い接触は2026-10-28に削除）
    ・後ろから来た側（仕掛けた側）を「責任あり」として記録する（ペナルティの判定に使える） */
 const CT_BASE = 0.010, WING_V = 0.988, WING_G = 0.955, WING_FIX = 3.5;
 const CT_LON = 20, CT_LAT = 13, CT_K = 0.1;   // バトル中の接触を判定する範囲（前後・横）。車が重ならなくなったので、真後ろ・真横にぴったり付いている状態で判定。
@@ -11225,7 +11469,8 @@ function stepBattleContact(){
 }
 function battleContact(att, vic){
   const r = Math.random();
-  let kind = r < 0.55 ? 'touch' : r < 0.8 ? 'wing' : r < 0.97 ? 'spin' : 'out';
+  if(r < 0.55) return;                                       // 軽い接触（以前は少し減速するだけの接触）は起きないようにした（2026-10-28）。ほかの結果の頻度は以前と同じ
+  let kind = r < 0.8 ? 'wing' : r < 0.97 ? 'spin' : 'out';
   if(kind === 'out' && (!$('#crashOn').checked)) kind = 'spin';
   if(sndCan('bump', 150)) noise(0.14, { filter: 'lowpass', freq: 1500, vol: 0.24 });
   emitDust(att, 5, true); emitDust(vic, 4, true);
@@ -11328,9 +11573,9 @@ function startSpin(c, dir){
   spinSlideSet(c); c.drs = false; c.overUntil = 0; c.underUntil = 0;
   dirEvent('spin', c, 6, 88, 'SPIN');
   crowdCheer(c.x, c.y, 0.8);
-  const sec = sectorOf(c.idx);
-  showFlag('yellow', 'YELLOW FLAG', `SECTOR ${sec+1} · ${c.m.name} SPIN`);
-  if(!race.yellow || race.yellow.until < race.t + 8 || race.yellow.sec !== sec) race.yellow = { sec, until: race.t + 9, noted: false };
+  const ms = miniOf(c.idx);
+  showFlag('yellow', 'YELLOW FLAG', `${yLabel(ms)} · ${c.m.name} SPIN`);
+  addYellow(ms, race.t + 9, false);                      // すぐ走り出せばシングルイエローだけで短く終わる
   if($('#pitOn').checked) c.wear += 0.03 + Math.random()*0.03;          // 回りながら滑るのでタイヤが削れる
 }
 /* ---------- スピン（2026-10 作り直し） ----------
@@ -11339,13 +11584,45 @@ function startSpin(c, dir){
    ② 止まる：後ろから来る車が通り過ぎるのを待ってから動き出す（走ってくる車の前には出ない）
    ③ 向き直る：止まった向きで変える。ほぼ前向きならそのまま、横向きで内側を向いていれば少し前に進みながらハンドルを切って、
       逆向き・外を向いているならアクセルを踏んで、前輪を軸にリアを振り回して向きを変える（スピンターン。後輪から白煙が出る） */
-const SPIN_FR = 260, SPIN_FR_OFF = 460;   // （2026-10：復帰を早めるため 140/300 から強めた）
+/* スピンで滑っているときの減速（2026-10-27 作り直し：路面と状態で変える。舗装は元の 140 に戻した）
+   ・路面：舗装 140／縁石 120／舗装のランオフ（市街地のエスケープゾーンも）150／グラベル 500（車を止めるための砂地）
+   ・雨：濡れているほど減速が弱まる（舗装・ランオフ 30%、縁石 40%、グラベル 5%：大雨のとき）
+   ・タイヤ：グリップが低いほど遠くまで滑る（種類・摩耗・温度。雨でスリック、乾いた路面で雨用タイヤも）。グラベルでは効きを3割にする */
+const SPIN_SURF = { tar: 140, curb: 120, runoff: 150, gravel: 500 };
+const SPIN_WET = { tar: 0.30, curb: 0.40, runoff: 0.30, gravel: 0.05 };
+function runoffSide(T){                    // 各点の舗装のランオフの側（±1、なければ0）。強いブレーキングのコーナーの外側
+  if(T.roSide) return T.roSide;
+  const N = T.N, out = new Int8Array(N);
+  if(T.type !== 'street') brakeCorners(T).forEach(c => {
+    const i0 = (c.e - Math.round(Math.min(c.L*0.55, 190)/T.sp) + N) % N, i1 = (c.x + Math.round(50/T.sp)) % N;   // 描くときと同じ範囲
+    for(let i = i0, n = 0; n < N; i = (i + 1) % N, n++){ out[i] = c.side; if(i === i1) break; }
+  });
+  return (T.roSide = out);
+}
+function spinSurface(c, T, i){
+  const half = T.width/2, a = Math.abs(c.lat);
+  if(a <= half) return 'tar';
+  if(onCurb(T, i) && a <= half + CURB_OFF) return 'curb';
+  if(T.type === 'street') return 'runoff';
+  const ro = runoffSide(T)[i];
+  return ro && Math.sign(c.lat) === ro && a <= half + 60 ? 'runoff' : 'gravel';
+}
+function spinTyreK(c){                     // タイヤのグリップ（1＝新品のミディアム・適温・乾いた路面）。低いほど遠くまで滑る
+  const ty = TYRES[c.comp] || TYRES.M, slick = isSlick(c.comp);
+  const g = (slick ? ty.grip*(1 - 0.35*race.wet) : Math.sqrt(wetGrip(c.comp, race.wet)))   // 雨のスリック・乾いた路面の雨用タイヤは滑る
+    * (1 - 0.19*clamp(c.wear || 0, 0, 1))                                                   // 減ったタイヤ（摩耗80%で約15%）
+    * (1 - 3*(1 - ttGrip(c)));                                                              // 冷えた・熱すぎるタイヤ（最大で約15%）
+  return clamp(g, 0.5, 1.1);
+}
 const SPIN_PIVOT_F = 6.2;                  // スピンターンの軸：車の中心から前の車軸までの距離（scrubSmoke の前輪の位置と同じ）
+/* 雨用タイヤ（I・W）で濡れた路面を走るときのミスの増え方（2026-10 少し下げた：コーナー 0.6→0.45、ブレーキ 2.5→1.8）。
+   スリックのまま雨を走るときは下げていない（作戦の駆け引きとして危ないまま） */
+const WET_MIST = { tyre: 0.45, brk: 1.8 };
 const SOLO_SPIN = 0.035;                   // オーバーステアのうち、立て直せずに単独でスピンする割合（晴れ・普通のペース・新しいタイヤのとき）   // 滑っているときの減速（舗装／芝・グラベル）
 function spinSlideSet(c){                   // 滑り始め（接触で押されて、もう一度滑り出したときも）
   const s = c.spin, u = Math.random();
   const tot = u < 0.45 ? Math.PI*(0.42 + Math.random()*0.16) : u < 0.9 ? Math.PI*(0.88 + Math.random()*0.22) : Math.PI*(1.35 + Math.random()*0.5);
-  Object.assign(s, { phase: 'slide', v0: Math.max(c.v, 50), b0: c.bodyOff || 0, rot: (s.dir || 1)*tot });
+  Object.assign(s, { phase: 'slide', v0: Math.max(c.v, 50), b0: c.bodyOff || 0, rot: (s.dir || 1)*tot, tk: spinTyreK(c) });
 }
 function spinTraffic(c, T){                 // 後ろから近づいてくる車がいるか（いれば動き出さない）
   const N = T.N;
@@ -11362,7 +11639,8 @@ function stepSpin(c, dt, T, best){
   c.drs = false; c.slip = 0;
   if(s.phase === 'slide'){
     if(s.v0 == null) spinSlideSet(c);
-    const fr = (c.off ? SPIN_FR_OFF : SPIN_FR) * (1 - 0.3*race.wet);   // 雨の路面はよく滑る
+    const sf = spinSurface(c, T, best), tk = s.tk ?? 1;
+    const fr = SPIN_SURF[sf] * (1 - SPIN_WET[sf]*clamp(race.wet, 0, 1)) * (sf === 'gravel' ? 0.7 + 0.3*tk : tk);   // 路面・雨・タイヤで滑る距離が変わる
     c.v = Math.max(0, c.v - fr*dt);
     const u = clamp(1 - c.v/s.v0, 0, 1), e = u*u*(3 - 2*u);           // 速度が落ちた割合で回る（始めと終わりはゆっくり、途中で一気に）
     const prev = c.bodyOff;
@@ -11406,7 +11684,8 @@ function stepSpin(c, dt, T, best){
     return;
   }
   // 止まっている間・向き直っている間は、その区間の黄旗を出したままにする
-  if(s.phase !== 'slide' && race.yellow && race.yellow.sec === sectorOf(best)) race.yellow.until = Math.max(race.yellow.until, race.t + 3);
+  // コースの上で止まっていればダブルイエローに上げる
+  if(s.phase !== 'slide') addYellow(miniOf(best), race.t + 3, Math.abs(c.lat) < half + 1);
   // フェンス
   const lat2 = (c.x - p.x)*p.nx + (c.y - p.y)*p.ny, lim = fenceLat(T, best);
   if(Math.abs(lat2) > lim){
@@ -11443,7 +11722,7 @@ function scrubSmoke(c, axle, dt, k = 1){
 function brakeMistake(c){
   const rate = ($('#crashOn').checked ? 0.5 + (+$('#crashRate').value)/6 : 0.5) * paceP(c).m;   // プッシュ中はミスが増え、セーブ中は減る
   let pr = 0.005 * (1.5 - c.m.brake*0.08) * rate * trMist(c, c.m.mistK);
-  pr *= 1 + 2.5*race.wet*(isSlick(c.comp) ? 1.5 : 1);
+  pr *= 1 + race.wet*(isSlick(c.comp) ? 2.5*1.5 : WET_MIST.brk);   // 濡れた路面ではブレーキのミスが増える（スリックのままならもっと）
   if(c.defend || c.slip > 0.4 || c.dirty > 0.5) pr *= 1.8;               // 抜きに行く／守るときは突っ込みがち
   if(c.wear > 0.8) pr *= 1.5;
   const r = Math.random();
@@ -11789,7 +12068,7 @@ function stepRecovery(dt){
     }
     // 黄旗・SC・VSCが解除されたら、破片の片付けが途中でも係員はコースから出て、コース上の残りは片付いたことにする
     if(!R.cleared && (R.phase === 'lift' || R.phase === 'leave')){
-      const yellowHere = race.yellow && race.yellow.until > race.t && sectorOf(c.idx) === race.yellow.sec;
+      const yellowHere = yAt(c.idx) > 0;
       if(!(race.sc && race.sc.until > race.t) && !race.vsc && !yellowHere){
         R.cleared = true;
         for(const m of R.M) if(m.tool === 'broom' && m.i < m.plan.length - 2) m.i = Math.max(m.i, m.plan.length - 2);
@@ -11999,7 +12278,7 @@ function renderStandings(force){
     else if(race.form) ft = 'FORMATION LAP';
     else if(race.sc && race.sc.until > race.t) ft = 'SC';
     else if(race.vsc) ft = race.vsc.ending ? 'VSC ENDING' : 'VSC';
-    else if(race.yellow && race.yellow.until > race.t) ft = `YELLOW S${race.yellow.sec+1}`;
+    else { const zs = yZones(); if(zs.length === 1) ft = `${zs[0].dbl ? 'DBL YELLOW' : 'YELLOW'} MS${zs[0].ms+1}`; else if(zs.length > 1) ft = `YELLOW ×${zs.length}`; }
   }
   const fh = ft ? `<span${ft === 'RED FLAG' ? ' class="red"' : ''}>${ft}</span>` : '';
   $('#stage').classList.toggle('redflag', !!race.red && mode === 'race');
@@ -12481,6 +12760,11 @@ function loop(now){
       dirty = true;
     } else if(race.state === 'racing'){
       let sim = race.paused ? 0 : realDt * race.timeScale; const h = race.timeScale >= 4 ? 1/60 : 1/120;   // 早送り時は計算の刻みを粗くする
+      // 赤旗のスキップ：1フレームあたり約25ミリ秒ぶん、描かずに計算だけ進める（ピットへ戻る・タイヤ交換・フォーメーションラップはいつもどおりの処理で）。
+      // 再開のシグナル（countdown）に入ったところで止まる
+      if(race.redSkip && (race.red || race.form)){ const t0 = performance.now(); sim = 0;
+        while(performance.now() - t0 < 25 && race.state === 'racing' && (race.red || race.form)){ const d = 1/60; race.t += d; stepWeather(d); stepVSC(); stepSC(d); stepUnlap(); stepRed(); stepForm(); if(race.state !== 'racing') break; for(const c of race.cars) stepCar(c, d); stepCollisions(); stepBattleContact(); stepTeamOrders(); stepIncident(); stepSparks(d); stepDust(d); stepSpray(d); stepSmokePuffs(d); stepDebris(d); stepDebrisHits(); stepWingBits(d); stepRecovery(d); recordReplay(); } }
+      if(race.redSkip && !race.red && !race.form) race.redSkip = false;
       while(sim > 1e-6){ const d = Math.min(h, sim); sim -= d; race.t += d; stepWeather(d); stepVSC(); stepSC(d); stepUnlap(); stepRed(); stepForm(); if(race.state !== 'racing') break; for(const c of race.cars) stepCar(c, d); stepCollisions(); stepBattleContact(); stepTeamOrders(); stepIncident(); stepSparks(d); stepDust(d); stepSpray(d); stepSmokePuffs(d); stepDebris(d); stepDebrisHits(); stepWingBits(d); stepRecovery(d); recordReplay(); }
       const done = race.cars.every(c=>c.finish !== null || c.out);
       if(done || (race.firstFinish !== null && race.t - race.firstFinish > 30)){
@@ -12498,6 +12782,7 @@ function loop(now){
   }
   // 雨：レースが動いていないとき（スタート前・カウントダウン・レース後）も雨粒を降らせ続ける
   if(mode === 'race' && race.rain > 0.03 && race.state !== 'racing'){ rainVis += realDt; dirty = true; }
+  syncRedSkip();
   stepReplay(realDt);
   stepDirector(); stepFade();
   if(stepCam(realDt, DIR.cut)) dirty = true;
@@ -12573,11 +12858,15 @@ const ovr = d => d.st ? r1(DSTATS.reduce((a, [k]) => a + d.st[k], 0) / DSTATS.le
 const GRADES = [[9, 'S'], [8, 'A'], [7, 'B'], [6, 'C'], [5, 'D'], [4, 'E'], [3, 'F'], [-Infinity, 'G']];
 const GRADE_RANGE = { S:'90〜', A:'80〜89', B:'70〜79', C:'60〜69', D:'50〜59', E:'40〜49', F:'30〜39', G:'〜29' };
 const gradeOf = v => GRADES.find(([t]) => pt100(v) >= t*10)[1];
+/* 並べ替え用の総合：数値が見えない選手はランク（S=8 … G=1）で並べ、同じランクの中の順番から上下が分からないようにする */
+const visOvr = (v, exact) => exact ? pt100(v) : GRADES.length - GRADES.findIndex(([t]) => pt100(v) >= t*10);
 const gradeTag = (v, num) => { const g = gradeOf(v); return `<span class="gd g${g}" title="ランク${g}（${GRADE_RANGE[g]}）">${g}</span>${num ? `<span class="gv num">${pt100(v)}</span>` : ''}`; };
 const abChip = (id, title = true) => `<span class="ab ${ABIL[id].blue ? 'blue' : 'red'}"${title ? ` title="${esc(ABIL[id].d)}"` : ''}>${esc(ABIL[id].n)}</span>`;
 const PTS = [25,18,15,12,10,8,6,4,2,1];
 const DEV_STEP = 0.4, OPS_COST = 1.2, PT_PRIZE = 0.25, FIN_PRIZE = 0.5, SIGN_K = 3;   // 賞金：1ポイント$0.25M、完走1台$0.5M（以前は0.12と0.2）
 const SPONS_K = 1.3;            // 基本スポンサー収入の倍率（資金繰りを楽にするため引き上げ）
+const SPONS_FLAT = 0.5;         // 基本スポンサー収入の定額の上乗せ（どのチームも同じ。2026-10-28：設計責任者の年俸などの出費が増えた分）
+const SPONS_OFFER_K = 1.1;      // スポンサー契約の提示額の倍率（2026-10-28：+10%）
 const DIST_PAY = 1.5;            // 参戦分配金：全チームに毎戦配られる定額（下位チームほど効く底上げ）
 const LOAN = { step: 5, cap: 15, rate: 0.08, pay: 1.0 };   // 借入：$5M単位・残高$15Mまで・借りるときに利息8%を上乗せ・毎戦$1Mずつ自動で返す
 const SEASON_PRIZE = 2;         // シーズン終了時の賞金：コンストラクターズの順位が1つ上がるごとに$2M（1位$20M〜10位$2M）
@@ -12745,7 +13034,7 @@ for(const name of Object.keys(SP_LOGO)){
 }
 
 function makeSponsorOffers(){
-  const me = myTeam(), k = (0.85 + clamp((me.spons - 2.8)/3.2, 0, 1)*0.35)*(1 + facLv(me, 'hosp')*0.05), v = x => r1(x*k*(0.9 + Math.random()*0.2));
+  const me = myTeam(), k = (0.85 + clamp((me.spons - 2.8)/3.2, 0, 1)*0.35)*(1 + facLv(me, 'hosp')*0.05)*SPONS_OFFER_K, v = x => r1(x*k*(0.9 + Math.random()*0.2));
   const names = shuffled(SPONSOR_NAMES);
   const all = {
     stable: () => ({ type:'stable', base:v(2.6) }),
@@ -12895,7 +13184,9 @@ function guideHtml(){
     <p class="gNote">タイヤの持ちはマシンでは変わりません。コンパウンドの性能と、ドライバーの「タイヤ」能力で決まります。</p>
     ${sub('reg', '開発枠と大規則変更')}
     <p><b>開発枠</b>：1戦ごとに開発できる回数には上限があります。前年のコンストラクターズ順位が低いほど多く、1〜3位は2回、4〜7位は3回、8〜10位は4回です。</p>
-    <p><b>開発の結果</b>：開発は「失敗（伸び×0.25）・成功（×1）・大成功（×1.75、攻めは×2）」のどれかになります。失敗しても値は下がりません。開発方針で確率が変わり、慎重＝失敗5%・大成功なし、標準＝失敗15%・大成功15%（平均すると以前と同じ伸び）、攻め＝失敗30%・大成功30%です。空力は風洞、パワーユニットとブレーキはシミュレーターのレベルが高いほど失敗しにくくなります（1レベルにつき失敗の10%が大成功に回ります。慎重は成功に回ります）。ライバルも同じ仕組みで開発し、ときどき開発枠を買い足します。</p>
+    <p><b>開発の結果</b>：開発は「失敗（伸び×0.25）・成功（×1）・大成功（×1.75、革新型は×2）」のどれかになります。失敗しても値は下がりません。確率は<b>設計責任者</b>のタイプで決まります。堅実型＝失敗5%・大成功なし、バランス型＝失敗15%・大成功15%、革新型＝失敗30%・大成功30%、グレーゾーン型＝バランス型と同じです。そこから、設計者の能力（ランクが高いほど）・得意分野（その部品は大きく、万能は全部を少し）・空力は風洞、パワーユニットとブレーキはシミュレーターのレベル・リザーブの手伝いで、失敗の一部が大成功（堅実型は成功）に回ります。設計責任者がいないときは技術陣で回すので、失敗しやすくなります。</p>
+    <p><b>設計責任者</b>：移籍市場の「設計責任者」で契約します（開発タブの「設計者を探す」からも開けます）。契約金は年俸の${SIGN_K}倍で、年俸は毎戦の収支から引かれます。特性を持つ人もいます（規則変更に強い＝新規則の1年目に失敗しにくい／低コスト＝開発費−10%／施設を使いこなす＝風洞・シミュレーターの効きが1.3倍）。契約が満了したら、更改するか、後任と契約します。ライバルのチームにも設計責任者がいます。</p>
+    <p><b>抜け穴（グレーゾーン型）</b>：グレーゾーン型の設計者は、レースのあとにときどき規則の隙をつく案を提案してきます。採用するとその部品が大きく伸びますが（開発枠は使いません）、「疑惑度」が上がります。採用中の抜け穴は毎戦「指摘」を受けることがあり、疑惑度が高いほど・表彰台に上がるほど受けやすくなります。結果は、即時禁止（伸びた分の1.2倍下がる）・来季から禁止（シーズンの終わりに伸びた分が下がる）・合法（ライバルもまねをして、伸びた分の半分ほど追いつく）のどれかです。ポイントの剥奪や罰金はありません。疑惑度は毎戦少しずつ下がります。</p>
     <p><b>開発枠の追加</b>：お金を払えば、1戦に1つだけ枠を足せます（その戦だけ有効）。値段は前年の順位が高いほど高く（1〜3位 $4.0M・4〜7位 $3.0M・8〜10位 $2.0M）、同じシーズンで買うたびに50%ずつ上がります。風洞のレベルが高いほど安くなります。</p>
     <p><b>大規則変更</b>：2〜3シーズンごとに、空力か全面の規則が大きく変わります。パワーユニットの規則は、前の変更から3〜4シーズンで必ず変わります（ほかの変更と同じシーズンになれば、まとめて「空力＋パワーユニット」などになります）。変わる部分は全チームが平均近くまで作り直しになり、勢力図がリセットされます。変更の前のシーズンの開幕に予告されます。</p>
     <p><b>先行研究</b>：予告されたシーズンだけ、開発枠を使って来季の研究ができます（1回 ${M(RES_COST)}。パワーユニットを含む変更のときは、PUのワークスはPU開発枠を使います）。研究するほど来季の初期値が平均より高くなります（効果の上限は、変わる項目が少ないテーマほど1項目あたり大きく、空力 +${REG_THEMES.aero.max.toFixed(1)}・パワーユニット +${REG_THEMES.pu.max.toFixed(1)}・空力＋パワーユニット +${REG_THEMES.aeropu.max.toFixed(1)}・全面 +${REG_THEMES.all.max.toFixed(1)}。当たり外れ ±25%）。今季を強くするか、今季を捨てて来季に賭けるかの判断です。研究を${RES_EASE[0]}回以上すると、オーナーは目標より1つ下（${RES_EASE[1]}回以上で2つ下）の順位までを「達成」として扱います。ライバルもそれぞれの方針で研究します。パワーユニットの規則変更のときは、PUのカスタマー（メーカーからPUを買っているチーム）は研究できません（来季のPUはメーカー製になり、メーカーの研究で決まるため）。</p>
@@ -12904,7 +13195,7 @@ function guideHtml(){
     <p>強化するとすぐに効きます（工期なし）。強化の費用は ${M(facCost(1))}（Lv1）〜 ${M(facCost(FAC_MAX))}（Lv${FAC_MAX}）。レベルごとに毎戦の維持費がかかり、高いレベルほど急に高くなります（Lv1 ${M(facUpkeep(1))}〜Lv5 ${M(facUpkeep(5))}/戦）。Lv4以上の施設は、シーズンの切り替えで「来季、改修が必要」と予告されることがあり（Lv4 25%・Lv5 40%）、予告された施設は次のシーズンの初めに改修する（強化費の半分）か、改修せずに1レベル下げるかを選びます。チームによって最初のレベルが違い、ライバルもシーズンの終わりに強化します。</p>
     ${tbl(['施設', 'Lv1', `Lv${FAC_MAX}`], FACS.map(f => [`<b>${f.n}</b><br><small>${esc(f.d)}</small>`, esc(f.eff(1)), esc(f.eff(FAC_MAX))]))}
     <p><b>ホームGP</b>：施設タブで自チームのサーキットを計画して建設費（$90M〜$180M。コースのタイプと観客席の規模で変わる）を払うと、今季の終わりに完成し、来季から毎シーズン、選んだラウンドがホームGPになります。開催国は、今のGPの開催国とドライバーの出身国から選べます（表示がその国の国旗になり、同じ国のGPとは重なりません）。コースは自動で作るか、コース作成の画面で自分で作れます（自分で作ったコースのタイプは、直線の割合とコーナーの形から自動で判定）。開催費は毎シーズン $5M。ホームGPでは観客席の多くがチームカラーになり、レース後に地元スポンサーのボーナス（$3〜5M）とドライバーのチーム愛 +3 が入ります。マシンの速さには影響しません。</p>
-    <p><b>セカンドチーム</b>：PUのワークスなら、施設タブで、コンストラクターズの下位3チーム（PUメーカーを除く）から1つを買収して姉妹チームにできます（買収費はチームの強さで $170M〜$200M ほど）。毎戦、運営費 ${M(SIS_OPS)} を払い、姉妹チームの賞金（ポイント・完走）の${Math.round(SIS_SHARE*100)}%を受け取ります。自チームのリザーブを姉妹チームのシートに送り込んで実戦を積ませ（その席の選手は移籍市場へ）、いつでもリザーブに呼び戻せます（リザーブの枠に空きが必要）。送り込んだ選手の年俸は姉妹チームが払い、ほかのチームに引き抜かれることもありません。姉妹チームには自チームのPUを自動で供給します（供給料など、条件はほかのカスタマーと同じ。来季の受け入れ数には数えません）。開発などの運営はAIが行います。いまの買収費の${Math.round(SIS_SELL*100)}%で売却でき、送り込んでいた選手はそのまま売却先のチームに残ります。</p>
+    <p><b>セカンドチーム</b>：PUのワークスなら、施設タブで、コンストラクターズの下位3チーム（PUメーカーを除く）から1つを買収して姉妹チームにできます（買収費はチームの強さで $170M〜$200M ほど）。毎戦、運営費 ${M(SIS_OPS)} を払い、姉妹チームの賞金（ポイント・完走）の${Math.round(SIS_SHARE*100)}%を受け取ります。自チームのリザーブを姉妹チームのシートに送り込んで実戦を積ませ（その席の選手は移籍市場へ）、いつでもリザーブに呼び戻せます（リザーブの枠に空きが必要）。送り込んだ選手の年俸は姉妹チームが払い、ほかのチームに引き抜かれることもありません。姉妹チームには自チームのPUを自動で供給します（供給料など、条件はほかのカスタマーと同じ。来季の受け入れ数には数えません）。開発などの運営はAIが行います。いまの買収費の${Math.round(SIS_SELL*100)}%で売却でき、送り込んでいた選手はそのまま売却先のチームに残ります。<br><b>技術提携</b>：レベル1（${M(SIS_TECH[1].cost)}/戦）でブレーキ、レベル2（${M(SIS_TECH[2].cost)}/戦）で空力も、自チームの1戦前の値から一定の差（ブレーキ−0.5・空力−1.5）まで姉妹チームの値が上がります。レベル3（${M(SIS_TECH[3].cost)}/戦）は空力の差を−1.0まで縮めますが、毎戦${Math.round(SIS_INV_P*100)}%の確率で技術規則の調査が入り、違反と判断されると罰金 ${M(SIS_FINE)}・その戦の姉妹チームのポイント剥奪・今季はレベル1までに制限されます。</p>
   `)}
   ${sec('quali', '予選', `
     <p>Q1（全車）→ Q2 → Q3（上位10台）のノックアウト方式で、Q1とQ2ではそれぞれ下位${qCut(20)}台が脱落します。各車2回アタックし、良いほうのタイムが残ります。</p>
@@ -12922,7 +13213,7 @@ function guideHtml(){
       ['BOX', 'この周の終わりにピットへ（もう一度押すと取り消し）'],
       ['カメラ', '全体・自動中継・先頭・追従視点、＋−でズーム']])}
     <p><b>チームオーダー</b>：操作パネルの「オーダー」から、<b>自由にバトル</b>（初期）／<b>バトル禁止</b>（今の順位のまま・接触もしない）／<b>順位を入れ替え</b>（2台が並んで${TO_GAP}秒以内のとき、前の車が後ろの車に譲る）を選べます。チーム愛が75以上ならすぐ従い、30以上なら少し渋ってから、30未満だと無視することがあります。譲ったドライバーはチーム愛が下がり（ファーストは大きく）、無視されるとレース後にチーム愛とオーナーの信頼が下がります。ドライバータブの「方針」を「ファースト優先」にすると、セカンドが前でファーストが迫ったときは自動で入れ替え、ダブルスタックではファーストが先に入ります（セカンドのチーム愛は毎戦少し下がる）。</p>
-    <p><b>接触</b>：並んでコーナーに飛び込むと、まれに接触が起きます（1周目・雨・プッシュ・「短気」で起きやすく、「バトル」「安定性」が高い2人なら起きにくい）。結果は、軽い接触（少し減速）・フロントウイング破損（ピットで交換するまで遅い。交換は+${WING_FIX}秒）・スピン・まれに両者リタイアです。ダメージはドライバーカードに表示されます。ウイングが壊れた車は、残りが3周以上あれば次の周でピットに入ってノーズを交換します（ピット判断が「自分で」の担当マシンは、ドライバーが交換を相談してきます）。</p>
+    <p><b>接触</b>：並んでコーナーに飛び込むと、まれに接触が起きます（1周目・雨・プッシュ・「短気」で起きやすく、「バトル」「安定性」が高い2人なら起きにくい）。結果は、フロントウイング破損（ピットで交換するまで遅い。交換は+${WING_FIX}秒）・スピン・まれに両者リタイアです。ダメージはドライバーカードに表示されます。ウイングが壊れた車は、残りが3周以上あれば次の周でピットに入ってノーズを交換します（ピット判断が「自分で」の担当マシンは、ドライバーが交換を相談してきます）。</p>
     <p><b>チームラジオ</b>：エンジニアとドライバーの会話が吹き出しで出ます。ピットの相談、前後のギャップ、天気の変化、タイヤの状態などを知らせてくれます。カードには、タイヤの残り・バッテリー・セクタータイム（紫＝全体ベスト、緑＝自己ベスト）が出ます。</p>`)}
   ${sec('tyres', 'タイヤと天気', `
     ${tbl(['タイヤ', '特徴', '得意な路面温度'], Object.entries(TYRES).map(([k, t]) => [`${tyreDot(k)}<b>${k}</b> ${t.name}`, k === 'S' ? '最も速いが減りが早い。使い込むと大きく落ちる' : k === 'M' ? '速さと持ちのバランス型' : k === 'H' ? '遅いが長持ち' : k === 'I' ? '小雨・乾きかけの路面用' : '大雨用', isSlick(k) ? (r => `${Math.ceil(r[0])}〜${Math.floor(r[1])}℃`)(ttFitRange(k, null)) : '—']))}
@@ -12937,7 +13228,7 @@ function guideHtml(){
       ['セーフティカー（SC）', '追い抜き禁止で隊列を作って走る。ピットのロスが小さくなるので、タイヤ交換のチャンス'],
       ['VSC', '全車が一律に減速する。追い抜き禁止'], ['赤旗', 'レースを中断して全車ピットへ。タイヤは無料で新品に交換される（タイヤ規定の交換にも数える。まだ守れていない車は別の種類を履く）'],
       ['イエローフラッグ', 'その区間は減速。追い抜きにくい'],
-      ['接触のペナルティ', '接触の原因を作った車（後ろから当てた側）は審議になり、1周ほどで裁定が出る。お咎めなし／+0.5秒／+1秒／ドライブスルー（ピットレーンを止まらずに通り抜ける。2周以内）。タイム加算は次のピットでその秒数だけ待ってから作業し、入らなければゴール後に加算。残り3周以内のドライブスルーはゴール後に+2.5秒（実際のF1の5秒・10秒・ドライブスルーをゲームの時間に合わせて縮めたもの）'], ['ブルーフラッグ', '周回遅れの車は、追いついてきた上位の車に道を譲る'],
+      ['接触のペナルティ', '接触の原因を作った車（後ろから当てた側）は審議になり、1周ほどで裁定が出る。お咎めなし／+0.5秒／+1秒／ドライブスルー（ピットレーンを止まらずに通り抜ける。2周以内）。タイム加算は次のピットでその秒数だけ待ってから作業し、入らなければゴール後に加算。残り3周以内のドライブスルーはゴール後に+2.5秒（実際のF1の5秒・10秒・ドライブスルーをゲームの時間に合わせて縮めたもの）'], ['ブルーフラッグ', '周回遅れの車は、追いついてきた上位の車に道を譲る（その場所のマーシャルポストで青旗を振る）'],
       ['OTモード', 'メインストレート手前の検知地点で前の車と1秒以内なら、次の1周、直線で追加のエネルギーを使って大きく加速できる'],
       ['ブースト・バッテリー', 'バッテリーはブレーキで回収し、ブーストで使う（使い方はAIが判断）。残りわずかになると直線の最後で失速する'],
       ['ピットの速度制限', `「PIT」の線から線まで、制限速度（${PIT_LIM}）で走る`]])}`)}
@@ -13047,7 +13338,7 @@ function sponsRenew(cons){
     out[t.id] = { old, nv, pct, pos: i + 1 }; });
   return out;
 }
-const baseSpons = t => r1(t.spons*SPONS_K*(1 + facLv(t, 'hosp')*0.1)*popOf(t));
+const baseSpons = t => r1(t.spons*SPONS_K*(1 + facLv(t, 'hosp')*0.1)*popOf(t) + SPONS_FLAT);   // 定額の上乗せは、施設・人気度に関係なく同じ額
 // 依頼
 function goalCtx(order, myCars){
   const pos = c => c.finish !== null ? order.indexOf(c) + 1 : 99;
@@ -13630,31 +13921,291 @@ function devStep(key, v){
   if(regFirstYear() && REG_THEMES[career.reg.cur.theme].keys.includes(key)) st *= REG_BOOST;
   return st;
 }
-/* ---------- 開発の結果（失敗・成功・大成功）と開発方針 ----------
+/* ---------- 開発の結果（失敗・成功・大成功）と設計責任者（2026-10-28：開発方針の3択を置き換え） ----------
    ・1回の開発は、基本の伸び（devStep）に結果の倍率を掛ける。失敗しても値は下がらない（伸びが小さいだけ）
-   ・方針：慎重＝失敗が少なく大成功なし／標準＝平均すると以前と同じ伸び／攻め＝失敗も大成功も多い（平均は少し高い）
-   ・施設：空力は風洞、パワーユニットとブレーキはシミュレーターのレベルが高いほど失敗しにくい（失敗の一部が大成功に回る。慎重は成功に回る）
-   ・AIも同じ仕組みで開発する（方針はチームごと） */
-const DEV_POL = {
-  safe: { n:'慎重', d:'失敗が少なく、大成功はない', fail:0.05, great:0,    k:[0.25, 1, 1.75] },
-  norm: { n:'標準', d:'平均すると以前と同じ伸び',     fail:0.15, great:0.15, k:[0.25, 1, 1.75] },
-  risk: { n:'攻め', d:'失敗も大成功も多い',           fail:0.30, great:0.30, k:[0.25, 1, 2.0] }
+   ・確率は設計責任者のタイプで決まる：堅実型（旧・慎重）／バランス型（旧・標準）／革新型（旧・攻め）／グレーゾーン型（ふだんはバランス型。ときどき「抜け穴」を提案）
+   ・失敗しにくさのレベル＝施設（風洞・シミュレーター）＋リザーブ＋設計者の能力（5が基準。1つにつき0.6レベル）＋得意分野（+1.5、万能は全部に+0.5）＋特性
+     1レベルごとに失敗の10%が大成功に回る（堅実型は成功に回る）。レベルがマイナスなら逆に失敗が増える
+   ・AIのチームにも設計者がいて、同じ仕組みで開発する */
+const DS_TYPES = {
+  safe: { n:'堅実型',         d:'失敗が少なく、大成功はない',                                     fail:0.05, great:0,    k:[0.25, 1, 1.75] },
+  bal:  { n:'バランス型',     d:'失敗も大成功もほどほど',                                         fail:0.15, great:0.15, k:[0.25, 1, 1.75] },
+  inno: { n:'革新型',         d:'失敗も大成功も多い',                                             fail:0.30, great:0.30, k:[0.25, 1, 2.0] },
+  gray: { n:'グレーゾーン型', d:'ふだんの開発はバランス型と同じ。ときどき規則の隙をつく「抜け穴」を提案してくる', fail:0.15, great:0.15, k:[0.25, 1, 1.75] }
 };
+const DS_SPEC = { aero: { n:'空力', keys:['df','eff'] }, pu: { n:'パワーユニット', keys:['power','drive','rel'] }, brk: { n:'ブレーキ', keys:['bpow','bstab'] }, all: { n:'万能', keys:null } };
+const DS_TRAITS = {
+  reg:  { n:'規則変更に強い',   d:'新しい規則の1年目は、すべての部品で失敗しにくい（+2レベル）' },
+  cost: { n:'低コスト',         d:'開発費 −10%' },
+  fac:  { n:'施設を使いこなす', d:'風洞・シミュレーターの効きが1.3倍' }
+};
+const DS_NONE_LV = -1.5;                      // 設計責任者がいないとき（技術陣で回す）：能力の分、失敗しやすい
 const DEV_RES = [['fail','失敗','#d7263d'], ['ok','成功','#1a9a55'], ['great','大成功','#c026d3']];
 const devFacKey = key => (key === 'df' || key === 'eff') ? 'wind' : 'sim';
-// 方針・施設レベルから、失敗・成功・大成功の確率を出す
-function devOdds(polKey, facLevel){
-  const P = DEV_POL[polKey] || DEV_POL.norm, moved = P.fail*0.1*facLevel;   // 施設1レベルごとに、失敗の10%を減らす
-  const fail = P.fail - moved, great = P.great + (P.great > 0 ? moved : 0);
+const dsOf = t => (career && career.ds && t && t.ds) ? career.ds[t.ds] || null : null;
+const dsType = t => { const d = dsOf(t); return d && DS_TYPES[d.type] ? d.type : 'bal'; };
+// 失敗しにくさのレベル（facLevel：施設＋リザーブなど、部品ごとの基本のレベル）
+function dsLevel(t, key, facLevel){
+  const d = dsOf(t); if(!d) return facLevel + DS_NONE_LV;
+  let lv = facLevel*(d.trait === 'fac' ? 1.3 : 1) + (d.lv - 5)*0.6;
+  if(d.spec === 'all') lv += 0.5; else if(DS_SPEC[d.spec] && DS_SPEC[d.spec].keys.includes(key)) lv += 1.5;
+  if(d.trait === 'reg' && typeof regFirstYear === 'function' && regFirstYear()) lv += 2;
+  return lv;
+}
+// タイプとレベルから、失敗・成功・大成功の確率を出す
+function devOdds(typeKey, level){
+  const P = DS_TYPES[typeKey] || DS_TYPES.bal, moved = P.fail*0.1*level;
+  const fail = clamp(P.fail - moved, 0.01, Math.min(0.6, P.fail*2));
+  const great = P.great > 0 ? clamp(P.great + (P.fail - fail), 0, 0.6) : 0;
   return { fail, ok: 1 - fail - great, great };
 }
 // 1回の開発の結果を決める。返り値 { tier: 0失敗/1成功/2大成功, add: 伸び }
-function rollDev(polKey, facLevel, base){
-  const o = devOdds(polKey, facLevel), r = Math.random(), P = DEV_POL[polKey] || DEV_POL.norm;
+function rollDev(typeKey, level, base){
+  const o = devOdds(typeKey, level), r = Math.random(), P = DS_TYPES[typeKey] || DS_TYPES.bal;
   const tier = r < o.fail ? 0 : r < o.fail + o.ok ? 1 : 2;
   return { tier, add: base*P.k[tier] };
 }
-const devPol = () => (career && DEV_POL[career.devPol]) ? career.devPol : 'norm';
+/* ---------- 設計責任者の人材（名前・国・顔・タイプ・得意分野・能力・特性・年俸） ---------- */
+const dsSalOf = (lv, trait) => r1(Math.max(0.2, 0.25 + (lv - 3)*0.14 + (trait ? 0.08 : 0)));
+function makeDesigner(lv){
+  const nats = Object.keys(NAME_POOL), nat = nats[Math.floor(Math.random()*nats.length)], P = NAME_POOL[nat];
+  const g = P.g[Math.floor(Math.random()*P.g.length)], s = P.s[Math.floor(Math.random()*P.s.length)][0];
+  const r = Math.random(), type = r < 0.27 ? 'safe' : r < 0.61 ? 'bal' : r < 0.88 ? 'inno' : 'gray';   // グレーゾーン型は少なめ（12%）
+  const q = Math.random(), spec = q < 0.3 ? 'aero' : q < 0.5 ? 'pu' : q < 0.7 ? 'brk' : 'all';
+  const tr = Math.random(), trait = tr < 0.6 ? null : tr < 0.73 ? 'reg' : tr < 0.87 ? 'cost' : 'fac';
+  const L = r1(clamp(lv ?? (3 + Math.random()*5.5), 2, 9.8));
+  career.dsSeq = (career.dsSeq || 0) + 1;
+  return { id: 'ds' + career.dsSeq, name: `${g}・${s}`, nat, age: 34 + Math.floor(Math.random()*26), type, spec, trait, lv: L, sal: dsSalOf(L, trait), face: makeFace(Math.random, nat) };
+}
+function dsFace(d, size = 44, suit){ return d ? faceSvg(d.face || (d.face = makeFace(Math.random, d.nat)), { size, age: d.age, suit: suit || FACE_FA_SUIT, mouth: false, label: d.name + 'の顔' }) : ''; }
+const dsPay = t => { const d = dsOf(t); return d ? (d.con ? d.con.sal : d.sal) : 0; };
+// 古いセーブ・新しいキャリア：全チームに設計責任者を置き、移籍市場にも数人。以前の開発方針は、同じ確率のタイプに引き継ぐ
+const DS_FROM_POL = { safe: 'safe', norm: 'bal', risk: 'inno' };
+function ensureDesigners(){
+  if(!career || !career.teams) return;
+  if(!career.ds) career.ds = {};
+  if(!career.dsFa) career.dsFa = [];
+  const strength = t => CAR_KEYS.reduce((a, k) => a + t.car[k], 0)/CAR_KEYS.length;
+  career.teams.forEach(t => {
+    if(t.ds && career.ds[t.ds]) return;
+    if(t.ds === null && t.id === career.team) return;                  // 自チームが自分で放出して、空席にしている
+    const mine = t.id === career.team;
+    const lv = mine ? 5.0 + Math.random()*1.0 : clamp(4 + (strength(t) - 5)*0.6 + Math.random()*1.6, 3, 9);
+    const d = makeDesigner(lv);
+    const pol = mine ? career.devPol : t.devPol;
+    if(pol && DS_FROM_POL[pol]) d.type = DS_FROM_POL[pol];
+    else if(mine) d.type = 'bal';
+    d.con = { yrs: 1 + Math.floor(Math.random()*3), sal: d.sal };
+    career.ds[d.id] = d; t.ds = d.id;
+  });
+  career.dsFa = career.dsFa.filter(id => career.ds[id] && !career.teams.some(t => t.ds === id));
+  while(career.dsFa.length < 6){ const d = makeDesigner(); career.ds[d.id] = d; career.dsFa.push(d.id); }
+  if(!career.dsFa.some(id => career.ds[id].type === 'gray')){ const d = makeDesigner(); d.type = 'gray'; career.ds[d.id] = d; career.dsFa.push(d.id); }   // 市場に必ず1人はグレーゾーン型
+  if(!career.gray) career.gray = { sus: 0, prop: null, tricks: [], log: [] };
+}
+let dsSignYrs = 2;
+// 移籍市場の設計責任者と契約する（今の設計責任者は市場へ）
+function signDesigner(id){
+  const d = career.ds[id], me = myTeam(); if(!d || !career.dsFa.includes(id)) return;
+  const sal = dsAsk(d, dsSignYrs), fee = r1(sal*SIGN_K);
+  if(career.money < fee) return;
+  if(!confirmTwice('dssign' + id, fee)) return;
+  const old = dsOf(me);
+  if(old){ delete old.con; career.dsFa.push(old.id); }
+  career.dsFa = career.dsFa.filter(x => x !== id);
+  me.ds = id; d.con = { yrs: dsSignYrs, sal };
+  career.money = r1(career.money - fee);
+  saveCareer(); renderHQ(`${d.name}（${DS_TYPES[d.type].n}）を設計責任者に迎えました。契約金 ${money(fee)}・年俸 ${money(sal)}/戦・${dsSignYrs}年契約。${old ? `${old.name}は移籍市場に移りました。` : ''}`);
+}
+// 契約年数ごとの年俸（若手は短い契約、ベテランは長い契約のほうが安い：ドライバーと同じ考え方。50歳を境にする）
+const dsAsk = (d, yrs) => r1(Math.max(0.2, d.sal*((d.age < 50 ? [0.97, 1, 1.08] : [1.08, 1, 0.95])[yrs - 1] || 1)));
+function renewDesigner(yrs){
+  const me = myTeam(), d = dsOf(me); if(!d || !d.con || d.con.yrs > 0) return;
+  const ask = r1(dsAsk(d, yrs)*1.05), fee = r1(ask*RENEW_K);
+  if(career.money < fee) return;
+  if(!confirmTwice('dsrenew' + yrs, fee)) return;
+  career.money = r1(career.money - fee); d.con = { yrs, sal: ask };
+  saveCareer(); renderHQ(`設計責任者 ${d.name} と${yrs}年の契約を更改しました（年俸 ${money(ask)}/戦）。`);
+}
+function releaseDesigner(){
+  const me = myTeam(), d = dsOf(me); if(!d) return;
+  if(!confirmTwice('dsrel')) return;
+  delete d.con; career.dsFa.push(d.id); me.ds = null;
+  saveCareer(); renderHQ(`設計責任者 ${d.name} との契約を終えました。後任が決まるまでは技術陣で開発を回します（失敗しやすくなります）。移籍市場の「設計責任者」から契約できます。`);
+}
+// シーズンの終わり：年齢・能力の変化、契約年数、AIの入れ替え、引退と新人
+function dsOffseason(rep){
+  ensureDesigners();
+  const me = myTeam(), out = { retired: [], moves: [], expired: false };
+  Object.values(career.ds).forEach(d => {
+    d.age++;
+    d.lv = r1(clamp(d.lv + (d.age < 45 ? Math.random()*0.35 : d.age > 58 ? -Math.random()*0.3 : (Math.random() - 0.5)*0.2), 2, 9.8));
+    d.sal = r1(Math.max(d.sal*0.9, dsSalOf(d.lv, d.trait)));
+  });
+  career.teams.forEach(t => {
+    const d = dsOf(t); if(!d || !d.con) return;
+    d.con.yrs = Math.max(0, d.con.yrs - 1);
+    if(t.id === career.team){ if(d.con.yrs <= 0) out.expired = true; return; }
+    if(d.con.yrs > 0) return;
+    // AI：更改するか、市場のもっと良い設計者と入れ替える（スポンサー収入が多いほど良い人を取りやすい）
+    const cands = career.dsFa.map(id => career.ds[id]).filter(x => x && x.age < 66).sort((a, b) => b.lv - a.lv).slice(0, 3);
+    const best = cands[Math.floor(Math.random()*cands.length)];
+    if(best && best.lv > d.lv + 0.3 && Math.random() < clamp((t.spons - 2)/5, 0.25, 0.85)){
+      delete d.con; career.dsFa = career.dsFa.filter(x => x !== best.id); career.dsFa.push(d.id);
+      t.ds = best.id; best.con = { yrs: 1 + Math.floor(Math.random()*3), sal: best.sal };
+      out.moves.push({ team: t.id, in: best.id, out: d.id });
+    } else d.con = { yrs: 1 + Math.floor(Math.random()*3), sal: d.sal };
+  });
+  // 引退：市場の高齢の設計者。チームの設計者は契約中なので引退しない
+  career.dsFa = career.dsFa.filter(id => { const d = career.ds[id]; if(d && d.age >= 64 && Math.random() < (d.age - 62)*0.2){ out.retired.push(d.name); d.retired = true; return false; } return !!d; });
+  while(career.dsFa.length < 6){ const d = makeDesigner(); d.age = Math.min(d.age, 48); career.ds[d.id] = d; career.dsFa.push(d.id); }
+  if(!career.dsFa.some(id => career.ds[id].type === 'gray')){ const d = makeDesigner(); d.type = 'gray'; career.ds[d.id] = d; career.dsFa.push(d.id); }
+  if(rep) rep.ds = out;
+}
+/* ---------- グレーゾーン型：規則の隙をつく「抜け穴」 ----------
+   ・グレーゾーン型の設計者は、レースのあとにときどき抜け穴を提案してくる（約30%。採用するかはプレイヤーが決める。開発枠は使わない）
+   ・採用すると、その部品が大きく伸びるかわりに「疑惑度」が上がる。疑惑度は毎戦少しずつ下がる
+   ・採用中の抜け穴は、毎戦「指摘」を受けることがある（疑惑度が高いほど・自チームが表彰台に上がるほど受けやすい）。指摘の結果は3通り：
+     即時禁止（次戦から使えない。作り直しで伸びた分の1.2倍下がる）／来季から禁止（今季は使え、シーズンの終わりに伸びた分が下がる）／合法（そのまま使えるが、ライバルがまねをして半分ほど追いつく）
+   ・ポイントの剥奪や罰金はない（能力が下がるだけ）
+   ・設計者を替えても、採用済みの抜け穴と疑惑度は残る（マシンに付いているもの） */
+const GRAY_P = 0.30, GRAY_MAX = 3, GRAY_DECAY = 2;
+const GRAY_IDEAS = {
+  df:    ['しなるフロントウイング', '床下の隠しスロット', '二重構造のディフューザー', '翼端板の切り欠き'],
+  eff:   ['高速で寝るリアウイング', '空気を流す隠しダクト', 'ホイールカバーの整流板'],
+  power: ['エンジンオイルの燃焼', '燃料流量計の測り方の解釈', '排気を使った過給の工夫'],
+  drive: ['予選モードの解釈', '制御すれすれの点火マップ'],
+  rel:   ['冷却部品を「消耗品」と解釈', 'パワーユニット部品の交換時期の解釈'],
+  bpow:  ['ブレーキダクトのリム冷却', '前後配分を自動で変える仕組み'],
+  bstab: ['ハンドルでトーを変える仕組み', '車高を保つ油圧サスペンション']
+};
+const GRAY_OUT = { ban: '即時禁止', next: '来季から禁止', legal: '合法と判断' };
+function grayState(){ if(!career.gray) career.gray = { sus: 0, prop: null, tricks: [], log: [] }; return career.gray; }
+function grayLog(text, cls){ const G = grayState(); G.log.unshift({ s: career.season, r: career.round, text, cls }); G.log.length = Math.min(G.log.length, 6); }
+// 抜け穴を採用する／見送る
+function grayAdopt(){
+  const G = grayState(), P = G.prop, me = myTeam(); if(!P) return;
+  if(career.money < P.cost) return;
+  if(!confirmTwice('grayok', P.cost)) return;
+  const v = me.car[P.key], nv = r1(Math.min(10, v + P.gain)), gain = r1(nv - v);
+  me.car[P.key] = nv; career.money = r1(career.money - P.cost);
+  G.tricks.push({ id: 'g' + Date.now(), key: P.key, name: P.name, gain, st: 'active', s: career.season, r: career.round });
+  G.sus = Math.min(100, G.sus + P.risk); G.prop = null;
+  grayLog(`「${P.name}」を採用（${carKeyName(P.key)} +${gain.toFixed(1)}・疑惑度 +${P.risk}）`, 'mine');
+  saveCareer(); renderHQ(`抜け穴「${P.name}」を採用しました。${carKeyName(P.key)}が ${v.toFixed(1)} → ${nv.toFixed(1)} に上がりました。疑惑度は ${Math.round(G.sus)} です。`);
+}
+function grayPass(){ const G = grayState(); if(!G.prop) return; grayLog(`「${G.prop.name}」の提案を見送り`, ''); G.prop = null; saveCareer(); renderHQ(); }
+const carKeyName = k => { for(const [, , items] of PARTS) for(const [id, lab] of items) if(id === k) return lab; return k; };
+// レースのあと：疑惑度が下がる・採用中の抜け穴への指摘・新しい提案（返り値はニュース用の出来事）
+function grayAfterRace(order){
+  const G = grayState(), me = myTeam(), ev = [];
+  G.sus = Math.max(0, G.sus - GRAY_DECAY);
+  const best = Math.min(...order.map((c, i) => c.m.team === career.team && c.finish !== null ? i + 1 : 99));
+  for(const T of G.tricks.filter(x => x.st === 'active')){
+    if(T.s === career.season && T.r === career.round) continue;        // 採用したその戦は対象外（まだ走っていない）
+    const p = 0.03 + G.sus/100*0.10 + (best === 1 ? 0.04 : best <= 3 ? 0.02 : 0);
+    if(Math.random() >= p) continue;
+    const r = Math.random(), out = r < 0.45 ? 'ban' : r < 0.8 ? 'next' : 'legal';
+    if(out === 'ban'){
+      const down = r1(T.gain*1.2), v = me.car[T.key]; me.car[T.key] = r1(Math.max(1, v - down));
+      T.st = 'done'; G.sus = Math.max(0, G.sus - 15);
+      grayLog(`「${T.name}」が即時禁止に（${carKeyName(T.key)} −${down.toFixed(1)}）`, 'bad');
+      ev.push({ out, name: T.name, key: T.key, down });
+    } else if(out === 'next'){
+      T.st = 'next'; G.sus = Math.max(0, G.sus - 10);
+      grayLog(`「${T.name}」は来季から禁止（今季は使える。シーズンの終わりに ${carKeyName(T.key)} −${T.gain.toFixed(1)}）`, 'warn');
+      ev.push({ out, name: T.name, key: T.key, down: T.gain });
+    } else {
+      T.st = 'legal'; G.sus = Math.max(0, G.sus - 15);
+      const copy = r1(T.gain*0.5);                                   // ライバルがまねをする（伸びた分の半分ほど追いつく）
+      career.teams.forEach(t => { if(t.id !== career.team) t.car[T.key] = r1(Math.min(10, t.car[T.key] + copy)); });
+      grayLog(`「${T.name}」は合法と判断（ライバルもまねをして ${carKeyName(T.key)} +${copy.toFixed(1)}）`, 'good');
+      ev.push({ out, name: T.name, key: T.key, copy });
+    }
+  }
+  // 提案の期限（2戦）と、新しい提案
+  if(G.prop && career.round + 1 > G.prop.until){ grayLog(`「${G.prop.name}」の提案は期限切れ`, ''); G.prop = null; }
+  const d = dsOf(me);
+  if(d && d.type === 'gray' && !G.prop && G.tricks.filter(x => x.st === 'active' || x.st === 'next').length < GRAY_MAX
+     && career.round + 1 < career.calendar.length && Math.random() < GRAY_P){
+    const keys = CAR_KEYS.filter(k => (!PU_KEYS.includes(k) || puWorks(me)) && me.car[k] < 9.6 && !G.tricks.some(x => x.key === k && (x.st === 'active' || x.st === 'next')));
+    if(keys.length){
+      const key = keys[Math.floor(Math.random()*keys.length)], names = GRAY_IDEAS[key] || ['規則の解釈の工夫'];
+      G.prop = { key, name: names[Math.floor(Math.random()*names.length)], gain: r1(clamp(0.5 + Math.random()*0.5 + (d.lv - 5)*0.08, 0.4, 1.2)),
+        cost: r1(1.5 + Math.random()*2), risk: 18 + Math.floor(Math.random()*18), until: career.round + 3 };
+    }
+  }
+  // ライバルのグレーゾーン型（簡易）：ときどき抜け穴で伸び、ときどき禁止されて下がる
+  career.teams.forEach(t => {
+    if(t.id === career.team || dsType(t) !== 'gray') return;
+    const k = CAR_KEYS.filter(x => !PU_KEYS.includes(x) || puWorks(t))[Math.floor(Math.random()*5)] || 'df';
+    if(Math.random() < 0.08){ t.grayN = (t.grayN || 0) + 1; t.car[k] = r1(Math.min(10, t.car[k] + 0.6)); }
+    else if(t.grayN && Math.random() < 0.06){ t.grayN--; t.car[k] = r1(Math.max(1, t.car[k] - 0.6)); ev.push({ out: 'rival', team: t.id, key: k }); }
+  });
+  return ev.length ? ev : null;
+}
+// シーズンの終わり：来季から禁止の抜け穴の分を下げる。規則が大きく変わった部品の抜け穴は消える（作り直しになるため）
+function grayOffseason(){
+  const G = grayState(), me = myTeam(), out = [];
+  const regKeys = typeof regFirstYear === 'function' && regFirstYear() && career.reg && career.reg.cur ? (REG_THEMES[career.reg.cur.theme] || { keys: [] }).keys : [];
+  for(const T of G.tricks){
+    if(T.st === 'next'){ const v = me.car[T.key]; if(!regKeys.includes(T.key)) me.car[T.key] = r1(Math.max(1, v - T.gain)); T.st = 'done'; out.push(T.name); grayLog(`「${T.name}」が今季から禁止（${carKeyName(T.key)} −${T.gain.toFixed(1)}）`, 'bad'); }
+    else if(T.st === 'active' && regKeys.includes(T.key)){ T.st = 'done'; grayLog(`規則変更で「${T.name}」は使えなくなった`, ''); }
+  }
+  G.tricks = G.tricks.filter(x => x.st === 'active' || x.st === 'next');
+  G.prop = null; G.sus = Math.max(0, G.sus - 10);
+  career.teams.forEach(t => { t.grayN = 0; });
+  return out;
+}
+/* ---------- 設計責任者・抜け穴の表示 ---------- */
+let mktView = 'drv';                      // 移籍市場の表示：drv＝ドライバー、ds＝設計責任者
+function dsTagsHtml(d, known){
+  const T = DS_TYPES[d.type] || DS_TYPES.bal, S = DS_SPEC[d.spec] || DS_SPEC.all, tr = d.trait && DS_TRAITS[d.trait];
+  return `<span class="dsType t-${d.type}" title="${esc(T.d)}">${T.n}</span><span class="dsChip" title="得意分野：${S.n}の開発が失敗しにくい">得意 ${S.n}</span><span class="dsChip">能力 ${gradeTag(d.lv, known)}</span>${tr ? `<span class="dsChip tr" title="${esc(tr.d)}">${tr.n}</span>` : ''}`;
+}
+function grayCardHtml(){
+  const me = myTeam(), G = grayState(), P = G.prop, d = dsOf(me);
+  const live = G.tricks.filter(x => x.st === 'active' || x.st === 'next' || x.st === 'legal');
+  if(dsType(me) !== 'gray' && !live.length && !P && G.sus <= 0) return '';
+  const sus = Math.round(G.sus), lvl = sus >= 60 ? 'hi' : sus >= 30 ? 'mid' : 'lo';
+  const stTag = { active: ['採用中', ''], next: ['来季から禁止', 'warn'], legal: ['合法', 'good'] };
+  const on = armed.key === 'grayok', left = P ? Math.max(1, P.until - career.round) : 0;
+  return `<div class="grayCard">
+    <div class="gcHead"><b>抜け穴</b><span class="muted">${d && d.type === 'gray' ? `${esc(d.name)}が規則の隙をつく案を出してきます` : '設計責任者はグレーゾーン型ではありません（採用済みの抜け穴はマシンに残っています）'}</span>
+      <span class="gcSus s-${lvl}" title="高いほど、採用中の抜け穴が指摘を受けやすい。毎戦 ${GRAY_DECAY} ずつ下がる">疑惑度<span class="susBar"><i style="width:${sus}%"></i></span><b class="num">${sus}</b></span></div>
+    ${P ? `<div class="gcProp"><div class="gcPT"><b>提案：「${esc(P.name)}」</b><span>${esc(carKeyName(P.key))} <b class="gainT">+${P.gain.toFixed(1)}</b>（今 ${me.car[P.key].toFixed(1)}）・費用 ${money(P.cost)}・疑惑度 <b class="lossT">+${P.risk}</b>・開発枠は使いません・期限 あと${left}戦</span></div>
+      <div class="cActs"><button type="button" class="b sm ${on ? 'go' : ''}" data-grayok="1" ${career.money >= P.cost && !inProgressHQ() ? '' : 'disabled'}>${on ? 'もう一度押して確定' : `採用する（${money(P.cost)}）`}</button><button type="button" class="b sm ghost" data-graypass="1">見送る</button></div></div>`
+      : d && d.type === 'gray' ? '<p class="muted gcNone">いまは提案がありません。レースのあとに、ときどき新しい案を持ってきます。</p>' : ''}
+    ${live.length ? `<div class="gcList">${live.map(T => `<span class="gcTrick"><b>${esc(T.name)}</b><span>${esc(carKeyName(T.key))} +${T.gain.toFixed(1)}</span><i class="${stTag[T.st][1]}">${stTag[T.st][0]}</i></span>`).join('')}</div>` : ''}
+    ${G.log.length ? `<div class="gcLog">${G.log.slice(0, 3).map(x => `<div class="${x.cls || ''}"><small>S${x.s}・R${x.r + 1}</small>${esc(x.text)}</div>`).join('')}</div>` : ''}
+    <p class="note gcNote">採用中の抜け穴は、毎戦「指摘」を受けることがあります（疑惑度が高いほど、表彰台に上がるほど受けやすい）。結果は、即時禁止（伸びた分の1.2倍下がる）・来季から禁止（シーズンの終わりに下がる）・合法（ライバルもまねをして半分ほど追いつく）のどれかです。ポイントの剥奪や罰金はありません。</p>
+  </div>`;
+}
+const inProgressHQ = () => !!(careerRace && careerRace.round === career.round && !careerRace.done && race.state !== 'idle');
+// 移籍市場：設計責任者
+function marketDsHtml(viewSeg){
+  const me = myTeam(), cur = dsOf(me), sc = myFac('scout') >= 4;
+  const list = career.dsFa.map(id => career.ds[id]).filter(Boolean).sort((a, b) => visOvr(b.lv, sc) - visOvr(a.lv, sc) || (a.name < b.name ? -1 : 1));
+  const card = (d, mine) => {
+    const sal = mine ? dsPay(me) : dsAsk(d, dsSignYrs), fee = r1(sal*SIGN_K), can = career.money >= fee, k = 'dssign' + d.id, on = armed.key === k, T = DS_TYPES[d.type], tr = d.trait && DS_TRAITS[d.trait];
+    return `<div class="dCard dsCard${mine ? ' mine' : ''}">
+      <div class="dcHead">${dsFace(d, 48, mine ? teamSuit(me) : null)}<div class="dcName">${flagSvg(d.nat, 13, 'nflag')}<b>${esc(d.name)}</b><small>${d.age}歳</small></div>${mine ? '<span class="cTag">現在の設計責任者</span>' : ''}</div>
+      <div class="dsTags">${dsTagsHtml(d, mine || sc)}</div>
+      <p class="dsDesc">${esc(T.d)}。${tr ? `${esc(tr.n)}：${esc(tr.d)}。` : ''}</p>
+      <div class="dcChips">${mine ? `<span class="dcChip"><small>年俸</small><b>${money(sal)}</b></span><span class="dcChip"><small>契約</small><b>${d.con ? (d.con.yrs > 0 ? `残り${d.con.yrs}年` : '満了') : '—'}</b></span>`
+        : `<span class="dcChip"><small>年俸（${dsSignYrs}年）</small><b>${money(sal)}</b></span><span class="dcChip ${can ? '' : 'bad'}"><small>契約金</small><b>${money(fee)}</b></span>`}</div>
+      ${mine ? '' : `<div class="dcActs"><button type="button" class="b sm ${on ? 'go' : ''}" data-dssign="${d.id}" ${can && !inProgressHQ() ? '' : 'disabled'}>${on ? 'もう一度押して確定' : cur ? `契約して${esc(cur.name.split('・').pop())}と交代` : '契約する'}</button></div>`}
+    </div>`;
+  };
+  return `<div class="sec">
+    <h2>移籍市場<button type="button" class="qm" data-guide="market" aria-label="遊び方を見る">?</button><span class="kick">契約金 = 年俸×${SIGN_K}</span></h2>
+    ${viewSeg}
+    <div class="row" style="margin:0 0 8px;gap:8px"><span class="muted">契約年数</span><div class="seg2">${[1, 2, 3].map(y => `<button type="button" data-dsy="${y}" class="${dsSignYrs === y ? 'on' : ''}">${y}年</button>`).join('')}</div><span class="muted">50歳未満は短い契約、50歳以上は長い契約のほうが年俸が安くなります</span></div>
+    ${cur ? `<div class="drvGrid faGrid dsCur">${card(cur, true)}</div>` : '<p class="warn" style="margin:0 0 10px">いまは設計責任者がいません。技術陣で開発を回しているため、失敗しやすくなっています。</p>'}
+    <div class="drvGrid faGrid">${list.map(d => card(d, false)).join('') || '<p class="muted">いま市場にいる設計者はいません。</p>'}</div>
+    <p class="note">設計責任者は1チームに1人です。タイプで開発の失敗・成功・大成功の確率が決まり、能力が高いほど・得意分野の部品ほど失敗しにくくなります。交代すると、今の設計責任者は移籍市場に移ります（違約金はかかりません）。年俸は毎戦の収支から引かれます。${sc ? 'スカウト部門（Lv4以上）の調査で、能力の数値まで分かっています。' : '能力はランクで表示しています（スカウト部門をLv4にすると数値が分かります）。'}</p>
+  </div>`;
+}
 /* ---------- リザーブのシミュレーター作業 ----------
    リザーブがシミュレーターで働くと、パワーユニット・ブレーキの開発が失敗しにくくなり、レギュラーの予選が少し速くなる。
    強さ（0〜1）＝リザーブの腕前（総合40で0.2〜90で1）×シミュレーター施設（Lv0で0.5〜Lv5で1）。
@@ -13678,7 +14229,7 @@ function research(){
   career.reg.res[career.team] = myRes() + 1;
   saveCareer(); renderHQ();
 }
-const devCostFor = (key, v) => r1(devCost(v)*((key === 'df' || key === 'eff') ? 1 - myFac('wind')*0.06 : 1)*(PU_KEYS.includes(key) && puEntryYear() ? PU_ENTRY[puEntryYear()].cost : 1)*(PU_KEYS.includes(key) && career && aduoOf(career.team) ? 1 - aduoOf(career.team).disc : 1)*(career && evActive(career.evFix) && career.evFix.key === key ? 0.7 : 1));
+const devCostFor = (key, v) => r1(devCost(v)*((key === 'df' || key === 'eff') ? 1 - myFac('wind')*0.06 : 1)*(PU_KEYS.includes(key) && puEntryYear() ? PU_ENTRY[puEntryYear()].cost : 1)*(PU_KEYS.includes(key) && career && aduoOf(career.team) ? 1 - aduoOf(career.team).disc : 1)*(career && evActive(career.evFix) && career.evFix.key === key ? 0.7 : 1)*(career && (dsOf(myTeam()) || {}).trait === 'cost' ? 0.9 : 1));
 /* ピットの静止時間（レース中、キャリアの車だけ施設のレベルで変わる） */
 function pitStopT(c){
   const lv = c.m && c.m.pitLv;
@@ -14234,6 +14785,18 @@ if(career && career.v !== 2){
   lsSet(LS_CAREER, career);
 }
 let signYrs = 2;                      // 移籍市場で契約するときの契約年数
+/* 移籍市場の並べ替え・絞り込み（最後に選んだものを覚えておく） */
+const MKT_SORTS = [['ovr', '総合', -1], ['pot', '伸びしろ', -1], ['age', '年齢', 1], ['fee', '契約金', 1]];   // 3つ目：最初に押したときの向き（-1＝高い順）
+const MKT_KEY = 'circuitMaker.mktSort.v1';
+let mktSort = (() => { try{ const o = JSON.parse(localStorage.getItem(MKT_KEY) || 'null'); if(o && MKT_SORTS.some(([k]) => k === o.k) && (o.dir === 1 || o.dir === -1)) return { k: o.k, dir: o.dir, aff: !!o.aff }; }catch(e){} return { k: 'ovr', dir: -1, aff: false }; })();
+function saveMktSort(){ try{ localStorage.setItem(MKT_KEY, JSON.stringify(mktSort)); }catch(e){} }
+function mktList(){                    // 並べ替え・絞り込み後の移籍市場の選手
+  const sc = myFac('scout') >= 4, D = c => career.drivers[c];
+  const val = { ovr: c => visOvr(ovr(D(c)), sc), pot: c => scoutStars(D(c)), age: c => D(c).age, fee: c => D(c).sal }[mktSort.k];
+  let list = career.fa.filter(c => D(c));
+  if(mktSort.aff) list = list.filter(c => career.money >= r1(D(c).sal*SIGN_K));
+  return list.sort((a, b) => (val(a) - val(b))*mktSort.dir || (a < b ? -1 : 1));   // 同じ値のときは略号順（隠れた数値の上下が分からないように）
+}
 let careerRace = null;                 // いま走っている（走った）ラウンド { round, done }
 let hqView = career ? 'hq' : 'new';
 let standView = 'drivers';
@@ -14353,7 +14916,7 @@ function newCareer(teamId, laps){
     fa: R.fa.map(d => d.code), calendar: makeCalendar(), dpts:{}, cpts:{}, last:null, history:[], startTyre:{} };
   career.owner = { trust: st ? st.trust : 60, target: ownerTarget(),
     pers: teamId === OWN_ID ? (OWN_PERS_OF_START[ownDef().start] || 'thrift') : (OWNER_PERS_OF[teamId] || 'thrift') };
-  career.offers = []; ensureContracts(); ensurePU();
+  career.offers = []; ensureContracts(); ensureDesigners(); ensurePU();
   myTeam().drivers.forEach(c => { const d = career.drivers[c]; d.love = 50 + Math.floor(Math.random()*11); d.loveD = 0; });
   career.sponsor = null; career.sponsorOffers = makeSponsorOffers();
   ensureStats();
@@ -14361,6 +14924,7 @@ function newCareer(teamId, laps){
   saveCareer();
 }
 function makeCalendar(){
+  const RAIN_MAX = [1, 2], RAIN_WET = 0.4;   // 1シーズンに雨の可能性がある戦の数（最小・最大）と、そのうち最初から雨の割合（残りは途中で降る「変わりやすい」）。読み込み直後にも呼ばれるので関数の中に置く
   // 4タイプを1戦ずつ入れ、残りは市街地以外から選ぶ（市街地は1シーズンに1戦まで）
   const types = shuffled(['power','flow','stopgo','street', ...Array.from({ length: Math.max(0, ROUNDS - 4) }, () => ['power','flow','stopgo'][Math.floor(Math.random()*3)])]);
   // 開催国：2026年の実際のカレンダーの国から選ぶ。市街地の回には、市街地で行われるGP（STREET_GPS）を1つ必ず入れ、
@@ -14369,9 +14933,10 @@ function makeCalendar(){
   const nStreet = types.filter(t => t === 'street').length;
   const names = shuffled(STREET_GPS).slice(0, nStreet).concat(shuffled(GP_NAMES.filter(n => !STREET_GPS.includes(n))).slice(0, types.length - nStreet));
   names.sort((a, b) => GP_NAMES.indexOf(a) - GP_NAMES.indexOf(b));
+  // 雨：1シーズンで雨の可能性がある戦は1〜2戦まで（RAIN_MAX）。その戦は「変わりやすい」か「雨」、ほかは晴れ
+  const nRain = RAIN_MAX[0] + Math.floor(Math.random()*(RAIN_MAX[1] - RAIN_MAX[0] + 1)), rainy = new Set(shuffled(types.map((_, i) => i)).slice(0, nRain));
   return types.map((type, i) => {
-    const r = Math.random();
-    const rd = { name: names[i] + 'GP', type, weather: r < 0.62 ? 'dry' : r < 0.85 ? 'mixed' : 'wet', points: null, startPos: 0, res: null };
+    const rd = { name: names[i] + 'GP', type, weather: rainy.has(i) ? (Math.random() < RAIN_WET ? 'wet' : 'mixed') : 'dry', points: null, startPos: 0, res: null };
     ensureForecast(rd);
     return rd;
   }).map((rd, i, all) => {                              // 市街地のGP（シンガポール・モナコなど）は必ず市街地。市街地だった回とタイプを入れ替える
@@ -14603,6 +15168,7 @@ function enterRace(grid){
   syncTabs('race');
   phoneLayout();
   if(mine) setCam('car', mine);                          // カメラは最初、自チームのファーストドライバー（担当マシン）を追う
+  sisTechRaceStart();                                    // セカンドチームへの技術提携（このレースの仕様に反映）
 }
 function showRaceView(){
   $('#hq').hidden = true; $('#quali').hidden = true; document.querySelector('main').hidden = false;
@@ -14646,8 +15212,18 @@ function recordRace(){
   const ln = career.loan; led.loan = ln && ln.bal > 0 ? -Math.min(ln.bal, LOAN.pay) : 0;   // 借入の返済
   if(ln && ln.bal > 0) ln.bal = r1(ln.bal + led.loan);
   led.home = rd.home && career.home ? HOME_BONUS[career.home.seat || 0] : 0;   // ホームGP：地元スポンサーのボーナス
+  let sisInv = null;
+  { const S = sisTeam(), tl = career.sister ? (career.sister.techRun || 0) : 0;   // 技術提携：このレースのレベルで費用を払い、レベル3なら調査の判定
+    if(S && tl){ led.sisTech = -SIS_TECH[tl].cost;
+      if(SIS_TECH[tl].risk && Math.random() < SIS_INV_P){
+        const guilty = Math.random() < SIS_INV_GUILTY, pts = rows.filter(r => r.team === S.id).reduce((a, r) => a + r.pts, 0);
+        sisInv = { team: S.id, guilty, pts: guilty ? pts : 0, fine: guilty ? SIS_FINE : 0 };
+        if(guilty){ led.sisFine = -SIS_FINE; career.cpts[S.id] = Math.max(0, (career.cpts[S.id] || 0) - pts); career.sister.tech = 1; career.sister.lock = career.season; }
+        career.sister.inv = { ...sisInv, season: career.season, round: career.round + 1 };
+      } } }
   { const S = sisTeam(); if(S){ const sr = rows.filter(r => r.team === S.id); led.sisPrize = r1((sr.reduce((a, r) => a + r.pts, 0)*PT_PRIZE + sr.filter(r => r.pos).length*FIN_PRIZE)*SIS_SHARE); led.sisOps = -SIS_OPS; } }   // セカンドチーム：賞金の分配と運営費
-  led.net = r1(led.spons + (led.sreq || 0) + (led.resApp || 0) + led.deal + led.prize + led.sal + led.ops + led.train + (led.fac || 0) + led.dist + led.goal + led.loan + (led.sub || 0) + (led.pu || 0) + led.home + (led.sisPrize || 0) + (led.sisOps || 0));
+  led.dsal = -r1(dsPay(me));                                         // 設計責任者の年俸
+  led.net = r1((led.dsal || 0) + led.spons + (led.sreq || 0) + (led.resApp || 0) + led.deal + led.prize + led.sal + led.ops + led.train + (led.fac || 0) + led.dist + led.goal + led.loan + (led.sub || 0) + (led.pu || 0) + led.home + (led.sisPrize || 0) + (led.sisOps || 0) + (led.sisTech || 0) + (led.sisFine || 0));
   career.money = r1(career.money + led.net);
   ensureStats();
   const preSt = {}; order.forEach(c => { const s = statD(c.m.name); preSt[c.m.name] = { wins: s.wins, pod: s.podiums, best: s.bestPos, starts: s.starts }; });   // 覚醒の判定用（このレースより前の成績）
@@ -14666,17 +15242,16 @@ function recordRace(){
     const pol = regAnnounced() && !resBlocked(t) ? AI_RES[career.reg.pol[t.id] || 'bal'] : null;   // PU規則変更の年のカスタマーは研究しない     // 規則変更の前年：方針に応じて今季の開発と来季の研究を振り分ける
     // 開発枠の追加購入：スポンサー収入が多いチームほど買いやすい（1戦に1枠まで）
     const buy = Math.random() < clamp((t.spons - 2.4)/8, 0.05, 0.4) ? 1 : 0;
-    // 開発方針：チームごとに決めておく（下位ほど攻めやすい）。結果はプレイヤーと同じ確率で決まる
-    if(!t.devPol){ const r = Math.random(), lowK = clamp((6.5 - t.spons)/4, 0, 1); t.devPol = r < 0.2 + lowK*0.3 ? 'risk' : r < 0.75 ? 'norm' : 'safe'; }
+    // 開発：チームの設計責任者のタイプと能力で、プレイヤーと同じ確率で決まる
     const KEYS = CAR_KEYS.filter(k => !PU_KEYS.includes(k));          // 空力・ブレーキ（PUはワークスだけが、PU専用の枠で開発する）
     for(let k=0; k<n + buy; k++){ const key = Math.random() < 0.5 ? KEYS.slice().sort((a, b) => t.car[a] - t.car[b])[0] : KEYS[Math.floor(Math.random()*KEYS.length)];
-      const res = rollDev(t.devPol, facLv(t, devFacKey(key)), 0.3*devStep(key, t.car[key])/0.4*(pol && !resUsesPU(t) ? pol.dev : 1));   // 0.3：以前のAIの1回の伸びの平均。研究で抑えるのは、研究に使う枠の側
+      const res = rollDev(dsType(t), dsLevel(t, key, facLv(t, devFacKey(key))), 0.3*devStep(key, t.car[key])/0.4*(pol && !resUsesPU(t) ? pol.dev : 1));   // 0.3：以前のAIの1回の伸びの平均。研究で抑えるのは、研究に使う枠の側
       t.car[key] = r1(Math.min(10, t.car[key] + Math.max(0.1, r1(res.add)))); }
     if(pol) career.reg.res[t.id] = r1((career.reg.res[t.id] || 0) + pol.pts*(0.7 + Math.random()*0.6)*clamp(0.85 + (t.spons - 2.8)*0.1, 0.6, 1.2));
     if(puWorks(t)){                                                  // ワークス：PU専用の枠で1回（スポンサー収入が多いほど2回になりやすい）
       const np = 1 + (Math.random() < clamp((t.spons - 3.5)/5, 0, 0.4) ? 1 : 0) + ((aduoOf(t.id) || {}).slots || 0);   // ADUO認定なら枠が増える
       for(let k = 0; k < np; k++){ const key = Math.random() < 0.5 ? PU_KEYS.slice().sort((a, b) => t.car[a] - t.car[b])[0] : PU_KEYS[Math.floor(Math.random()*PU_KEYS.length)];
-        const res = rollDev(t.devPol, facLv(t, devFacKey(key)), 0.3*devStep(key, t.car[key])/0.4*(pol && resUsesPU(t) ? pol.dev : 1));   // PUを含む変更の前年：研究に回すぶんPUの開発を抑える
+        const res = rollDev(dsType(t), dsLevel(t, key, facLv(t, devFacKey(key))), 0.3*devStep(key, t.car[key])/0.4*(pol && resUsesPU(t) ? pol.dev : 1));   // PUを含む変更の前年：研究に回すぶんPUの開発を抑える
         t.car[key] = r1(Math.min(10, t.car[key] + Math.max(0.1, r1(res.add)))); }
     }
   });
@@ -14736,7 +15311,9 @@ function recordRace(){
     gain: { d: Object.fromEntries(rows.map(r => [r.code, r.pts])), c: gainC }, to: (race.toLog || []).slice(0, 12), pop: { d: popD[career.team] || 0, v: popOf(me) }, sreq: sreqRes,
     grow: Object.fromEntries([...new Set([...myTeam().drivers, ...order.filter(c => c.m.team === career.team).map(c => c.m.name), ...resList(myTeam())])].filter(code => growLog[code]).map(code => [code, growLog[code]])),
     inj: injLog,
-    abil: abLog, goals: goalRes, awk: awkLog };
+    abil: abLog, goals: goalRes, awk: awkLog, sisInv };
+  try{ career.last.gray = grayAfterRace(order); }catch(e){ console.error(e); }   // グレーゾーン：疑惑度・指摘・新しい提案
+  if(career.sister){ career.sister.lag = carSnap(me); career.sister.techRun = 0; }   // 技術提携の基準：このレースの自チームの仕様（次のレースで使う＝1戦遅れ）
   career.offseason = null;
   career.round++;
   hqTab = 'ov'; lsSet(HQ_TAB_KEY, 'ov'); window.scrollTo(0, 0);   // レースのあとチーム本部に戻ったら、必ず概要タブから
@@ -14752,7 +15329,7 @@ function upgrade(key){
   if(isPU && !puWorks(t)) return;                                   // カスタマーはPUを開発できない
   if(v >= 10 || career.money < cost || (isPU ? puSlotsLeft() : slotsLeft()) <= 0) return;   // PUはPU専用の開発枠を使う
   career.money = r1(career.money - cost); if(isPU) usePuSlot(); else useSlot();
-  const res = rollDev(devPol(), devFacKey(key) === 'sim' ? puFacLv(myTeam()) : aeroFacLv(myTeam()), devStep(key, v));
+  const res = rollDev(dsType(t), dsLevel(t, key, devFacKey(key) === 'sim' ? puFacLv(t) : aeroFacLv(t)), devStep(key, v));
   const gk = isPU && puEntryYear() ? PU_ENTRY[puEntryYear()].gain : 1;   // 自社PUの参入直後は伸びが大きい
   const nv = r1(Math.min(10, v + Math.max(0.1, res.add*gk))); t.car[key] = nv;
   const [, tn] = DEV_RES[res.tier];
@@ -14810,6 +15387,7 @@ function pendingContracts(){
   career.offers = (career.offers || []).filter(offerValid);
   career.offers.forEach(o => out.push(`${o.code}${o.res ? '（リザーブ）' : ''}への獲得の申し出`));
   if(career.pu && career.pu.choose && !puWorks(me)) out.push('来季のPUの供給元');
+  { const d = dsOf(me); if(d && d.con && d.con.yrs <= 0) out.push('設計責任者の契約更改'); }
   return out;
 }
 function renew(code, yrs, free){
@@ -14828,7 +15406,8 @@ function poachCands(o){
   const out = poachOut(o), rs = resList(myTeam()), list = career.fa.filter(c => career.drivers[c] && !career.drivers[c].retired);
   if(out && !list.includes(out)) list.push(out);
   rs.forEach(res => { if(career.drivers[res] && !career.drivers[res].retired && !list.includes(res)) list.push(res); });
-  return list.sort((a, b) => rs.includes(b) - rs.includes(a) || ovr(career.drivers[b]) - ovr(career.drivers[a]) || (a < b ? -1 : 1));   // リザーブはいちばん上に
+  const sc = myFac('scout') >= 4, key = c => visOvr(ovr(career.drivers[c]), sc || rs.includes(c));   // スカウトLv4未満では、自チーム以外の選手はランク順（同じランクの中は略号順）
+  return list.sort((a, b) => rs.includes(b) - rs.includes(a) || key(b) - key(a) || (a < b ? -1 : 1));   // リザーブはいちばん上に
 }
 function acceptPoach(i, pick){
   const o = (career.offers || [])[i]; if(!o) return;
@@ -14975,7 +15554,7 @@ function contractOffseason(rep){
     }
   }
 }
-if(career) ensureContracts();
+if(career){ ensureContracts(); ensureDesigners(); }
 /* ---------- PUワークス：パワーユニットのメーカー（ワークス）と、PUを買うチーム（カスタマー） ----------
    ・PUメーカーは4社。残りのチームはどこかのメーカーのPUを使う（career.pu.sup[チーム] = メーカーのチーム）
    ・PUの性能（出力・ドライバビリティ・信頼性）はメーカーごとに1つ。メーカーが開発すると、カスタマーのPUも同じ値になる
@@ -15306,7 +15885,7 @@ function openIncome(){
   $('#incBody').innerHTML = `
     <h4>基本スポンサー収入（毎戦）</h4>
     <table class="ledger">
-      ${row('基本料', money(r1(base)), '', 'チームの基本のスポンサー料。シーズンの終わりに成績と人気度で見直されます')}
+      ${row('基本料', money(r1(base + SPONS_FLAT)), '', 'チームの基本のスポンサー料。シーズンの終わりに成績と人気度で見直されます')}
       ${row(`ホスピタリティ Lv${hl}`, hl ? sg(withH - base) : '±0', '', `施設1段階ごとに +10%（今は ×${(1 + hl*0.1).toFixed(1)}）`)}
       ${row(`人気度 ${Math.round(P*100)}`, Math.abs(withH*(P - 1)) < 0.05 ? '±0' : sg(withH*(P - 1)), '', `×${P.toFixed(2)}`)}
       ${adj ? row(`スポンサーの依頼による${adj > 0 ? '上乗せ' : '減額'}`, sg(adj), '', '今シーズンの残りの毎戦') : ''}
@@ -15389,6 +15968,7 @@ function nextSeason(){
     rep.signed.push({ team: t.id, out: code, in: pickC });
   }));
   contractOffseason(rep);
+  dsOffseason(rep);                                                     // 設計責任者：年齢・能力・契約・AIの入れ替え
   facAging(rep);                                                        // 施設の老朽化：改修の予告と、予告された施設の改修
   // オーナーの評価とシーズン賞金（選手権の最終順位で決まる）
   const ease = wasAnn ? resEase(myResPts) : 0;                          // 来季への投資（先行研究）の分、目標をゆるめて評価する
@@ -15409,9 +15989,10 @@ function nextSeason(){
   career.offseason = rep;
   puOffseason();                                                    // PU：自社PUの開始・カスタマーの乗り換え・供給元の選び直し
   syncPU();                                                         // 規則変更などで変わったメーカーのPUを、カスタマーにも
+  if(career.sister) career.sister.lag = carSnap(myTeam());          // 技術提携の基準も、規則変更などのあとの値に
   const homeOpened = !!(career.home && career.home.stage === 'build');      // 建設中のホームサーキットは、シーズンの終わりに完成する
   if(homeOpened) career.home.stage = 'open';
-  career.season++; career.round = 0; career.calendar = makeCalendar(); career.dpts = {}; career.cpts = {}; career.last = null;
+  career.season++; career.round = 0; try{ rep.grayBan = grayOffseason(); }catch(e){ console.error(e); } career.calendar = makeCalendar(); career.dpts = {}; career.cpts = {}; career.last = null;
   if(career.home && career.home.stage === 'open'){ const i = homeInsert(career.calendar); career.money = r1(career.money - HOME_FEE); rep.home = { opened: homeOpened, round: i + 1, fee: HOME_FEE }; }
   career.owner.target = ownerTarget(); career.sponsor = null; career.sponsorOffers = makeSponsorOffers();
   const shift = ownerPersShift(subRes.length > 0 && subRes.every(x => !x.ok));   // オーナーの方針転換（性格が変わることがある）
@@ -15620,7 +16201,7 @@ function pickInfo(i){
   const feat = works ? `PUメーカー（ワークス）。PUを自分で開発でき、カスタマー${custs}チームから供給料が入る`
     : `PUは${sup ? teamLogo(sup, 14) : ''}${esc(sup ? sup.name : '')}製。PUの開発はできないぶん、空力とブレーキに集中できる`;
   const style = i < 3 ? '勝って当たり前。オーナーの期待が高く、開発枠は少なめ' : i < 7 ? '上位も下位も狙える位置。開発の方針で差がつく' : '予算は少ないが開発枠が多い。少しずつ這い上がる';
-  return { d, drv, target, slots, works, sup, feat, style, money: r1(10 + d.spons*1.5), spons: r1(d.spons*SPONS_K), dAvg: (ovr(drv[0]) + ovr(drv[1]))/2 };
+  return { d, drv, target, slots, works, sup, feat, style, money: r1(10 + d.spons*1.5), spons: r1(d.spons*SPONS_K + SPONS_FLAT), dAvg: (ovr(drv[0]) + ovr(drv[1]))/2 };
 }
 function carPreviewSvg(c1, c2, w = 150){
   return `<svg class="carPv" viewBox="0 0 160 64" width="${w}" aria-hidden="true">
@@ -15880,6 +16461,42 @@ function sisRecall(code){
   d.con = { yrs: Math.max(1, d.con ? d.con.yrs : 1), sal: d.sal };
   saveCareer(); renderHQ(`${code}（${d.name}）をリザーブに呼び戻しました。${S.name}の空いた席には${pick}（${pd.name}）が入りました。`);
 }
+/* ---------- セカンドチームへの技術提携（レベル0〜3） ----------
+   ・自チームの「1戦前の仕様」（career.sister.lag：毎戦のあとに記録）を基準に、姉妹チームの値を、レベルごとの差まで引き上げる（下げはしない）
+   ・反映はレースの開始時（enterRace）。そのとき選んでいたレベルで、レース後に費用を払い、調査の判定をする（techRun）
+   ・レベルはレースの合間ならいつでも変えられる
+   ・レベル3だけ、毎戦 SIS_INV_P の確率で技術規則の調査。有罪（SIS_INV_GUILTY）なら罰金・その戦の姉妹チームのコンストラクターズポイント剥奪・今季はレベル1まで */
+const SIS_TECH = [
+  { n:'なし',         cost:0,   d:'技術提携をしません' },
+  { n:'部品の供給',   cost:1.0, brk:0.5,            d:'ブレーキ2項目が、自チームの1戦前の値−0.5まで上がります' },
+  { n:'型落ちの空力', cost:2.5, brk:0.5, aero:1.5,  d:'レベル1に加えて、空力2項目が自チームの1戦前の値−1.5まで上がります' },
+  { n:'全面協力',     cost:4.0, brk:0.5, aero:1.0, risk:true, d:'空力の差を−1.0まで縮めます。毎戦、技術規則の調査が入ることがあります' }
+];
+const SIS_INV_P = 0.06, SIS_INV_GUILTY = 0.6, SIS_FINE = 5;   // 調査の確率（レベル3・毎戦）・有罪の確率・罰金
+const sisTechLv = () => (career && career.sister && career.sister.tech) || 0;
+const sisLocked = () => !!(career && career.sister && career.sister.lock === career.season);
+const carSnap = t => Object.fromEntries(CAR_KEYS.map(k => [k, t.car[k]]));
+// 技術提携の目標値（その項目をここまで引き上げる。対象外の項目は null）
+function sisTechTarget(k, lv = sisTechLv()){
+  const L = SIS_TECH[lv], src = (career.sister && career.sister.lag) || carSnap(myTeam());
+  const off = (k === 'bpow' || k === 'bstab') ? L.brk : (k === 'df' || k === 'eff') ? L.aero : null;
+  return off == null ? null : r1(Math.min(10, src[k] - off));
+}
+// レースの開始時：いまのレベルで姉妹チームの値を引き上げ、このレースのレベルを覚えておく
+function sisTechRaceStart(){
+  const S = sisTeam(); if(!S || !career.sister) return;
+  const lv = sisTechLv(); career.sister.techRun = lv;
+  if(!lv) return;
+  ['bpow', 'bstab', 'df', 'eff'].forEach(k => { const tg = sisTechTarget(k, lv); if(tg != null && S.car[k] < tg) S.car[k] = tg; });
+}
+function sisSetTech(lv){
+  if(!career.sister) return;
+  if(sisBusy()){ renderHQ('レースの途中は技術提携を変えられません。'); return; }
+  lv = clamp(lv | 0, 0, 3);
+  if(sisLocked() && lv > 1){ renderHQ('今季は技術規則の調査の処分で、技術提携はレベル1までです。'); return; }
+  career.sister.tech = lv; saveCareer();
+  renderHQ(`技術提携を「${SIS_TECH[lv].n}」にしました。${lv ? `次のレースの開始時から反映され、毎戦 ${money(SIS_TECH[lv].cost)} かかります。` : ''}`);
+}
 function sisCard(me){
   const S = sisTeam(), ico = '<span class="facIco"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M5 20V10l5-3v13M10 20V7l5 3v10M15 20v-7l4-2v9"/></svg></span>';
   const eff = `毎戦、運営費 <b>${money(SIS_OPS)}</b> を払い、姉妹チームの賞金（ポイント・完走）の <b>${Math.round(SIS_SHARE*100)}%</b> を受け取ります。自チームのリザーブを送り込んで、実戦を積ませられます`;
@@ -15913,10 +16530,24 @@ function sisCard(me){
     ${L && L.sisPrize != null ? `<div class="sisLast">前戦：賞金の分配 <b class="gainT">+${money(L.sisPrize)}</b> ・ 運営費 <b class="lossT">${money(L.sisOps)}</b></div>` : ''}
     <div class="sisSeats">${S.drivers.map(seat).join('')}</div>
     <p class="note" style="margin:4px 0 0">送り込むと、その席の選手は移籍市場に出ます。送り込んだ選手は姉妹チームの選手として走り（年俸は姉妹チームが負担）、いつでもリザーブに呼び戻せます（リザーブの枠に空きが必要。空いた席は移籍市場の選手で埋めます）。PUは自チームのものを供給しています。</p>
+    ${sisTechHtml(S, me, busy)}
     <div class="facFoot"><span class="muted">売却額はいまの買収費の${Math.round(SIS_SELL*100)}%。送り込んでいる選手は、売却先のチームに残ります</span><span class="facBtns"><button class="b sm ${armed.key === 'sissell' ? 'go' : ''}" type="button" data-sissell ${busy ? 'disabled' : ''}>${armed.key === 'sissell' ? 'もう一度押して売却' : `売却する +${money(Math.round(sisCost(S)*SIS_SELL))}`}</button></span></div>
   </div>`;
 }
+function sisTechHtml(S, me, busy){
+  const lv = sisTechLv(), lock = sisLocked(), L = SIS_TECH[lv], inv = career.sister.inv;
+  const items = [['df', 'ダウンフォース'], ['eff', '空力効率'], ['bpow', 'ブレーキ性能'], ['bstab', 'ブレーキ安定性']];
+  const rows = items.map(([k, lab]) => { const tg = sisTechTarget(k), base = (career.sister.lag || carSnap(me))[k];
+    return `<tr><td>${lab}</td><td class="num">${S.car[k].toFixed(1)}</td><td class="num muted">${base.toFixed(1)}</td><td class="num">${tg == null ? '<span class="muted">—</span>' : (S.car[k] >= tg ? `<span class="muted">${tg.toFixed(1)}（到達）</span>` : `<b>${tg.toFixed(1)}</b>`)}</td></tr>`; }).join('');
+  return `<div class="sisTech">
+    <div class="homeRow"><span class="hLab">技術提携</span><div class="seg2" role="radiogroup" aria-label="技術提携のレベル">${SIS_TECH.map((x, i) => `<button type="button" role="radio" data-sistech="${i}" class="${i === lv ? 'on' : ''}" aria-checked="${i === lv}" ${busy || (lock && i > 1) ? 'disabled' : ''}>Lv${i} ${x.n}<small>${x.cost ? money(x.cost) + '/戦' : '費用なし'}${x.risk ? ' ・ 調査あり' : ''}</small></button>`).join('')}</div></div>
+    <p class="note" style="margin:2px 0 4px">${esc(L.d)}。${lv ? '毎戦のレース開始時に反映します（基準は自チームの1戦前の仕様。値が下がることはありません）。' : ''}${lock ? '<b class="lossT">今季は調査の処分で、レベル1までしか選べません。</b>' : ''}</p>
+    <div class="wrapx"><table class="ledger sisTbl"><tr><th>項目</th><th>姉妹チーム</th><th>自チーム（1戦前）</th><th>提携の目標</th></tr>${rows}</table></div>
+    ${inv ? `<div class="sisLast">技術規則の調査（シーズン${inv.season} 第${inv.round}戦）：${inv.guilty ? `<b class="lossT">違反</b>（罰金 ${money(inv.fine)}・ポイント剥奪 ${inv.pts}pt）` : '<b class="gainT">違反なし</b>'}</div>` : ''}
+  </div>`;
+}
 function sisBind(el){
+  el.querySelectorAll('[data-sistech]').forEach(b => b.onclick = () => sisSetTech(+b.dataset.sistech));
   el.querySelectorAll('[data-sisbuy]').forEach(b => b.onclick = () => sisBuy(b.dataset.sisbuy));
   el.querySelectorAll('[data-sissend]').forEach(b => b.onclick = () => { const [c, s] = b.dataset.sissend.split(':'); sisSend(c, +s); });
   el.querySelectorAll('[data-sisrec]').forEach(b => b.onclick = () => sisRecall(b.dataset.sisrec));
@@ -16002,8 +16633,8 @@ const homeCostOf = (type, seat) => type ? HOME_BASE[type] + HOME_SEAT[seat || 0]
 function homePlanCost(P){ return homeCostOf(P.mode === 'self' ? (P.judge && P.course ? P.judge.type : null) : P.type, P.seat); }
 // カレンダーのラウンドをホームGPに入れ替える（戻り値：入れたラウンドの番号 0〜）
 function homeInsert(cal){
-  const H = career.home, i = clamp(H.round || 0, 0, cal.length - 1), r = Math.random();
-  const rd = { name: H.name, type: H.type, weather: r < 0.62 ? 'dry' : r < 0.85 ? 'mixed' : 'wet', points: H.course.points.map(p => ({ x: p.x, y: p.y })), startPos: H.course.startPos, size: H.course.size, city: H.course.city || null, gen: 2, home: 1, res: null };
+  const H = career.home, i = clamp(H.round || 0, 0, cal.length - 1);   // 天気は、入れ替える戦のものを引き継ぐ（1シーズンの雨の戦の数を変えない）
+  const rd = { name: H.name, type: H.type, weather: (cal[i] && cal[i].weather) || 'dry', points: H.course.points.map(p => ({ x: p.x, y: p.y })), startPos: H.course.startPos, size: H.course.size, city: H.course.city || null, gen: 2, home: 1, res: null };
   ensureForecast(rd);
   cal[i] = rd;
   if(H.nat){                                              // 同じ国のGPが別のラウンドにあれば、まだ入っていない国のGPに差し替える（市街地の回は市街地のGPから）
@@ -16131,28 +16762,49 @@ function homeEdOpen(kind){
   window.scrollTo({ top: 0 });
 }
 let homeEdHtml = '';
+/* ホームGPのコース作りの欄：上（判定・状態）／スタート位置（固定の部品。バーを動かしている最中に作り直さない）／下（建設費・ボタン）。
+   スタート位置のバーは「コース」の欄から借りてきて、抜けるときに元へ戻す */
+const HE_STEP = 0.005;                                   // ◀▶で動かすスタート位置の量（1周の0.5%）
 function homeEdUI(){
   const box = document.getElementById('homeEdBox'); if(!box) return;
   box.hidden = !homeEd; if(!homeEd){ homeEdHtml = ''; return; }
-  const H = career.home, P = career.homePlan, seat = homeEd.kind === 'build' ? H.seat : P.seat;
-  let body, ok = false, j = null;
-  if(!track) body = '<p class="muted" style="margin:0">点を置くか手描きで、1周につながるコースを作ってください。つながると、タイプを判定します。</p>';
-  else {
-    j = judgeCourse(track); const why = homeCheck(track); ok = !why;
-    const fix = why && gridStartPos(track) !== null && !homeStartOk(track);
-    body = `<div class="hjRes"><span class="muted" style="font-size:11px">作ったコースから自動で判定</span><b>判定：${COURSE_TYPES[j.type].name}</b><small>${homeJudgeTxt(j)}</small></div>${why ? `<div class="warn" style="margin-top:6px">${why}</div>` : ''}${fix ? '<div class="acts" style="margin-top:6px"><button class="b sm" type="button" id="homeEdStart">スタート位置を直線に合わせる</button></div>' : ''}`;
+  if(!box.querySelector('#heStart')){
+    box.innerHTML = `<div id="heTop"></div>
+      <div class="heStart" id="heStart"><div class="heSH"><b>スタート位置</b><span class="heSt" id="heStartSt"></span></div>
+        <div id="heSlot"></div>
+        <div class="heSB"><button class="b sm" type="button" id="heSL" aria-label="スタート位置を少し戻す">◀</button><button class="b sm" type="button" id="heSR" aria-label="スタート位置を少し進める">▶</button><button class="b sm" type="button" id="heFit">直線に合わせる</button></div>
+        <p class="heSN">バーか ◀ ▶ で動かします。図の枠がスターティンググリッドです（緑＝直線の上、赤＝コーナーにかかっている）。</p></div>
+      <div id="heBot"></div>`;
+    homeEdHtml = '';
+    const mv = d => { if(!track) return; course.startPos = ((course.startPos + d) % 1 + 1) % 1; syncSliders(); rebuild(); };
+    box.querySelector('#heSL').onclick = () => mv(-HE_STEP); box.querySelector('#heSR').onclick = () => mv(HE_STEP);
+    box.querySelector('#heFit').onclick = () => { if(!track) return; const sp = gridStartPos(track); if(sp === null) return; pushUndo(); course.startPos = sp; syncSliders(); rebuild(); };
   }
+  { const sl = document.querySelector('label.startSl'), slot = box.querySelector('#heSlot'); if(sl && slot && sl.parentNode !== slot) slot.appendChild(sl); }
+  const H = career.home, P = career.homePlan, seat = homeEd.kind === 'build' ? H.seat : P.seat, name = homeEd.kind === 'build' ? H.name : P.name;
+  let ok = false, j = null, why = null;
+  if(track){ j = judgeCourse(track); why = homeCheck(track); ok = !why; }
+  // スタート位置の状態（textContent だけ書き換える）
+  { const st = box.querySelector('#heStartSt'), sok = track && homeStartOk(track), fitOk = track && gridStartPos(track) !== null;
+    st.textContent = !track ? 'コースを1周につなぐと決められます' : sok ? '✓ グリッドは直線の上' : '⚠ グリッドがコーナーにかかっています';
+    st.className = 'heSt ' + (!track ? '' : sok ? 'ok' : 'ng');
+    box.querySelector('#heSL').disabled = box.querySelector('#heSR').disabled = !track;
+    box.querySelector('#heFit').disabled = !fitOk || sok; }
   const cost = j ? homeCostOf(j.type, seat) : null, diff = homeEd.kind === 'build' && cost != null ? r1(cost - H.paid) : 0, poor = diff > 0 && career.money < diff;
   const costTxt = cost == null ? '' : homeEd.kind === 'build'
     ? (diff > 0 ? `タイプが変わるので、差額 <b>${money(diff)}</b> がかかります` : '建設費は追加でかかりません（安くなっても返金はありません）')
     : `建設費 <b>${money(cost)}</b>（観客席：${HOME_SEAT_N[seat]}）`;
-  const html = `<h2>ホームGPのコース</h2>${body}${costTxt ? `<div class="hjCost">${costTxt}</div>` : ''}
-    <div class="acts"><button class="b sm" type="button" id="homeEdTrial" ${ok ? '' : 'disabled'} title="自チームの2台がAIでこのコースを走ります">試走する</button></div>
-    <div class="acts"><button class="b sm go" type="button" id="homeEdOk" ${ok && !poor ? '' : 'disabled'}>${poor ? '資金が足りません' : diff > 0 ? `差額を払って決める` : 'このコースに決める'}</button><button class="b sm" type="button" id="homeEdBack">本部に戻る</button></div>
-    <p class="muted" style="margin:6px 0 0;font-size:11.5px">決めずに戻っても、描いたコースは残ります。保存したコースを読み込んで使うこともできます。</p>`;
-  if(html !== homeEdHtml){ box.innerHTML = html; homeEdHtml = html; }
-  $('#homeEdOk').onclick = homeEdDecide; $('#homeEdTrial').onclick = homeTrialStart;
-  { const fs = document.getElementById('homeEdStart'); if(fs) fs.onclick = () => { const sp = gridStartPos(track); if(sp === null) return; pushUndo(); course.startPos = sp; syncSliders(); rebuild(); }; } $('#homeEdBack').onclick = () => { homeEdLeave(false); hqTab = 'fac'; lsSet(HQ_TAB_KEY, hqTab); showHQ(); };
+  const top = `<div class="heHead"><h2>ホームGPのコース</h2>${name ? `<span class="heName">${esc(name)}</span>` : ''}</div>
+    ${!track ? '<div class="heStatus">点を置くか手描きで、1周につながるコースを作ってください。つながると、タイプを判定します。</div>'
+      : ok ? '<div class="heStatus ok">✓ このコースで建設できます</div>' : `<div class="heStatus ng">⚠ ${esc(why)}</div>`}
+    ${j ? `<div class="heJudge"><span class="heType">${COURSE_TYPES[j.type].name}</span><small>${homeJudgeTxt(j)}</small></div>` : ''}`;
+  const bot = `${costTxt ? `<div class="hjCost">${costTxt}</div>` : ''}
+    <div class="heActs"><button class="b sm" type="button" id="homeEdTrial" ${ok ? '' : 'disabled'} title="自チームの2台がAIでこのコースを走ります">試走する</button><button class="b sm go" type="button" id="homeEdOk" ${ok && !poor ? '' : 'disabled'}>${poor ? '資金が足りません' : diff > 0 ? '差額を払って決める' : 'このコースに決める'}</button></div>
+    <div class="heBack"><button class="b sm ghost" type="button" id="homeEdBack">本部に戻る</button><span class="muted">決めずに戻っても、描いたコースは残ります</span></div>`;
+  const html = top + bot;
+  if(html !== homeEdHtml){ box.querySelector('#heTop').innerHTML = top; box.querySelector('#heBot').innerHTML = bot; homeEdHtml = html;
+    $('#homeEdOk').onclick = homeEdDecide; $('#homeEdTrial').onclick = homeTrialStart;
+    $('#homeEdBack').onclick = () => { homeEdLeave(false); hqTab = 'fac'; lsSet(HQ_TAB_KEY, hqTab); showHQ(); }; }
 }
 // 描きかけのコースを残して、コース作成の画面を抜ける
 function homeEdLeave(){
@@ -16160,6 +16812,7 @@ function homeEdLeave(){
   if(homeTrial) homeTrialStop();
   const kind = homeEd.kind; homeEd = null; homeEdHtml = ''; bgDirty = true; dirty = true;
   document.body.classList.remove('homeEd'); const box = document.getElementById('homeEdBox'); if(box) box.hidden = true;
+  { const sl = document.querySelector('label.startSl'), li = document.getElementById('lenInfo'); if(sl && li && sl.nextElementSibling !== li) li.before(sl); }   // スタート位置のバーを「コース」の欄へ戻す
   if(kind === 'plan' && career.homePlan && course.points.length) career.homePlan.draft = { points: course.points.map(p => ({ x: Math.round(p.x), y: Math.round(p.y) })), startPos: course.startPos, closed: course.closed, size: mapSize, city: course.type === 'street' ? course.city || null : null };
   saveCareer();
 }
@@ -16383,6 +17036,7 @@ function renderHQ(msg){
         ${career.last.led.deal ? `<tr><td>スポンサー契約${career.sponsor ? `（${esc(career.sponsor.name)}）` : ''}</td><td class="gainT">+${money(career.last.led.deal)}</td></tr>` : ''}
         <tr><td>賞金（ポイント・完走）</td><td class="gainT">+${money(career.last.led.prize)}</td></tr>
         <tr><td>ドライバー年俸（1戦分）</td><td class="lossT">${money(career.last.led.sal)}</td></tr>
+        ${career.last.led.dsal ? `<tr><td>設計責任者の年俸（1戦分）</td><td class="lossT">${money(career.last.led.dsal)}</td></tr>` : ''}
         <tr><td>運営費</td><td class="lossT">${money(career.last.led.ops)}</td></tr>
         ${career.last.led.train ? `<tr><td>トレーニング費</td><td class="lossT">${money(career.last.led.train)}</td></tr>` : ''}
         ${career.last.led.sub ? `<tr><td>代役ドライバーの契約料</td><td class="lossT">${money(career.last.led.sub)}</td></tr>` : ''}
@@ -16390,6 +17044,8 @@ function renderHQ(msg){
         ${career.last.led.dist ? `<tr><td>参戦分配金</td><td class="gainT">+${money(career.last.led.dist)}</td></tr>` : ''}
         ${career.last.led.home ? `<tr><td>ホームGP：地元スポンサーのボーナス</td><td class="gainT">+${money(career.last.led.home)}</td></tr>` : ''}
         ${career.last.led.sisOps ? `<tr><td>セカンドチーム：賞金の分配（${Math.round(SIS_SHARE*100)}%）</td><td class="gainT">+${money(career.last.led.sisPrize || 0)}</td></tr><tr><td>セカンドチーム：運営費</td><td class="lossT">${money(career.last.led.sisOps)}</td></tr>` : ''}
+        ${career.last.led.sisTech ? `<tr><td>セカンドチーム：技術提携</td><td class="lossT">${money(career.last.led.sisTech)}</td></tr>` : ''}
+        ${career.last.led.sisFine ? `<tr><td>技術規則の調査：罰金</td><td class="lossT">${money(career.last.led.sisFine)}</td></tr>` : ''}
         ${career.last.led.goal ? `<tr><td>スポンサー目標ボーナス</td><td class="gainT">+${money(career.last.led.goal)}</td></tr>` : ''}
         ${career.last.led.loan ? `<tr><td>借入の返済</td><td class="lossT">${money(career.last.led.loan)}</td></tr>` : ''}
         ${career.last.led.fac ? `<tr><td>施設の維持費</td><td class="lossT">${money(career.last.led.fac)}</td></tr>` : ''}
@@ -16410,7 +17066,7 @@ function renderHQ(msg){
       <h2>オフシーズンの変化<span class="kick">SEASON ${career.season}</span></h2>
       <div class="lastRes">
         ${off.owner ? `<div style="margin-bottom:6px">前シーズン：コンストラクターズ${off.owner.pos}位（${off.owner.goal && off.owner.goal.kind !== 'rank' ? `主目標「${esc(off.owner.gt)}」${esc(off.owner.gp)}${off.owner.ease ? '。先行研究の分、少し届かなくても達成として扱う' : ''}` : `目標${off.owner.target}位以内${off.owner.ease ? `。先行研究の評価で${Math.min(10, off.owner.target + off.owner.ease)}位までを達成として扱う` : ''}`}）→ <b class="${off.owner.cls}">${off.owner.grade}</b>。ボーナス ${off.owner.bonus >= 0 ? '+' : ''}${money(off.owner.bonus)}、シーズン賞金 +${money(off.owner.prize)}、信頼度 ${off.owner.trustD >= 0 ? '+' : ''}${off.owner.trustD}${off.owner.subs && off.owner.subs.length ? `。副目標 ${off.owner.subs.map(x => `「${esc(x.t)}」<b class="${x.ok ? 'gainT' : 'lossT'}">${x.ok ? '達成' : '未達'}</b>`).join('・')}（ボーナス +${money(off.owner.subB)}・信頼度 ${off.owner.subT >= 0 ? '+' : ''}${off.owner.subT}）` : ''}（信頼度 ${off.owner.trust}）</div>${off.owner.pers ? `<div class="persShift">オーナーが方針を転換：<b>${esc(OWNER_PERS[off.owner.pers.from].n)}</b> → <b>${esc(OWNER_PERS[off.owner.pers.to].n)}</b>。今シーズンの副目標は新しい方針で選ばれています。</div>` : ''}` : ''}
-        ${off.spons && off.spons[career.team] ? (() => { const S = off.spons[career.team], k = SPONS_K*(1 + myFac('hosp')*0.1); return `<div style="margin-bottom:6px">基本スポンサー料の更改：コンストラクターズ${S.pos}位・人気度を反映して <b class="${S.nv >= S.old ? 'gainT' : 'lossT'}">${S.nv >= S.old ? '+' : ''}${Math.round((S.nv/S.old - 1)*100)}%</b>（毎戦 ${money(r1(S.old*k))} → <b>${money(r1(S.nv*k))}</b>、人気度は除く）</div>`; })() : ''}
+        ${off.spons && off.spons[career.team] ? (() => { const S = off.spons[career.team], k = SPONS_K*(1 + myFac('hosp')*0.1); return `<div style="margin-bottom:6px">基本スポンサー料の更改：コンストラクターズ${S.pos}位・人気度を反映して <b class="${S.nv >= S.old ? 'gainT' : 'lossT'}">${S.nv >= S.old ? '+' : ''}${Math.round((S.nv/S.old - 1)*100)}%</b>（毎戦 ${money(r1(S.old*k + SPONS_FLAT))} → <b>${money(r1(S.nv*k + SPONS_FLAT))}</b>、人気度は除く）</div>`; })() : ''}
         ${off.con && off.con.leave && off.con.leave.length ? `<div class="warn" style="margin-bottom:6px">${off.con.leave.join('・')}は、チーム愛が低く契約の更新を断りました。移籍市場で後任を選んでください。</div>` : ''}
         ${off.reg ? (() => { const R = off.reg, th = REG_THEMES[R.theme], mine = R.teams[career.team] || { pts: 0, b: 0, avg: 0 }, rv = Object.entries(R.teams).filter(([id]) => id !== career.team).sort((a, b) => b[1].avg - a[1].avg)[0];
           return `<div class="regBar now" style="margin-bottom:8px"><span class="kick">NEW REGULATIONS</span><span><b>${esc(th.n)}の大規則変更</b>。自チームの先行研究 ${mine.pts}回 → ${esc(th.n)}の項目は平均 <b>${mine.avg.toFixed(1)}</b> から（研究の効果 +${mine.b.toFixed(1)}）。${rv ? `ライバル最高は${esc((teamOf(rv[0]) || {}).name || '')}の${rv[1].avg.toFixed(1)}。` : ''}</span></div>`; })() : ''}
@@ -16431,7 +17087,9 @@ function renderHQ(msg){
       <ol class="calH">${career.calendar.map((c, i) => {
         const now = i === career.round, my = c.res ? c.res.my.map(r => r.pos ? 'P' + r.pos : 'DNF') : [], best = c.res ? Math.min(...c.res.my.map(r => r.pos || 99)) : 99;
         const st = c.res ? `<span class="chRes${best <= 3 ? ' pod' : best <= 10 ? ' pts' : ''}">${my.join(' / ')}</span><small>優勝 ${c.res.winner || '—'}</small>` : now ? '<span class="chNext">次戦</span>' : `<small>${COURSE_TYPES[c.type].short}</small>`;
-        return `<li class="ch${now ? ' now' : ''}${c.res ? ' done' : ''}${c.home ? ' home' : ''}">${c.home ? '<span class="chHome">HOME</span>' : ''}<span class="chRd">R${i + 1}</span><span class="chFlag">${gpFlag(c.name, 22)}</span><span class="chNm">${esc(c.name.replace(/GP$/, ''))}</span>${st}</li>`;
+        const inner = `${c.home ? '<span class="chHome">HOME</span>' : ''}<span class="chRd">R${i + 1}</span><span class="chFlag">${gpFlag(c.name, 22)}</span><span class="chNm">${esc(c.name.replace(/GP$/, ''))}</span>${st}`;
+        const lg = c.res && (career.raceLog || []).some(r => r.season === career.season && r.round === i + 1);   // 終わったレースは押すと結果を表示する
+        return `<li class="ch${now ? ' now' : ''}${c.res ? ' done' : ''}${c.home ? ' home' : ''}${lg ? ' link' : ''}">${lg ? `<button type="button" class="chBtn" data-calr="r:${career.season}:${i + 1}" aria-label="第${i + 1}戦 ${esc(c.name)}の結果を見る">${inner}</button>` : inner}</li>`;
       }).join('')}</ol>
     </div>`;
   const drivers = (() => {
@@ -16496,7 +17154,7 @@ function renderHQ(msg){
     return `<div class="sec drvSec resSec">${head}<div class="drvGrid">${rs.map(card).join('')}${rs.length < MAX_RES ? `<div class="resAdd"><b>2人目のリザーブ</b><span class="muted">移籍市場の「リザーブに（2人目）」から契約できます。役割を分けると、両方の効果が同時に働きます</span></div>` : ''}</div></div>`;
   })();
   const dev = (() => {
-    const pc = v => Math.round(v*100) + '%', P = DEV_POL[devPol()];
+    const pc = v => Math.round(v*100) + '%', P = DS_TYPES[dsType(me)], myDs = dsOf(me);
     const pips = (n, used) => `<span class="slotPips" aria-hidden="true">${Array.from({ length: n }, (_, i) => `<i class="${i < used ? 'used' : ''}"></i>`).join('')}</span>`;
     const odds = (lab, o) => `<span class="dbOdd"><b>${lab}</b><i class="f">${pc(o.fail)}</i><i class="s">${pc(o.ok)}</i>${P.great > 0 ? `<i class="g">${pc(o.great)}</i>` : ''}</span>`;
     // ① 今戦の開発：枠・方針・確率・枠の追加を1つのバーに
@@ -16505,8 +17163,8 @@ function renderHQ(msg){
       return `<div class="devBar">
         <div class="dbSlots"><span class="dbSlot"><small>開発枠</small><b class="num">${slotsLeft()}/${devSlots()}</b>${pips(devSlots(), slotsUsed())}</span>${puWorks(me) ? `<span class="dbSlot pu"><small>PU枠${aduoOf(me.id) ? ' <span class="aduoTag sm">ADUO</span>' : ''}</small><b class="num">${puSlotsLeft()}/${puSlots()}</b>${pips(puSlots(), puUsed())}</span>` : ''}
           ${live ? `<button type="button" class="b sm ${on ? 'go' : ''}" id="buySlot" ${bought || poor ? 'disabled' : ''} title="${bought ? '追加の枠は1戦に1つまで' : `1戦に1枠まで・今戦だけ有効${slotBuysSeason() ? '・買うたびに値上がり' : ''}${myFac('wind') ? `・風洞で−${myFac('wind')*6}%` : ''}`}">${bought ? '枠を追加済み' : on ? `もう一度押して確定（${money(cost)}）` : `＋枠 ${money(cost)}`}</button>` : ''}</div>
-        <div class="dbPol"><span class="dbLab">方針</span><div class="seg2" role="radiogroup" aria-label="開発方針">${Object.entries(DEV_POL).map(([k, Q]) => `<button type="button" role="radio" data-dpol="${k}" class="${k === devPol() ? 'on' : ''}" aria-checked="${k === devPol()}" title="${esc(Q.d)}">${Q.n}</button>`).join('')}</div></div>
-        <div class="dbOdds"><span class="dbKey"><i class="f">失敗</i><i class="s">成功</i>${P.great > 0 ? '<i class="g">大成功</i>' : ''}</span>${odds(aeroResLv(me) ? '空力*' : '空力', devOdds(devPol(), aeroFacLv(me)))}${odds(resSupport(me) ? 'PU・ブレーキ*' : 'PU・ブレーキ', devOdds(devPol(), puFacLv(me)))}<span class="dbMult">伸び ×${P.k[0]}／×1${P.great > 0 ? `／×${P.k[2]}` : ''}</span></div>
+        <div class="dbDs">${myDs ? dsFace(myDs, 36, teamSuit(me)) : '<span class="dsNone" aria-hidden="true">?</span>'}<div class="dsTxt"><small>設計責任者</small><b>${myDs ? esc(myDs.name) : '不在（技術陣で開発中）'}</b>${myDs ? `<span class="dsTags">${dsTagsHtml(myDs, true)}</span>` : '<span class="muted dsWarn">失敗しやすくなっています。移籍市場で契約してください</span>'}</div><button type="button" class="b sm" data-gods="1">${myDs ? '設計者を探す' : '移籍市場で探す'}</button></div>
+        <div class="dbOdds"><span class="dbKey"><i class="f">失敗</i><i class="s">成功</i>${P.great > 0 ? '<i class="g">大成功</i>' : ''}</span>${odds(aeroResLv(me) ? '空力*' : '空力', devOdds(dsType(me), dsLevel(me, 'df', aeroFacLv(me))))}${puWorks(me) ? odds(resSupport(me) ? 'PU*' : 'PU', devOdds(dsType(me), dsLevel(me, 'power', puFacLv(me)))) : ''}${odds(resSupport(me) ? 'ブレーキ*' : 'ブレーキ', devOdds(dsType(me), dsLevel(me, 'bpow', puFacLv(me))))}<span class="dbMult">伸び ×${P.k[0]}／×1${P.great > 0 ? `／×${P.k[2]}` : ''}</span></div>
       </div>`;
     })();
     // ④ 規則変更：先行研究ができる年だけカードで、ほかは1行
@@ -16546,6 +17204,7 @@ function renderHQ(msg){
     return `<div class="sec devSec">
       <h2>マシン開発<button type="button" class="qm" data-guide="machine" aria-label="遊び方を見る">?</button>${rd ? `<span class="kick"><span class="hotDot"></span>次戦の${esc(COURSE_TYPES[rd.type].short)}コースで効きやすい</span>` : ''}</h2>
       ${bar}
+      ${grayCardHtml()}
       <div class="devInfo">${puSum1}${reg}</div>
       <div class="pCards">${cards}</div>
       <p class="devFoot muted">数字の右は、ライバルの最高値との差です。項目名を押すと説明が出ます。開発の仕組みは「?」から。</p>
@@ -16566,7 +17225,14 @@ function renderHQ(msg){
     const exp = me.drivers.filter(c => career.drivers[c].con && career.drivers[c].con.yrs <= 0);
     const rexp = resList(me).filter(c => career.drivers[c] && career.drivers[c].con && career.drivers[c].con.yrs <= 0);
     const puC = puChoiceHtml();
-    if(!offers.length && !exp.length && !rexp.length && !puC) return '';
+    const dsX = (() => { const d = dsOf(me); if(!d || !d.con || d.con.yrs > 0) return '';   // 設計責任者の契約満了
+      const onRel = armed.key === 'dsrel';
+      return `<div class="cBlk"><div class="cHead">${dsFace(d, 28, teamSuit(me))}<b>${esc(d.name)}</b><span class="cTag">設計責任者</span><span class="cTag">契約満了</span></div>
+        <p class="cTxt">${d.age}歳・${DS_TYPES[d.type].n}・能力 ${gradeTag(d.lv, true)}。更改金は年俸の${RENEW_K}倍です。更改しない場合は、移籍市場の「設計責任者」から後任と契約できます（いなくても開発はできますが、失敗しやすくなります）。</p>
+        <div class="cOpts">${[1, 2, 3].map(y => { const a = r1(dsAsk(d, y)*1.05), fee = r1(a*RENEW_K), on = armed.key === 'dsrenew' + y;
+          return `<button type="button" class="b sm ${on ? 'go' : ''}" data-dsrenew="${y}" ${career.money >= fee ? '' : 'disabled'}><b>${y}年契約</b><span>${money(a)}/戦</span><small>${on ? 'もう一度押して確定' : '更改金 ' + money(fee)}</small></button>`; }).join('')}</div>
+        <div class="cActs"><button type="button" class="b sm ${onRel ? 'go' : ''}" data-dsrel="1">${onRel ? 'もう一度押して確定' : '更改せずに契約を終える'}</button></div></div>`; })();
+    if(!offers.length && !exp.length && !rexp.length && !puC && !dsX) return '';
     const offHtml = offers.map((o, i) => { const d = career.drivers[o.code], open = poachUI.code === o.code, sc = myFac('scout') >= 4, outC = poachOut(o);
       if(o.res){ const on = armed.key === 'rpoach' + o.code;   // リザーブの引き抜き：後任は要らない（受けると違約金が入り、リザーブの枠が1つ空く）
         return `<div class="cBlk"><div class="cHead"><b>${o.code}</b> ${esc(d.name)}<span class="cTag">リザーブ</span><span class="cTag hot">引き抜き</span></div>
@@ -16597,13 +17263,19 @@ function renderHQ(msg){
           return `<button type="button" class="b sm ${on ? 'go' : ''}" data-rrenew="${c}" data-yrs="${y}" ${career.money >= fee ? '' : 'disabled'}><b>${y}年契約</b><span>${money(a)}/戦</span><small>${on ? 'もう一度押して確定' : '更改金 ' + money(fee)}</small></button>`; }).join('')}</div>`}
         <div class="cActs"><button type="button" class="b sm ${onRel ? 'go' : ''}" data-rrel="${c}">${onRel ? 'もう一度押して確定' : '更改せずに放出する'}</button></div></div>`; }).join('');
     return `<div class="sec conSec"><h2>契約<button type="button" class="qm" data-guide="contract" aria-label="遊び方を見る">?</button><span class="kick">更改・引き抜き</span></h2>
-      <p class="note" style="margin:0 0 4px">決めるまでレースには進めません。更改しない場合は、移籍市場から別のドライバーと交代してください（リザーブは放出するだけでもかまいません）。</p>${puC}${offHtml}${expHtml}${rexpHtml}</div>`;
+      <p class="note" style="margin:0 0 4px">決めるまでレースには進めません。更改しない場合は、移籍市場から別のドライバーと交代してください（リザーブは放出するだけでもかまいません）。</p>${puC}${dsX}${offHtml}${expHtml}${rexpHtml}</div>`;
   })();
-  const market = `
+  const mktSeg = `<div class="seg2 mktViewSeg" role="tablist" aria-label="移籍市場の表示"><button type="button" role="tab" data-mview="drv" class="${mktView === 'drv' ? 'on' : ''}" aria-selected="${mktView === 'drv'}">ドライバー</button><button type="button" role="tab" data-mview="ds" class="${mktView === 'ds' ? 'on' : ''}" aria-selected="${mktView === 'ds'}">設計責任者</button></div>`;
+  const market = mktView === 'ds' ? marketDsHtml(mktSeg) : `
     <div class="sec">
       <h2>移籍市場<button type="button" class="qm" data-guide="market" aria-label="遊び方を見る">?</button><span class="kick">契約金 = 年俸×${SIGN_K}</span></h2>
+      ${mktSeg}
       <div class="row" style="margin:0 0 6px;gap:8px"><span class="muted">契約年数</span><div class="seg2">${[1, 2, 3].map(y => `<button type="button" data-sy="${y}" class="${signYrs === y ? 'on' : ''}">${y}年</button>`).join('')}</div><span class="muted">若手は短い契約、ベテランは長い契約のほうが年俸が安くなります</span></div>
-      <div class="drvGrid faGrid">${career.fa.map(code => { const d = career.drivers[code], fee = r1(d.sal*SIGN_K), csal = r1(Math.max(0.2, d.sal*conMult(d.age, signYrs))), can = career.money >= fee, sc = myFac('scout') >= 4;
+      <div class="mktBar"><span class="muted">並べ替え</span><div class="seg2 mktSort">${MKT_SORTS.map(([k, lab]) => { const on = mktSort.k === k; return `<button type="button" data-msort="${k}" class="${on ? 'on' : ''}" aria-pressed="${on}" title="${on ? 'もう一度押すと逆の順に' : ''}">${lab}${on ? `<i>${mktSort.dir < 0 ? '▼' : '▲'}</i>` : ''}</button>`; }).join('')}</div>
+        <button type="button" class="b sm ghost mktAff ${mktSort.aff ? 'on' : ''}" data-maff="1" aria-pressed="${mktSort.aff}">${mktSort.aff ? '✓ ' : ''}契約できる選手だけ</button>
+        <span class="muted mktCnt">${mktList().length === career.fa.length ? `${career.fa.length}人` : `表示中 ${mktList().length}人／全${career.fa.length}人`}</span></div>
+      ${!mktList().length && career.fa.length ? '<p class="muted" style="margin:6px 0 10px">今の資金で契約できる選手はいません。</p>' : ''}
+      <div class="drvGrid faGrid">${mktList().map(code => { const d = career.drivers[code], fee = r1(d.sal*SIGN_K), csal = r1(Math.max(0.2, d.sal*conMult(d.age, signYrs))), can = career.money >= fee, sc = myFac('scout') >= 4;
         const chip = (lab, val, cls = '', tip = '') => `<span class="dcChip ${cls}"${tip ? ` title="${esc(tip)}"` : ''}><small>${lab}</small><b>${val}</b></span>`;
         const gW = v => sc ? v*10 : GRADES.find(([t]) => pt100(v) >= t*10)[0] === -Infinity ? 15 : GRADES.find(([t]) => pt100(v) >= t*10)[0]*10 + 5;   // 未調査はランクの中央で表示
         const ovTxt = `<span class="ovG">${gradeTag(ovr(d), sc)}</span>`;
@@ -16736,7 +17408,14 @@ function renderHQ(msg){
   el.querySelectorAll('[data-dd]').forEach(b => b.onclick = () => { const k = b.dataset.dd; devDD.has(k) ? devDD.delete(k) : devDD.add(k); renderHQ(); });
   { const rb2 = el.querySelector('#resBtn'); if(rb2) rb2.addEventListener('click', e => e.preventDefault()); }
   { const bs = el.querySelector('#buySlot'); if(bs) bs.onclick = buySlot; }
-  el.querySelectorAll('[data-dpol]').forEach(b => b.onclick = () => { career.devPol = b.dataset.dpol; saveCareer(); renderHQ(); });
+  el.querySelectorAll('[data-gods]').forEach(b => b.onclick = () => { hqTab = 'mkt'; lsSet(HQ_TAB_KEY, hqTab); mktView = 'ds'; renderHQ(); });   // 開発タブから、移籍市場の設計責任者へ
+  el.querySelectorAll('[data-mview]').forEach(b => b.onclick = () => { mktView = b.dataset.mview; renderHQ(); });
+  el.querySelectorAll('[data-dsy]').forEach(b => b.onclick = () => { dsSignYrs = +b.dataset.dsy; renderHQ(); });
+  el.querySelectorAll('[data-dssign]').forEach(b => b.onclick = () => signDesigner(b.dataset.dssign));
+  el.querySelectorAll('[data-dsrenew]').forEach(b => b.onclick = () => renewDesigner(+b.dataset.dsrenew));
+  el.querySelectorAll('[data-dsrel]').forEach(b => b.onclick = () => releaseDesigner());
+  el.querySelectorAll('[data-grayok]').forEach(b => b.onclick = () => grayAdopt());
+  el.querySelectorAll('[data-graypass]').forEach(b => b.onclick = () => grayPass());
   { const rb = $('#resBtn'); if(rb) rb.onclick = research; }
   el.querySelectorAll('[data-fac]').forEach(b => b.onclick = () => upgradeFac(b.dataset.fac));
   el.querySelectorAll('[data-facsell]').forEach(b => b.onclick = () => sellFac(b.dataset.facsell));
@@ -16764,6 +17443,7 @@ function renderHQ(msg){
   el.querySelectorAll('[data-tpol]').forEach(b => b.onclick = () => { career.tpol = b.dataset.tpol; saveCareer(); renderHQ(); });
   el.querySelectorAll('[data-dswap]').forEach(b => b.onclick = () => { const t = myTeam(); t.drivers.reverse(); saveCareer(); renderHQ(); });
   el.querySelectorAll('[data-prof]').forEach(b => b.onclick = () => openProf(b.dataset.prof));   // カードの「戦績」
+  el.querySelectorAll('[data-calr]').forEach(b => b.onclick = () => openProf(b.dataset.calr));   // カレンダー：終わったレースの結果
   el.querySelectorAll('[data-spk]').forEach(b => b.onclick = () => { const k = b.dataset.spk; if(k) openProf(k); });   // 選手権の名前：戦績を画面の上に重ねて出す（記録タブ・ドライバータブと同じ）
   el.querySelectorAll('[data-sign]').forEach(b => b.onclick = () => sign(b.dataset.sign, +b.dataset.slot));
   { const pc = el.querySelector('#popCard'); if(pc) pc.onclick = openIncome; }
@@ -16787,6 +17467,9 @@ function renderHQ(msg){
   el.querySelectorAll('[data-poachclose]').forEach(b => b.onclick = () => { poachUI = { code: null, pick: null }; armed = { key:'', until:0 }; renderHQ(); });
   el.querySelectorAll('[data-refuse]').forEach(b => b.onclick = () => refusePoach(+b.dataset.refuse));
   el.querySelectorAll('[data-sy]').forEach(b => b.onclick = () => { signYrs = +b.dataset.sy; renderHQ(); });
+  el.querySelectorAll('[data-msort]').forEach(b => b.onclick = () => { const k = b.dataset.msort;
+    mktSort.dir = mktSort.k === k ? -mktSort.dir : MKT_SORTS.find(x => x[0] === k)[2]; mktSort.k = k; saveMktSort(); renderHQ(); });
+  el.querySelectorAll('[data-maff]').forEach(b => b.onclick = () => { mktSort.aff = !mktSort.aff; saveMktSort(); renderHQ(); });
   const gr = $('#goRace'); if(gr) gr.onclick = () => { sndInit(); goRace(); };
   const grb = $('#goRaceBar'); if(grb) grb.onclick = () => { sndInit(); goRace(); };
   el.querySelectorAll('[data-hqt]').forEach(b => b.onclick = () => {
@@ -19303,6 +19986,28 @@ function openProf(key){
 }
 function closeProf(){ const m = document.getElementById('profModal'); if(m) m.classList.remove('show'); }
 let standPick = null;
+/* レース結果（カレンダーから開く）：key = r:シーズン:第何戦。career.raceLog の記録から、全員の順位・ポイントを表示する */
+function raceResPanel(key, close){
+  const [, sn, rd] = key.split(':').map(Number);
+  const log = career.raceLog || [], r = log.find(x => x.season === sn && x.round === rd); if(!r) return '';
+  const cal = sn === career.season ? career.calendar[rd - 1] : null;
+  const nav = d => log.some(x => x.season === sn && x.round === rd + d) ? `r:${sn}:${rd + d}` : '';
+  const pv = nav(-1), nx = nav(1);
+  const dName = c => career.drivers[c] ? esc(career.drivers[c].name) : '';
+  const myGrid = Object.fromEntries((r.my || []).map(m => [m.code, m.grid]));
+  const sum = [['優勝', r.winner ? `${natFlag(r.winner, 12)}<b>${r.winner}</b>` : '—'], ['ポール', r.pole ? esc(r.pole) : '—'], ['ファステストラップ', r.fl ? esc(r.fl) : '—']];
+  const rows = r.res ? (() => { let k = 0; return r.res.map(([code, tid, pos, pts]) => { const t = teamOf(tid), mine = tid === career.team; k++;
+      return `<tr class="${mine ? 'mine' : ''}"><td class="n">${pos ? `<span class="rcP ${rcMedal(pos)}">${pos}</span>` : '<span class="rrDnf">DNF</span>'}</td>
+        <td><button type="button" class="recLink" data-spk="d:${code}">${natFlag(code, 12)}<b>${code}</b> <span class="muted rrNm">${dName(code)}</span></button>${mine && myGrid[code] ? `<small class="muted rrGrid">グリッド${myGrid[code]}番手</small>` : ''}</td>
+        <td>${t ? `<button type="button" class="recLink" data-spk="t:${tid}">${teamLogo(t, 16)}<span class="rrTm">${esc(tShort(t))}</span></button>` : '—'}</td>
+        <td class="n">${pts ? `<b>${pts}</b>` : '<span class="muted">0</span>'}</td></tr>`; }).join(''); })() : '';
+  return `<div class="recDetail prPanel"><div class="prHead">${gpFlag(r.name, 20)}<b class="prName">${esc(r.name)}</b><small class="muted">シーズン${sn} 第${rd}戦${cal && cal.home ? '・ホームGP' : ''}${COURSE_TYPES[r.type] ? '・' + COURSE_TYPES[r.type].short : ''}</small>${close}</div>
+    <div class="recNums rrSum">${sum.map(([k, v]) => `<span><small>${k}</small><b>${v}</b></span>`).join('')}</div>
+    ${rows ? `<div class="wrapx"><table class="stand rrTbl"><tr><th class="n">順位</th><th>ドライバー</th><th>チーム</th><th class="n">ポイント</th></tr>${rows}</table></div>`
+      : `<p class="note">このレースは全員の順位が記録されていません（記録の機能を入れる前のレース）。自チーム：${(r.my || []).map(m => `${m.code} ${m.pos ? 'P' + m.pos : 'DNF'}`).join(' / ') || '—'}</p>`}
+    <div class="rrNav"><button type="button" class="b sm ghost" data-spk="${pv}" ${pv ? '' : 'disabled'}>‹ 前のレース</button><button type="button" class="b sm ghost" data-spk="${nx}" ${nx ? '' : 'disabled'}>次のレース ›</button></div>
+  </div>`;
+}
 function profPanel(key){
   if(!key || !career) return '';
   ensureStats();
@@ -19325,6 +20030,7 @@ function profPanel(key){
           ${seasons.length ? `<div class="wrapx"><table class="stand"><tr><th>シーズン</th><th>チーム</th><th class="n">ポイント</th><th class="n">順位</th><th class="n">優勝</th></tr>${seasons.map(([sn, x]) => { const T = teamOf(x.team); return `<tr><td>${sn}</td><td>${T ? teamLogo(T, 14) + esc(T.name) : '—'}</td><td class="n">${x.pts}</td><td class="n">${x.pos ? x.pos + '位' : '<span class="muted">途中</span>'}</td><td class="n">${x.wins || 0}</td></tr>`; }).join('')}</table></div>` : '<p class="note">まだレースの記録がありません。</p>'}</div>
       </div></div>`;
   }
+  if(kind === 'r') return raceResPanel(key, close);
   if(kind === 't'){
     const t = teamOf(id); if(!t) return '';
     const s = statT(id), seasons = Object.entries(s.seasons || {}).sort((a, b) => b[0] - a[0]);
@@ -19336,7 +20042,7 @@ function profPanel(key){
         <div class="prBox"><h4>マシンの能力<span class="muted">数字の右は全チーム中の順位</span></h4>
           ${PARTS.map(([pid, plab, items]) => `<div class="prPart"><div class="prPL">${PART_ICO && PART_ICO[pid] ? `<span class="pcIco pi-${pid}">${PART_ICO[pid]}</span>` : ''}${plab}${pid === 'pu' && pu ? `<span class="pkPu ${pu === '自社製' ? 'works' : ''}">${pu}</span>` : ''}</div>
             ${items.map(([k, lab]) => `<div class="prCar"><span>${lab}</span><span class="skill"><i style="width:${t.car[k]*10}%"></i></span><b class="num">${t.car[k].toFixed(1)}</b><small class="${rk(k) <= 3 ? 'top' : ''}">${rk(k)}位</small></div>`).join('')}</div>`).join('')}
-          <div class="prDrv"><small class="muted">ドライバー</small>${t.drivers.map(c => `<button type="button" class="recLink" data-spk="d:${c}">${natFlag(c, 12)}<b>${c}</b> <span class="muted">${esc(career.drivers[c].name)}</span></button>`).join('')}</div></div>
+          ${dsOf(t) ? `<div class="prDrv"><small class="muted">設計責任者</small><span>${esc(dsOf(t).name)}（${DS_TYPES[dsOf(t).type].n}）</span></div>` : ''}<div class="prDrv"><small class="muted">ドライバー</small>${t.drivers.map(c => `<button type="button" class="recLink" data-spk="d:${c}">${natFlag(c, 12)}<b>${c}</b> <span class="muted">${esc(career.drivers[c].name)}</span></button>`).join('')}</div></div>
         <div class="prBox"><h4>戦績<span class="muted">今季 ${career.cpts[id] || 0}pts${pos ? `・${pos}位` : ''}</span></h4>${nums(s)}
           ${seasons.length ? `<div class="wrapx"><table class="stand"><tr><th>シーズン</th><th class="n">ポイント</th><th class="n">順位</th><th>ドライバー</th></tr>${seasons.map(([sn, x]) => `<tr><td>${sn}</td><td class="n">${x.pts}</td><td class="n">${x.pos}位</td><td class="muted">${(x.drivers || []).join(' / ')}</td></tr>`).join('')}</table></div>` : '<p class="note">シーズンを終えると、ここにシーズンごとの順位が記録されます。</p>'}</div>
       </div></div>`;
@@ -20221,6 +20927,16 @@ function makeNews(){
   const add = (tag, cls, w, h, b) => N.push({ tag, cls, w, h, b });
   const win = order[0] && fin(order[0]) ? order[0] : null;
   const mine = order.filter(c => c.m.team === me);
+  if(L.sisInv){ const st = teamOf(L.sisInv.team), sn = st ? st.name : '姉妹チーム';
+    if(L.sisInv.guilty) add('調査', 'bad', 95, `${sn}に技術規則違反の裁定`, `自チームとの技術提携が深すぎるとして調査が入り、違反と判断された。罰金 ${money(L.sisInv.fine)}、${sn}は今戦のコンストラクターズポイント${L.sisInv.pts ? `（${L.sisInv.pts}pt）` : ''}を剥奪。今季の技術提携はレベル1までに制限される。`);
+    else add('調査', 'good', 70, `${sn}への技術規則の調査、違反なし`, `自チームとの技術提携について調査が入ったが、規則の範囲内と判断された。`); }
+  (L.gray || []).forEach(g => {
+    const kn = carKeyName(g.key), me2 = teamOf(career.team), mn = me2 ? me2.name : '自チーム';
+    if(g.out === 'ban') add('技術指令', 'bad', 94, `${mn}の「${g.name}」に即時禁止の技術指令`, `ライバルチームの抗議を受けた統括機関が、${mn}の「${g.name}」を規則違反と判断。次戦から使用できず、作り直しで${kn}は −${g.down.toFixed(1)}。`);
+    else if(g.out === 'next') add('技術指令', 'bad', 88, `${mn}の「${g.name}」、来季から禁止に`, `統括機関は今季の使用は認めたが、来季から規則で禁止すると発表。シーズンの終わりに${kn}は −${g.down.toFixed(1)}。`);
+    else if(g.out === 'legal') add('技術指令', 'good', 80, `${mn}の「${g.name}」は合法と判断`, `抗議を受けた統括機関は「${g.name}」を規則の範囲内と判断。ライバル各チームもまねを始め、${kn}で +${g.copy.toFixed(1)} ほど追いついた。`);
+    else if(g.out === 'rival'){ const t = teamOf(g.team); if(t) add('技術指令', '', 55, `${t.name}の新しい仕掛けに禁止の技術指令`, `${t.name}の${kn}まわりの仕掛けが規則違反と判断され、使えなくなった。`); }
+  });
   // ---- 優勝 ----
   if(win){
     const sec = order[1] && fin(order[1]) ? order[1] : null;
