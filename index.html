@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<!-- レーシングチームマネージャー ver 1.7.0 -->
+<!-- レーシングチームマネージャー ver 1.7.1 -->
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="version" content="1.7.0">
+<meta name="version" content="1.7.1">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>レーシングチームマネージャー</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1497,6 +1497,22 @@ body.phoneRace .stage:has(#flag:not(:empty)) #camctl{top:80px}
   #records .stand th{white-space:normal;word-break:break-all}           /* 記録の表の見出しは2行に折り返してよい（数字の列を細くする） */
   #records .recLink{flex-wrap:wrap;row-gap:0}
   #records .recLink .muted{flex-basis:100%;font-size:8.5px}   /* 名前は略号の下に（長い名前は「・」で折り返す） */
+  /* 歴代記録：スマホでは1件を2〜3行のカードにする（記録名と数字 → 保持者 → 達成日） */
+  #records .atT,#records .atT tbody{display:block;width:100%;min-width:0}
+  #records .atT tr:first-child{display:none}
+  #records .atT tr{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:8px;align-items:center;padding:5px 2px;border-bottom:1px solid var(--line)}
+  #records .atT td{display:block;width:auto;padding:1px 0;border:0;background:none;overflow:visible}
+  #records .atT td.n{width:auto;text-align:right;padding:1px 0}
+  #records .atT tr.atMine{background:rgba(0,200,255,.09)}
+  #records .atT td:nth-child(1){grid-area:1/1;font-weight:700;font-size:11px}
+  #records .atT td:nth-child(2){grid-area:2/1/auto/span 2}
+  #records .atT td:nth-child(3){grid-area:1/2;font-size:12px;font-weight:700}
+  #records .atT td.atWhen{grid-area:3/1/auto/span 2;font-size:9px}
+  #records .atT td.atWhen:empty{display:none}
+  #records .atC tr{grid-template-columns:minmax(0,1fr) auto auto}
+  #records .atC td:nth-child(2){grid-area:2/1/auto/span 3}
+  #records .atC td:nth-child(4){grid-area:1/3;font-size:10px;font-weight:400}
+  #records .atC td.n[data-u]::after{content:attr(data-u);font-size:9px;font-weight:400;margin-left:1px}
 }
 /* 記録：シーズン別ランキング・戦ごとの結果・ポイント推移・自チームの歩み */
 .recTitle .recClose{margin-left:auto}
@@ -2964,16 +2980,16 @@ body.career.phoneRace:not(.pcRace) .tcPace .pcLab{display:inline}
 body.career.phoneRace:not(.pcRace) .tcPace button{white-space:nowrap}
 body.career.phoneRace:not(.pcRace) .tcPace button svg{display:none}
 /* オーナーの方針：色と1文字の札で、どのタイプかすぐ分かるように */
-.ownPers{display:flex;gap:12px;align-items:flex-start;margin:4px 0 12px;padding:12px 14px;border-radius:12px;border:2px solid var(--opc);background:color-mix(in srgb,var(--opc) 9%,#fff)}
-.ownPers .opMark{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--opc);color:#fff;font:900 22px/1 "M PLUS 1p",system-ui,sans-serif}
+.ownPers{display:flex;gap:9px;align-items:flex-start;margin:2px 0 10px;padding:7px 10px;border-radius:9px;border:1px solid var(--line);border-left:3px solid var(--opc);background:transparent}
+.ownPers .opMark{flex:none;width:24px;height:24px;margin-top:1px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--opc) 16%,transparent);color:var(--opc);font:800 12.5px/1 "M PLUS 1p",system-ui,sans-serif}
 .ownPers .opBody{min-width:0}
-.ownPers .opHead{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-.ownPers .opHead small{font-size:11px;color:var(--muted,#6b7280);font-weight:700;letter-spacing:.04em}
-.ownPers .opHead b{font-size:19px;font-weight:900;color:var(--opc)}
-.ownPers p{margin:3px 0 0;font-size:12.5px;color:#3a3f47}
-.ownPers .opFocus{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:7px}
-.ownPers .opFocus small{font-size:11px;color:var(--muted,#6b7280);margin-right:2px}
-.ownPers .opFocus span{font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--opc);color:#fff}
+.ownPers .opHead{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+.ownPers .opHead small{font-size:10.5px;color:var(--muted,#6b7280);font-weight:700;letter-spacing:.03em}
+.ownPers .opHead b{font-size:13.5px;font-weight:800;color:var(--text)}
+.ownPers p{margin:2px 0 0;font-size:11.5px;color:var(--muted,#6b7280)}
+.ownPers .opFocus{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:4px}
+.ownPers .opFocus small{font-size:10.5px;color:var(--muted,#6b7280);margin-right:2px}
+.ownPers .opFocus span{font-size:10.5px;font-weight:700;padding:0 6px;border-radius:999px;border:1px solid color-mix(in srgb,var(--opc) 45%,transparent);color:var(--opc);background:transparent}
 .ownPers.op-win{--opc:#d7263d}.ownPers.op-thrift{--opc:#1a8a4e}.ownPers.op-youth{--opc:#1a7fd0}.ownPers.op-brand{--opc:#8e3fc0}
 .atH{font-size:13.5px;margin:14px 0 6px}
 .atT{table-layout:fixed;min-width:640px}
@@ -2981,11 +2997,34 @@ body.career.phoneRace:not(.pcRace) .tcPace button svg{display:none}
 .atT tr.atMine td{background:rgba(0,200,255,.09)}
 .atT td{vertical-align:middle}
 .nwTag.rec{background:linear-gradient(100deg,#ffd85a,#f2b705);color:#3a2600}
+.prBox.prWide{grid-column:1/-1}
+.ohWrap{width:100%;overflow:hidden}
+.ohSvg{width:100%;height:auto;display:block}
+.ohSvg .ohGrid{stroke:var(--line);stroke-width:1}
+.ohSvg .ohGrid.v{stroke-dasharray:2 4}
+.ohSvg .ohYl{font-size:10px;fill:var(--muted);text-anchor:end}
+.ohSvg .ohXl{font-size:10px;fill:var(--muted);text-anchor:middle}
+.ohSvg .ohBand{font-size:10px;fill:var(--muted);text-anchor:middle;font-weight:700}
+.ohSvg .ohLnB{stroke:rgba(0,0,0,.25);stroke-width:4.5;stroke-linecap:round}
+.ohSvg .ohLn{stroke-width:2.6;stroke-linecap:round}
+.ohSvg .ohPt{stroke:#fff;stroke-width:1}
+.ohSvg .ohSn{fill:#fff;stroke:#5b6472;stroke-width:1.8}
+.ohSvg .ohAwk{fill:#b36bff;stroke:#fff;stroke-width:1.6}
+.ohSvg .ohBrk{fill:#f2c230;stroke:#8a5a00;stroke-width:1.6}
+.ohSvg .ohHit{fill:transparent;cursor:pointer}
+.ohSvg .ohHit.on{fill:rgba(0,180,255,.18);stroke:rgba(0,180,255,.7);stroke-width:1.2}
+.ohSvg .ohMove{stroke:#5b6472;stroke-width:1;stroke-dasharray:3 3}
+.ohSvg .ohMoveT{font-size:9.5px;fill:var(--muted)}
+.ohSvg .ohLast{font-size:12px;font-weight:800;fill:var(--text)}
+.ohLeg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--muted);margin-top:4px}
+.ohLeg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.ohLeg i.ohSn{background:#fff;border:1.8px solid #5b6472}.ohLeg i.ohAwk{background:#b36bff}.ohLeg i.ohBrk{background:#f2c230;border:1.5px solid #8a5a00}.ohLeg i.ohMoveL{width:12px;height:0;border-radius:0;border-top:1.5px dashed #5b6472;vertical-align:3px}
+.ohCap{font-size:12px;margin-top:4px;min-height:1.4em}
 </style>
 </head>
 <body>
 <header>
-  <h1 id="appTitle" style="user-select:none">レーシングチームマネージャー<small class="appVer">ver 1.7.0</small></h1>
+  <h1 id="appTitle" style="user-select:none">レーシングチームマネージャー<small class="appVer">ver 1.7.1</small></h1>
   <div class="hdrTools">
   <button class="b sm" id="soundBtn" hidden aria-pressed="true" title="効果音のオン・オフ"></button>
   <label class="volWrap" id="volWrap" hidden title="音量"><span class="volLab">音量</span><input type="range" id="volume" min="0" max="150" step="5" aria-label="音量"><span class="num volV" id="volV"></span></label>
@@ -16020,6 +16059,10 @@ function recordRace(){
   // レースの経験で伸びる（全ドライバー）。戦数が多いシーズンは1戦あたりを小さく（seasonK）
   const growLog = {};
   growK = seasonK();
+  // 総合値の推移：記録がまだない選手は、レース前の値を前日の点として置く（線の始まり）
+  const ovrDay = dayOfYmd(rdDate(career.season, career.round, rd, career.calendar.length));
+  const ovrWho = [...new Set([...order.map(c => c.m.name), ...resList(myTeam())])].map(c => career.drivers[c]).filter(d => d && d.st);
+  try{ ovrWho.forEach(d => { if(!(d.ovrH && d.ovrH.length)) ovrRec(d, ovrDay - 1); }); }catch(e){ console.error(e); }
   const bestAll = Math.min(...race.cars.map(c => c.best ?? Infinity));
   const abLog = [];
   const longestOf = c => { const st = c.myLog || []; return st.reduce((m, s, k) => Math.max(m, (k + 1 < st.length ? st[k+1].lap : race.laps + 1) - s.lap), 0); };
@@ -16057,6 +16100,7 @@ function recordRace(){
   const awkLog = awakenings(order, preSt, growLog);
   let brkLog = []; try{ brkLog = breakthroughs(order, preSt, growLog); }catch(e){ console.error(e); }   // 限界突破（レース後）
   { const mineB = brkLog.filter(x => x.team === career.team); if(mineB.length) career.brkFx = (career.brkFx || []).concat(mineB); }
+  try{ ovrWho.forEach(d => ovrRec(d, ovrDay, { r: career.season*100 + career.round + 1, ...(awkLog.some(x => x.code === d.code) ? { e: 'awk' } : brkLog.some(x => x.code === d.code) ? { e: 'brk' } : {}) })); }catch(e){ console.error(e); }   // 総合値の推移：レース後
   // 負傷：欠場していた選手は1戦分回復。クラッシュでリタイアした選手は、まれに負傷して1〜2戦欠場する
   const raced = new Set(order.map(c => c.m.name)), injLog = [];
   Object.values(career.drivers).forEach(d => { if(d.inj > 0 && !raced.has(d.code)){ d.inj--; if(!d.inj) delete d.injWhy; } });
@@ -17075,6 +17119,8 @@ function nextSeason(){
     rep.brk.forEach(x => { if(x.team === career.team){ rep.gnote.push({ code: x.code, t: x.late ? '限界突破！能力が大きく上がりました' : `限界突破！成長タイプが「${x.from}」→「${x.to}」に` }); } });
     const mineB = rep.brk.filter(x => x.team === career.team); if(mineB.length) career.brkFx = (career.brkFx || []).concat(mineB);
   }catch(e){ console.error(e); }
+  try{ const day = Math.round(Date.UTC(SY(career.season) + 1, 0, 1)/DAY_MS);          // 総合値の推移：年を取ったあと（翌年の1月1日として）
+    Object.values(career.drivers).forEach(d => { if(!d.retired && d.st && ((d.ovrH && d.ovrH.length) || ovrTeamOf(d.code))) ovrRec(d, day, { e: (rep.brk || []).some(x => x.code === d.code) ? 'brk' : 'season' }); }); }catch(e){ console.error(e); }
   let payRe = null; try{ payRe = payRenewInfo(); }catch(e){ console.error(e); }   // ペイドライバー型の継続の提案（今季の成績で確率が決まる）
   career.season++; career.round = 0; try{ rep.grayBan = grayOffseason(); }catch(e){ console.error(e); } career.calendar = makeCalendar(); career.dpts = {}; career.cpts = {}; career.last = null;
   if(career.home && career.home.stage === 'open'){ const i = homeInsert(career.calendar); career.money = r1(career.money - HOME_FEE); rep.home = { opened: homeOpened, reno: homeReno, round: i + 1, fee: HOME_FEE }; }
@@ -21571,6 +21617,7 @@ function openProf(key){
   const box = m.querySelector('.box'); box.innerHTML = html; box.scrollTop = 0;
   // パネルの中のリンク：チーム名・ドライバー名で切り替え、「閉じる」で閉じる
   box.querySelectorAll('[data-spk]').forEach(b => b.onclick = () => b.dataset.spk ? openProf(b.dataset.spk) : closeProf());
+  box.querySelectorAll('.ohHit').forEach(el => el.addEventListener('click', () => { const cap = box.querySelector('.ohCap'); if(cap) cap.textContent = el.dataset.tip; box.querySelectorAll('.ohHit.on').forEach(x => x.classList.remove('on')); el.classList.add('on'); }));
   m.classList.add('show');
   const c = box.querySelector('.prClose'); if(c) c.focus({ preventScroll: true });
 }
@@ -21618,6 +21665,7 @@ function profPanel(key){
           <div class="dcAbs" style="margin-top:6px">${d.ab.length ? d.ab.map(x => abChip(x)).join('') : '<span class="muted" style="font-size:11.5px">特殊能力なし</span>'}${d.rab ? rabChip(d.rab) : ''}</div></div>
         <div class="prBox"><h4>戦績<span class="muted">今季 ${career.dpts[id] || 0}pts${pos ? `・${pos}位` : ''}</span></h4>${nums(s, [['リタイア', s.dnf]])}
           ${seasons.length ? `<div class="wrapx"><table class="stand"><tr><th>シーズン</th><th>チーム</th><th class="n">ポイント</th><th class="n">順位</th><th class="n">優勝</th></tr>${seasons.map(([sn, x]) => { const T = teamAt(x.team, +sn); return `<tr><td>${SY(sn)}</td><td>${T ? teamLogo(T, 14) + esc(T.name) : '—'}</td><td class="n">${x.pts}</td><td class="n">${x.pos ? x.pos + '位' : '<span class="muted">途中</span>'}</td><td class="n">${x.wins || 0}</td></tr>`; }).join('')}</table></div>` : '<p class="note">まだレースの記録がありません。</p>'}</div>
+        <div class="prBox prWide"><h4>総合値の推移<span class="muted">横軸は年齢</span></h4>${ovrChartHtml(d, known)}</div>
       </div></div>`;
   }
   if(kind === 'r') return raceResPanel(key, close);
@@ -22008,7 +22056,7 @@ function allTimeRecords(){
   ageRec('yPole', '最年少ポール', pole, true);     ageRec('oPole', '最年長ポール', pole, false);
   { let yc = null, oc = null;                      // チャンピオン：そのシーズンの最終戦の日の年齢
     for(const h of career.history || []){ if(!h.champ || !D[h.champ]) continue; const last = log.filter(r => r.season === h.season).pop(); if(!last) continue;
-      const a = ageAt(D[h.champ], logDate(last)); if(!a) continue; const rec = { v: a.days, code: h.champ, txt: ageTxt(a), when: { season: h.season, name: `${SY(h.season)}年シーズン` } };
+      const a = ageAt(D[h.champ], logDate(last)); if(!a) continue; const rec = { v: a.days, code: h.champ, txt: ageTxt(a), when: { season: h.season, name: `${SY(h.season)}年シーズン`, date: logDate(last) } };
       if(!yc || a.days < yc.v) yc = rec; if(!oc || a.days > oc.v) oc = rec; }
     out.push({ g: 'age', id: 'yChamp', label: '最年少チャンピオン', min: true, ...(yc || {}) }, { g: 'age', id: 'oChamp', label: '最年長チャンピオン', min: false, ...(oc || {}) }); }
   // 通算
@@ -22082,19 +22130,71 @@ const isMineCode = code => { const me = myTeam(); return !!code && (me.drivers.i
 function allTimeHtml(){
   const { list, log } = allTimeRecords();
   if(!log.length) return '<p class="note">まだレースの記録がありません。</p>';
-  const whenTxt = w => !w ? '' : w.round ? `${SY(w.season)}年 第${w.round}戦 ${esc(String(w.name || '').replace(/GP$/, '') + 'GP')}` : esc(w.name || '');
+  const jd = s => { const [y, m, d] = String(s).split('-').map(Number); return `${y}年${m}月${d}日`; };
+  const whenTxt = w => !w ? '' : w.round ? `${w.date ? jd(w.date) : SY(w.season) + '年'} 第${w.round}戦 ${esc(String(w.name || '').replace(/GP$/, '') + 'GP')}` : esc(w.name || '') + (w.date ? `（最終戦 ${jd(w.date)}）` : '');
   const sec = (g, label) => { const L = list.filter(x => x.g === g); if(!L.length) return '';
     return `<h3 class="atH">${label}</h3><div class="wrapx"><table class="stand atT"><tr><th>記録</th><th>保持者</th><th class="n">記録</th><th>達成</th></tr>${L.map(x => {
       const mine = x.team ? x.team === career.team : isMineCode(x.code);
-      return `<tr class="${mine ? 'atMine' : ''}"><td>${esc(x.label)}</td><td>${x.v != null ? recWhoHtml(x.code, x.team) : '<span class="muted">—</span>'}</td><td class="n">${x.v != null ? esc(x.txt) : ''}</td><td class="muted">${x.from && x.when && (x.from.season !== x.when.season || x.from.round !== x.when.round) ? `${whenTxt(x.from)} 〜 ${whenTxt(x.when)}` : whenTxt(x.when)}</td></tr>`; }).join('')}</table></div>`; };
+      return `<tr class="${mine ? 'atMine' : ''}"><td>${esc(x.label)}</td><td>${x.v != null ? recWhoHtml(x.code, x.team) : '<span class="muted">—</span>'}</td><td class="n">${x.v != null ? esc(x.txt) : ''}</td><td class="muted atWhen">${x.from && x.when && (x.from.season !== x.when.season || x.from.round !== x.when.round) ? `${whenTxt(x.from)} 〜 ${whenTxt(x.when)}` : whenTxt(x.when)}</td></tr>`; }).join('')}</table></div>`; };
   const C = circuitRecords(log);
-  const circ = C.length ? `<h3 class="atH">サーキットの記録（GPごとの最多勝）</h3><div class="wrapx"><table class="stand atT"><tr><th>GP</th><th>最多勝</th><th class="n">勝数</th><th class="n">開催</th></tr>${C.map(c => `<tr class="${c.codes.some(isMineCode) ? 'atMine' : ''}"><td>${gpFlag(c.gp + 'GP', 12)} ${esc(c.gp)}GP</td><td>${c.codes.length ? c.codes.map(code => recWhoHtml(code)).join(' ') : '<span class="muted">—</span>'}</td><td class="n">${c.top || ''}</td><td class="n">${c.n}</td></tr>`).join('')}</table></div>` : '';
+  const circ = C.length ? `<h3 class="atH">サーキットの記録（GPごとの最多勝）</h3><div class="wrapx"><table class="stand atT atC"><tr><th>GP</th><th>最多勝</th><th class="n">勝数</th><th class="n">開催</th></tr>${C.map(c => `<tr class="${c.codes.some(isMineCode) ? 'atMine' : ''}"><td>${gpFlag(c.gp + 'GP', 12)} ${esc(c.gp)}GP</td><td>${c.codes.length ? c.codes.map(code => recWhoHtml(code)).join(' ') : '<span class="muted">—</span>'}</td><td class="n" data-u="勝">${c.top || ''}</td><td class="n" data-u="回開催">${c.n}</td></tr>`).join('')}</table></div>` : '';
   return REC_GROUPS.map(([g, l]) => sec(g, l)).join('') + circ + '<p class="note">「いちばん後ろのグリッドからの優勝」は、全員のグリッドを記録するようにしてからのレースだけで数えます。引退した選手の生年月日は、最後に走ったシーズンから逆算した目安です。</p>';
 }
 // レース結果・ニュースに出す新記録の文
 const recNewTxt = x => { const who = x.who && career.drivers[x.who] ? `${x.who}（${career.drivers[x.who].name}）` : ((teamOf(x.who) || {}).name || x.who);
   const prev = x.prevWho && career.drivers[x.prevWho] ? x.prevWho : ((teamOf(x.prevWho) || {}).name || x.prevWho);
   return `${x.label}：${who} ${x.txt}${prev ? `（前の記録：${prev} ${x.prevTxt}）` : ''}`; };
+
+/* =====================================================================
+   総合値の推移（2026-11）：ドライバーごとに d.ovrH = [{ t: 日（1970年からの日数）, v: 総合（0〜100）, tm: チーム, r: シーズン×100＋戦, e: 印 }]
+   ・毎戦のあと：走った全員と自チームのリザーブ（e：awk 覚醒・brk 限界突破）
+   ・シーズンの終わり（年を取ったあと）：引退していない全員（e：season）
+   ・その選手の最初の記録の前日に、レース前の値を1点置く（線の始まり）
+   ・同じ日の点はまとめる。過去にはさかのぼらない（この機能を入れた時点から）
+   ===================================================================== */
+function ovrTeamOf(code){ const t = career.teams.find(x => x.drivers.includes(code)) || career.teams.find(x => isRes(x, code)); return t ? t.id : null; }
+function ovrRec(d, day, extra){
+  if(!d || !d.st || d.retired) return;
+  const h = d.ovrH = d.ovrH || [], v = pt100(ovr(d)), tm = ovrTeamOf(d.code), last = h[h.length - 1];
+  if(last && last.t === day){ last.v = v; last.tm = tm; if(extra) Object.assign(last, extra); return; }
+  h.push({ t: day, v, tm, ...(extra || {}) });
+}
+const dayOfYmd = s => Math.round(ymdT(s)/DAY_MS);
+function ovrChartHtml(d, known){
+  const H = (d.ovrH || []).filter(p => p && p.t != null);
+  if(!known) return '<p class="note">ほかのチームの選手の推移は、スカウト部門Lv4で見られます。</p>';
+  ensureBirth(d);
+  if(!d.birth || !H.length) return '<p class="note">まだ記録がありません。次のレースから、総合値の推移を記録します。</p>';
+  const b0 = dayOfYmd(d.birth), pts = H.map(p => ({ ...p, x: (p.t - b0)/365.2425 }));
+  let x0 = Math.min(...pts.map(p => p.x)), x1 = Math.max(...pts.map(p => p.x));
+  if(x1 - x0 < 3){ const c = (x0 + x1)/2; x0 = c - 1.5; x1 = c + 1.5; } else { x0 -= 0.2; x1 += 0.2; }
+  const vs = pts.map(p => p.v); let y0 = Math.max(0, Math.floor((Math.min(...vs) - 4)/10)*10), y1 = Math.min(100, Math.ceil((Math.max(...vs) + 4)/10)*10); if(y1 - y0 < 20){ y1 = Math.min(100, y0 + 20); y0 = Math.max(0, y1 - 20); }
+  const W = 600, Hh = 230, L = 34, R = 14, T = 18, B = 26;
+  const X = a => L + (a - x0)/(x1 - x0)*(W - L - R), Y = v => T + (1 - (v - y0)/(y1 - y0))*(Hh - T - B);
+  // 背景：成長の時期（伸び盛り・ピーク・衰え）。成長タイプが確かでなければ「推定」
+  const g = gtShown(d), ge = GT_GROW + g.t.sh + 1, pe = GT_PEAK + g.t.sh + 1;
+  const band = (a, b, col, lab) => { const s = Math.max(a, x0), e = Math.min(b, x1); if(e <= s) return ''; return `<rect x="${X(s)}" y="${T}" width="${X(e) - X(s)}" height="${Hh - T - B}" fill="${col}"/><text x="${(X(s) + X(e))/2}" y="${T + 11}" class="ohBand">${lab}</text>`; };
+  const bands = band(-99, ge, 'rgba(60,224,140,.10)', '伸び盛り') + band(ge, pe, 'rgba(255,196,0,.12)', 'ピーク') + band(pe, 99, 'rgba(255,90,110,.10)', '衰え');
+  let grid = '';
+  for(let v = y0; v <= y1; v += 10) grid += `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" class="ohGrid"/><text x="${L - 5}" y="${Y(v) + 3.5}" class="ohYl">${v}</text>`;
+  const stepA = x1 - x0 > 12 ? 2 : 1;
+  for(let a = Math.ceil(x0); a <= x1; a += stepA) grid += `<line x1="${X(a)}" x2="${X(a)}" y1="${T}" y2="${Hh - B}" class="ohGrid v"/><text x="${X(a)}" y="${Hh - B + 15}" class="ohXl">${a}歳</text>`;
+  // 線：チームの色。チームが変わった所は縦の点線
+  const colOf = id => { const t = teamOf(id); return t ? palOf(t)[0] : '#9aa3b2'; };
+  let line = '', marks = '';
+  for(let i = 1; i < pts.length; i++){ const a = pts[i - 1], p = pts[i];
+    line += `<line x1="${X(a.x)}" y1="${Y(a.v)}" x2="${X(p.x)}" y2="${Y(p.v)}" class="ohLnB"/><line x1="${X(a.x)}" y1="${Y(a.v)}" x2="${X(p.x)}" y2="${Y(p.v)}" class="ohLn" style="stroke:${colOf(p.tm)}"/>`;
+    if(p.tm !== a.tm && p.tm){ const t = teamOf(p.tm); marks += `<line x1="${X(p.x)}" x2="${X(p.x)}" y1="${T}" y2="${Hh - B}" class="ohMove"/><text x="${X(p.x) + 3}" y="${Hh - B - 5}" class="ohMoveT">${esc(t ? t.name : '')}</text>`; } }
+  const tip = p => { const a = ageAt(d, ymdOf(p.t*DAY_MS)); const when = p.r ? `${SY(Math.floor(p.r/100))}年 第${p.r % 100}戦のあと` : p.e === 'season' ? 'シーズンの終わり（年を取ったあと）' : '記録の始まり';
+    return `${ageTxt(a)}・総合${p.v}（${when}${p.e === 'awk' ? '・覚醒' : p.e === 'brk' ? '・限界突破' : ''}）`; };
+  const dots = pts.map(p => { const cx = X(p.x), cy = Y(p.v), t = esc(tip(p));
+    const vis = p.e === 'awk' ? `<circle cx="${cx}" cy="${cy}" r="6" class="ohAwk"/>` : p.e === 'brk' ? `<circle cx="${cx}" cy="${cy}" r="6" class="ohBrk"/>` : p.e === 'season' ? `<circle cx="${cx}" cy="${cy}" r="3.6" class="ohSn"/>` : `<circle cx="${cx}" cy="${cy}" r="2.2" class="ohPt" style="fill:${colOf(p.tm)}"/>`;
+    return `${vis}<circle cx="${cx}" cy="${cy}" r="11" class="ohHit" data-tip="${t}"><title>${t}</title></circle>`; }).join('');
+  const lastP = pts[pts.length - 1];
+  return `<div class="ohWrap"><svg viewBox="0 0 ${W} ${Hh}" class="ohSvg" role="img" aria-label="${esc(d.name)}の総合値の推移（横軸は年齢）">${bands}${grid}${marks}${line}${dots}<text x="${X(lastP.x) + 8}" y="${Y(lastP.v) + 4}" class="ohLast">${lastP.v}</text></svg></div>
+    <div class="ohLeg"><span><i class="ohSn"></i>シーズンの終わり</span><span><i class="ohAwk"></i>覚醒</span><span><i class="ohBrk"></i>限界突破</span><span><i class="ohMoveL"></i>移籍</span>${g.sure ? '' : '<span class="muted">背景の時期は推定（成長タイプが確かでないため）</span>'}</div>
+    <div class="ohCap muted">点を押すと、その時の年齢と総合値を表示します。</div>`;
+}
 
 /* ---------- ミニマップ（コース画面の左上） ----------
    コースの形と全車の位置を小さく描く。自チームの車は大きく水色の縁取り、先頭は白い縁取り。
