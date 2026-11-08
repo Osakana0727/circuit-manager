@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- レーシングチームマネージャー ver 1.8.0 -->
+<!-- レーシングチームマネージャー ver 1.9.0 -->
 <!--
   コースの形について
   各国GPのコースの形は、次のデータをもとに、ゲーム用に加工（縮尺・向き・曲がりの調整）して使っています。
@@ -29,7 +29,7 @@ SOFTWARE.
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="version" content="1.8.0">
+<meta name="version" content="1.9.0">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>レーシングチームマネージャー</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2161,6 +2161,17 @@ body.career.pcRace .radio .rl>span:last-child{display:block;-webkit-line-clamp:u
 body.career.pcRace .radio .rl:nth-last-child(n+2){display:flex}
 body.career.pcRace .radio .rl:nth-last-child(n+3){display:none}
 body.career.pcRace .radio .rw{font-size:9.5px;padding:1px 4px}
+.tkCard{padding:10px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--line);margin-top:8px}
+.tkCard.mine{border-color:var(--accent,#17b8c4);background:color-mix(in srgb,#17b8c4 10%,var(--bg))}
+.tkType{font-size:11.5px;font-weight:700;color:var(--muted)}
+.tkBr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0}
+.tkT{display:flex;align-items:center;gap:6px;min-width:0}.tkT>span{display:flex;flex-direction:column;gap:3px;min-width:0}
+.tkT b{font-size:13px;overflow-wrap:anywhere}
+.tkSw{display:inline-block;width:34px;height:10px;border-radius:3px;border:1px solid rgba(0,0,0,.2)}
+.tkArr{color:var(--muted);font-weight:700}
+.tkH{display:block;font-size:13.5px;margin-top:2px}.tkB{margin:4px 0 0;font-size:12.5px;color:var(--muted)}
+.tkBtns{margin-top:8px;gap:8px;flex-wrap:wrap}
+.rcEra{font-size:12px;margin:2px 0 8px;color:var(--muted)}
 .clRow{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border-radius:10px;background:var(--bg);border:1px solid var(--line);margin-top:8px}
 .clRow.mine{background:color-mix(in srgb,#ffc400 18%,var(--bg));border-color:#e5b000}
 .clRow .clIco{font-size:24px;line-height:1}
@@ -3138,7 +3149,7 @@ body.career.phoneRace:not(.pcRace) .tcPace button svg{display:none}
 </head>
 <body>
 <header>
-  <h1 id="appTitle" style="user-select:none">レーシングチームマネージャー<small class="appVer">ver 1.8.0</small></h1>
+  <h1 id="appTitle" style="user-select:none">レーシングチームマネージャー<small class="appVer">ver 1.9.0</small></h1>
   <div class="hdrTools">
   <button class="b sm" id="soundBtn" hidden aria-pressed="true" title="効果音のオン・オフ"></button>
   <label class="volWrap" id="volWrap" hidden title="音量"><span class="volLab">音量</span><input type="range" id="volume" min="0" max="150" step="5" aria-label="音量"><span class="num volV" id="volV"></span></label>
@@ -3424,6 +3435,13 @@ body.career.phoneRace:not(.pcRace) .tcPace button svg{display:none}
     <h3 id="clinchModalT">チャンピオン決定</h3>
     <div id="clinchBody"></div>
     <div class="row" style="margin-top:12px;justify-content:flex-end"><button class="b go" id="clinchClose" type="button">閉じる</button></div>
+  </div>
+</div>
+<div class="modal" id="takeModal" role="dialog" aria-modal="true" aria-labelledby="takeModalT">
+  <div class="box" style="width:min(480px,100%)">
+    <h3 id="takeModalT">チームの身売り</h3>
+    <div id="takeBody"></div>
+    <div class="row" style="margin-top:12px;justify-content:flex-end"><button class="b go" id="takeClose" type="button">閉じる</button></div>
   </div>
 </div>
 <div class="modal" id="resultModal">
@@ -16216,6 +16234,7 @@ function showHQ(){
   $('#resultModal').classList.remove('show');
   syncTabs('hq'); renderHQ(); window.scrollTo({ top: 0 });
   if(career && career.clinchPop){ const cl = career.clinchPop; career.clinchPop = null; saveCareer(); openClinch(cl); }   // 最終戦の前にチャンピオンが決まった知らせ
+  else if(career && (career.takePop || career.takeAsk)){ career.takePop = null; saveCareer(); openTake(); }   // チームの身売りの知らせ（自チームなら名前を選ぶまで出す）
 }
 function syncTabs(v){
   $('#tabHQ').classList.toggle('on', v === 'hq'); $('#tabHQ').setAttribute('aria-selected', v === 'hq' ? 'true' : 'false');
@@ -17245,6 +17264,179 @@ function openIncome(){
   $('#incModal').addEventListener('click', e => { if(e.target.id === 'incModal') hideInc(); });
   document.addEventListener('keydown', e => { if(e.key === 'Escape' && $('#incModal').classList.contains('show')) hideInc(); });
 }
+/* ---------- チームの身売り（買収・冠スポンサー・メーカーの参入） ----------
+   シーズンの終わりに、コンストラクターズで2年続けて下位3チームだったチームが候補になる。
+   候補がいれば TAKE_P の確率で（平均で4〜5年に1回ほど）、1シーズンに1チームだけ。同じチームは TAKE_CD シーズンのあいだ対象にしない。
+   ・企業による買収：チーム名・カラー・ロゴが変わる。資金が入り、来季のマシンが少し速くなる
+   ・冠スポンサー：チーム名の前にスポンサー名が付き、カラーがスポンサーの色に。スポンサー収入が増える
+   ・メーカーの参入：チーム名・カラー・ロゴが変わり、自社製PUのワークスになる
+   自チームも対象：オーナーがチームを売り、新しいオーナー（方針も新しい）が来る。チーム名・カラーを変えるかは自分で選ぶ。
+   企業名・ブランド名はすべて架空 */
+const TAKE_P = 0.3, TAKE_CD = 5, TAKE_MAKER_MAX = 6;
+const TAKE_TYPE = { buy: { n: '企業による買収', ico: '🏢' }, title: { n: '冠スポンサー', ico: '🏷️' }, maker: { n: 'メーカーの参入', ico: '🏭' } };
+const TAKE_BUY = [
+  { co: 'ヴェルテクス・キャピタル', team: 'ヴェルテクス・レーシング', s: 'VTX' }, { co: 'ハルシオン・グループ', team: 'ハルシオンGP', s: 'HAL' },
+  { co: 'ケストレル・インダストリーズ', team: 'ケストレル・レーシング', s: 'KST' }, { co: 'オベリスク・ホールディングス', team: 'オベリスク・モータースポーツ', s: 'OBL' },
+  { co: 'セレスティア・ファンド', team: 'セレスティアGP', s: 'CLS' }, { co: 'ラディアント・エナジー', team: 'ラディアント・レーシング', s: 'RDT' },
+  { co: 'グラナイト・ベンチャーズ', team: 'グラナイト・レーシング', s: 'GRN' }, { co: 'オルカ・マリン', team: 'オルカ・グランプリ', s: 'ORK' },
+  { co: 'ペルセウス・テクノロジーズ', team: 'ペルセウス・レーシング', s: 'PRS' }, { co: 'ノクターン・メディア', team: 'ノクターンGP', s: 'NCT' },
+  { co: 'アルティア航空', team: 'アルティア・レーシング', s: 'ALT' }, { co: 'カデンツァ・グループ', team: 'カデンツァ・モータースポーツ', s: 'CDZ' }
+];
+const TAKE_TITLE = [
+  { n: 'ノヴァテック', k: 'IT企業', s: 'NVT' }, { n: 'クォンタ', k: '通信会社', s: 'QNT' }, { n: 'ピクセラ', k: 'ゲーム会社', s: 'PXL' },
+  { n: 'アクアリス', k: '飲料メーカー', s: 'AQR' }, { n: 'ブルーフィン', k: '海運会社', s: 'BLF' }, { n: 'ゼフィラ', k: '化粧品メーカー', s: 'ZFR' },
+  { n: 'オムニカ', k: '通販サイト', s: 'OMN' }, { n: 'リンクスネット', k: '通信会社', s: 'LNX' }, { n: 'サンブリッジ', k: '銀行', s: 'SNB' },
+  { n: 'フロストバイト', k: 'エナジードリンク', s: 'FRB' }
+];
+const TAKE_MAKER = [
+  { co: 'ヴォルテン自動車', team: 'ヴォルテン・ワークス', s: 'VLT' }, { co: 'アストリア・モーターズ', team: 'アストリア・ファクトリー', s: 'ATR' },
+  { co: 'ドラコ・オートモビル', team: 'ドラコ・モータースポーツ', s: 'DRK' }, { co: 'イグニス自動車', team: 'イグニス・レーシング', s: 'IGN' },
+  { co: 'ハヤテ自動車', team: 'ハヤテ・ワークス', s: 'HYT' }, { co: 'セリオン・モータース', team: 'セリオン・レーシング', s: 'SRN' }
+];
+function takeUsedNames(){
+  const S = new Set(career.teams.map(t => t.name));
+  Object.values(career.teamHist || {}).forEach(L => L.forEach(x => S.add(x.name)));
+  (career.takes || []).forEach(x => { S.add(x.to.name); if(x.co) S.add(x.co); });
+  return S;
+}
+const takeRand = a => a[Math.floor(Math.random()*a.length)];
+// ほかのチームの色と離れた、パレットの組み合わせ（地の色・2色目）
+function takeLivery(t){
+  const others = career.teams.filter(x => x !== t).map(x => hexToRgb(palOf(x)[0]));
+  const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+  const cur = hexToRgb(palOf(t)[0]);
+  const cand = PALETTE.map(p => ({ p, d: Math.min(...others.map(o => dist(o, hexToRgb(p[0])))), c: dist(cur, hexToRgb(p[0])) }))
+    .filter(x => x.c > 60).sort((a, b) => b.d - a.d);
+  const top = cand.filter(x => x.d >= 80);
+  const pk = takeRand(top.length ? top.slice(0, 6) : cand.slice(0, 3));
+  return { col: pk.p[0], col2: pk.p[2] };
+}
+// 新しいチームの名前・カラー・ロゴを作る（チームにはまだ反映しない）
+function takeMake(t, type){
+  const used = takeUsedNames();
+  if(type === 'title'){
+    const free = TAKE_TITLE.filter(x => ![...used].some(n => n.startsWith(x.n + '・')) && !t.name.startsWith(x.n)), sp = takeRand(free.length ? free : TAKE_TITLE);
+    const base = t.tbase || t.name;
+    return { co: sp.n, kind: sp.k, base, brand: { name: `${sp.n}・${base}`, short: sp.s, logo: t.logo || null, ...takeLivery(t) } };
+  }
+  const pool = (type === 'maker' ? TAKE_MAKER : TAKE_BUY).filter(x => !used.has(x.team) && !used.has(x.co));
+  const e = takeRand(pool.length ? pool : (type === 'maker' ? TAKE_MAKER : TAKE_BUY));
+  const syms = Object.keys(OWN_SYM).filter(k => k !== 'text');
+  return { co: e.co, base: e.team, brand: { name: e.team, short: e.s, logo: { sym: takeRand(syms), inv: Math.random() < 0.3 }, ...takeLivery(t) } };
+}
+// チームの名前・カラー・ロゴを変える（記録の表は、来季の最初のレースから新しい名前で出る）
+function takeApplyBrand(t, brand, base){
+  const prev = brandOf(t);
+  t.name = brand.name; if(brand.short) t.short = brand.short; else delete t.short;
+  if(brand.logo) t.logo = brand.logo; else delete t.logo;
+  t.col = brand.col; t.col2 = brand.col2;
+  if(base) t.tbase = base;
+  teamHistPush(t, prev);
+}
+// マシン・資金などの変化
+function takeEffect(t, type){
+  const P = career.pu, ch = CAR_KEYS.filter(k => !PU_KEYS.includes(k)), fx = { car: 0 };
+  const bump = (keys, v) => keys.forEach(k => { t.car[k] = r1(clamp(t.car[k] + v*(0.7 + Math.random()*0.6), 1, 10)); });
+  if(t.sp0 == null) t.sp0 = t.spons;
+  const sp = k => { t.sp0 = r1(t.sp0*k); t.spons = r1(Math.min(8, t.spons*k)); };
+  if(type === 'buy'){ bump(ch, 0.35); sp(1.2); fx.car = 0.35; }
+  else if(type === 'title'){ bump(ch, 0.1); sp(1.35); fx.car = 0.1; }
+  else if(type === 'maker'){
+    bump(ch, 0.25); sp(1.25); fx.car = 0.25;
+    if(P && !puWorks(t)){
+      const ms = puMakers();
+      delete P.sup[t.id]; delete P.fee[t.id];
+      PU_KEYS.forEach(k => { const av = ms.reduce((a, x) => a + x.car[k], 0)/Math.max(1, ms.length); t.car[k] = r1(clamp(av - (k === 'rel' ? 0.8 : 0.4), 1, 10)); });
+      P.lag[t.id] = Object.fromEntries(PU_KEYS.map(k => [k, t.car[k]]));
+      if(t.id === career.team){ P.selfSince = career.season; delete P.choose; P.selfNext = false; P.quitNext = false; }
+      fx.works = true;
+    } else bump(PU_KEYS, 0.3);
+  }
+  return fx;
+}
+// シーズンの終わり（career.season を進めたあと）に呼ぶ。起きたら記録を返す
+function takeOffseason(){
+  const S = career.season, n = career.teams.length, sis = career.sister && career.sister.id;
+  const posAt = (id, sn) => { const st = career.stats && career.stats.teams && career.stats.teams[id]; const x = st && st.seasons && st.seasons[sn]; return x ? x.pos : 0; };
+  const cd = career.takeCd = career.takeCd || {};
+  const cands = career.teams.filter(t => t.id !== sis && !(cd[t.id] > S) && !(t.id === career.team && career.fired)
+    && posAt(t.id, S - 1) > n - 3 && posAt(t.id, S - 2) > n - 3);
+  if(!cands.length || Math.random() >= TAKE_P) return null;
+  const w = t => posAt(t.id, S - 1) + posAt(t.id, S - 2);           // 順位が低いほど選ばれやすい
+  let x = Math.random()*cands.reduce((a, t) => a + w(t), 0), t = cands[0];
+  for(const c of cands){ x -= w(c); if(x < 0){ t = c; break; } }
+  const mine = t.id === career.team, canMaker = career.pu && !puWorks(t) && puMakers().length < TAKE_MAKER_MAX;
+  const r = Math.random();
+  let type = mine ? (canMaker && r < 0.3 ? 'maker' : 'buy') : (r < 0.5 ? 'buy' : r < 0.85 ? 'title' : 'maker');
+  if(type === 'maker' && !canMaker) type = 'buy';
+  const mk = takeMake(t, type), from = brandOf(t), fx = takeEffect(t, type);
+  const rec = { season: S, team: t.id, type, co: mk.co, kind: mk.kind || null, from, to: mk.brand, base: mk.base, fx, mine };
+  cd[t.id] = S + TAKE_CD;
+  if(mine){
+    const o = career.owner, opts = Object.keys(OWNER_PERS).filter(k => k !== o.pers), pers = takeRand(opts);
+    const cash = type === 'maker' ? 4 : 6;
+    rec.owner = { from: o.pers, to: pers, cash, trust0: o.trust };
+    o.pers = pers; o.trust = 60; career.money = r1(career.money + cash);
+    career.takeAsk = { season: S, type, brand: mk.brand, base: mk.base, co: mk.co };   // 名前・カラーを変えるかは自分で選ぶ
+  } else takeApplyBrand(t, mk.brand, mk.base);
+  (career.takes = career.takes || []).push(rec);
+  career.takePop = { season: S };
+  return rec;
+}
+// 自チーム：新しい名前・カラーにするか、今のままにするか
+function takeChoose(adopt){
+  const A = career.takeAsk; if(!A) return;
+  const me = myTeam(), rec = (career.takes || []).slice().reverse().find(x => x.mine && x.season === A.season);
+  if(adopt){
+    if(careerRace && !careerRace.done) return;
+    takeApplyBrand(me, A.brand, A.base);
+  }
+  if(rec) rec.adopt = !!adopt;
+  career.takeAsk = null; saveCareer();
+  $('#takeModal').classList.remove('show');
+  renderHQ(adopt ? `チーム名を「${A.brand.name}」に変えました。来季から新しいカラーで走ります。` : `チーム名とカラーは「${me.name}」のままにしました。`);
+}
+function takeBrandPrev(t, b){ return { ...t, name: b.name, short: b.short || undefined, logo: b.logo || undefined, col: b.col, col2: b.col2 }; }
+function takeLine(x){
+  const t = teamOf(x.team), oldN = x.from.name, ty = TAKE_TYPE[x.type];
+  if(x.mine){
+    const o = x.owner;
+    return { h: `オーナーが${oldN}を${x.co}に売却`, b: `${x.type === 'maker' ? `自動車メーカーの${x.co}がチームを買い取り、来季から自社製のPUで戦うワークスになる。` : `${x.co}がチームを買い取った。`}新しいオーナーの方針は「${OWNER_PERS[o.to].n}」。資金 +${money(o.cash)}、オーナーの信頼度は60から。` };
+  }
+  if(x.type === 'title') return { h: `${x.kind}の${x.co}が${oldN}の冠スポンサーに`, b: `来季は「${x.to.name}」として参戦。チームカラーも${x.co}の色に変わる。` };
+  if(x.type === 'maker') return { h: `${x.co}が${oldN}を買収、メーカーとして参入`, b: `来季は「${x.to.name}」として参戦。${x.fx && x.fx.works ? '自社製のPUを持つワークスチームになる。' : ''}` };
+  return { h: `${x.co}が${oldN}を買収`, b: `来季は「${x.to.name}」として参戦。新しい資金でマシンの開発も進む見込み。` };
+}
+function takeCardHtml(x, big){
+  const t = teamOf(x.team); if(!t) return '';
+  const L = takeLine(x), A = x.mine && career.takeAsk && career.takeAsk.season === x.season ? career.takeAsk : null;
+  const oldT = { ...t, ...x.from, short: x.from.short || undefined, logo: x.from.logo || undefined }; if(!x.from.col){ delete oldT.col; delete oldT.col2; }
+  const newT = takeBrandPrev(t, x.to), sz = big ? 40 : 26;
+  const sw = p => `<span class="tkSw" style="background:linear-gradient(135deg,${p[0]} 58%,${p[2]} 58%)"></span>`;
+  const keepNote = x.mine && !A ? (x.adopt ? '新しい名前・カラーに変えました' : '名前・カラーは今のままにしました') : '';
+  return `<div class="tkCard${x.mine ? ' mine' : ''}">
+    <div class="tkHead"><span class="tkType">${TAKE_TYPE[x.type].ico} ${TAKE_TYPE[x.type].n}</span></div>
+    <div class="tkBr"><span class="tkT">${teamLogo(oldT, sz)}<span><b>${esc(x.from.name)}</b>${sw(palOf(oldT))}</span></span><span class="tkArr">→</span><span class="tkT">${teamLogo(newT, sz)}<span><b>${esc(x.to.name)}</b>${sw(palOf(newT))}</span></span></div>
+    <b class="tkH">${esc(L.h)}</b><p class="tkB">${esc(L.b)}</p>
+    ${A ? `<p class="tkB"><b>新しいオーナーから提案：</b>チーム名・カラー・ロゴを「${esc(A.brand.name)}」に変えますか？（今のままでも、新オーナーの評価は変わりません）</p>
+      <div class="row tkBtns"><button type="button" class="b go" data-take="new">新しい名前にする</button><button type="button" class="b ghost" data-take="keep">今の名前のまま</button></div>` : keepNote ? `<p class="tkB muted">${keepNote}</p>` : ''}
+  </div>`;
+}
+function openTake(){
+  const L = (career.takes || []).filter(x => x.season === career.season); if(!L.length) return;
+  const mine = L.some(x => x.mine);
+  $('#takeModalT').textContent = mine ? 'チームが売却されました' : 'チームの身売り';
+  $('#takeBody').innerHTML = L.map(x => takeCardHtml(x, true)).join('');
+  $('#takeClose').hidden = !!career.takeAsk;
+  $('#takeModal').classList.add('show');
+}
+{
+  const hide = () => { if(career && career.takeAsk) return; $('#takeModal').classList.remove('show'); };
+  $('#takeClose').addEventListener('click', hide);
+  $('#takeModal').addEventListener('click', e => { if(e.target.id === 'takeModal') hide(); });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape' && $('#takeModal').classList.contains('show')) hide(); });
+  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-take]'); if(b && career && career.takeAsk) takeChoose(b.dataset.take === 'new'); });
+}
 function nextSeason(){
   Object.values(career.drivers).forEach(d => { if(!d.retired) ensureBirth(d); });   // 生年月日：年を取る前に決める（今の年齢と今季の年がそろっているうちに）
   const champ = driverTable()[0], cons = teamTable();
@@ -17368,14 +17560,16 @@ function nextSeason(){
     Object.values(career.drivers).forEach(d => { if(!d.retired && d.st && ((d.ovrH && d.ovrH.length) || ovrTeamOf(d.code))) ovrRec(d, day, { e: (rep.brk || []).some(x => x.code === d.code) ? 'brk' : 'season' }); }); }catch(e){ console.error(e); }
   let payRe = null; try{ payRe = payRenewInfo(); }catch(e){ console.error(e); }   // ペイドライバー型の継続の提案（今季の成績で確率が決まる）
   career.season++; career.round = 0; try{ rep.grayBan = grayOffseason(); }catch(e){ console.error(e); } career.calendar = makeCalendar(); career.dpts = {}; career.cpts = {}; career.last = null;
+  try{ rep.take = takeOffseason(); }catch(e){ console.error(e); }       // チームの身売り（2年続けて下位3チーム）
   if(career.home && career.home.stage === 'open'){ const i = homeInsert(career.calendar); career.money = r1(career.money - HOME_FEE); rep.home = { opened: homeOpened, reno: homeReno, round: i + 1, fee: HOME_FEE }; }
   career.owner.target = ownerTarget(); career.sponsor = null; career.sponsorOffers = makeSponsorOffers(); try{ payRenewApply(payRe); }catch(e){ console.error(e); }
-  const shift = ownerPersShift(subRes.length > 0 && subRes.every(x => !x.ok));   // オーナーの方針転換（性格が変わることがある）
+  const shift = rep.take && rep.take.mine ? null : ownerPersShift(subRes.length > 0 && subRes.every(x => !x.ok));   // 身売りで新しいオーナーになったときは方針転換なし   // オーナーの方針転換（性格が変わることがある）
   if(shift) rep.owner.pers = shift;
   career.owner.goal = makeOwnerGoal(); career.owner.goalSeason = career.season;   // 新しいシーズンの主目標（新しい性格で選ぶ）
   career.owner.subs = makeOwnerSubs(); career.owner.subSeason = career.season;   // 新しいシーズンの副目標（新しい性格で選ぶ）
   if(regAnnounced()) assignRegPol();
   careerRace = null; saveCareer(); renderHQ();
+  if(career.takePop){ career.takePop = null; saveCareer(); openTake(); }
 }
 function driverTable(){
   const list = [];
@@ -17835,6 +18029,16 @@ function teamAt(id, sn, rd = 999){
   const o = { ...t, name: e.name }; if(e.short) o.short = e.short; else delete o.short; if(e.logo) o.logo = e.logo; else delete o.logo;
   if(e.col){ o.col = e.col; o.col2 = e.col2; } else if(e.col === null){ delete o.col; delete o.col2; }
   return o;
+}
+// チームの歴史：名前ごとの期間（記録のチームの詳細）
+function teamEraHtml(t){
+  const L = career.teamHist && career.teamHist[t.id]; if(!L || L.length < 2) return '';
+  const eras = [];
+  L.forEach(x => { const last = eras[eras.length - 1]; if(last && last.name === x.name) return; eras.push({ name: x.name, at: x.at }); });
+  if(eras.length < 2) return '';
+  const st = e => e.at === 0 ? 1 : Math.floor(e.at/1000), en = n => Math.floor(n.at/1000) - (n.at % 1000 <= 1 ? 1 : 0);
+  return `<p class="rcEra">チームの歴史：${eras.map((e, i) => { const nx = eras[i + 1];
+    return `<b>${esc(e.name)}</b>（${e.at === 0 ? '' : SY(st(e)) + '年'}〜${nx ? SY(en(nx)) + '年' : ''}）`; }).join(' → ')}</p>`;
 }
 const teamOldNames = t => { const L = career.teamHist && career.teamHist[t.id]; return L ? [...new Set(L.map(x => x.name))].filter(n => n !== t.name) : []; };
 function sisBrandSave(){
@@ -18834,6 +19038,7 @@ function renderHQ(msg){
     const todoI = pendingContracts().map(t => ['bad', t, 'drv']);
     if(!career.sponsor) todoI.unshift(['bad', 'スポンサーを選ぶ', 'ov']);
     Object.keys(career.facRen || {}).forEach(k => todoI.push(['warn', `${FAC_K[k].n}の改修を決める`, 'fac']));
+    if(career.takeAsk) todoI.unshift(['bad', '新しいチーム名にするか決める（下の「チームの身売り」）', 'ov']);
     const todoB = `<div class="osBlk osTodo ${todoI.length ? '' : 'ok'}"><span class="osLab">要対応${todoI.length ? `<b>${todoI.length}件</b>` : ''}</span>${todoI.length ? `<div class="osTodoL">${todoI.map(([lv, t, tab]) => `<button type="button" class="todo ${lv}" data-hqt="${tab}"><i aria-hidden="true">!</i><span>${esc(t)}</span></button>`).join('')}</div>` : '<p class="osNone">対応が必要なことはありません。</p>'}</div>`;
     // ドライバー：総合の前後と、能力ごとの伸び
     const drvCard = code => { const d = career.drivers[code]; if(!d || !d.st) return '';
@@ -18875,6 +19080,7 @@ function renderHQ(msg){
       <h2>オフシーズンの変化<span class="kick">SEASON ${SY(career.season)}</span></h2>
       <div class="osGrid">
       ${todoB}
+      ${off.take ? `<div class="osBlk"><span class="osLab">チームの身売り</span>${takeCardHtml(off.take, false)}</div>` : ''}
       <div class="osBlk osPrev"><span class="osLab">前シーズンの精算</span>
         ${off.sisSeason ? `<div style="margin-bottom:6px">セカンドチーム（${esc(off.sisSeason.name)}）はコンストラクターズ${off.sisSeason.pos}位。シーズン賞金の分配 <b class="gainT">+${money(off.sisSeason.v)}</b></div>` : ''}
         ${off.owner ? `<div style="margin-bottom:6px">前シーズン：コンストラクターズ${off.owner.pos}位（${off.owner.goal && off.owner.goal.kind !== 'rank' ? `主目標「${esc(off.owner.gt)}」${esc(off.owner.gp)}${off.owner.ease ? '。先行研究の分、少し届かなくても達成として扱う' : ''}` : `目標${off.owner.target}位以内${off.owner.ease ? `。先行研究の評価で${Math.min(10, off.owner.target + off.owner.ease)}位までを達成として扱う` : ''}`}）→ <b class="${off.owner.cls}">${off.owner.grade}</b>。ボーナス ${off.owner.bonus >= 0 ? '+' : ''}${money(off.owner.bonus)}、シーズン賞金 +${money(off.owner.prize)}、信頼度 ${off.owner.trustD >= 0 ? '+' : ''}${off.owner.trustD}${off.owner.subs && off.owner.subs.length ? `。副目標 ${off.owner.subs.map(x => `「${esc(x.t)}」<b class="${x.ok ? 'gainT' : 'lossT'}">${x.ok ? '達成' : '未達'}</b>`).join('・')}（ボーナス +${money(off.owner.subB)}・信頼度 ${off.owner.subT >= 0 ? '+' : ''}${off.owner.subT}）` : ''}（信頼度 ${off.owner.trust}）</div>${off.owner.pers ? `<div class="persShift">オーナーが方針を転換：<b>${esc(OWNER_PERS[off.owner.pers.from].n)}</b> → <b>${esc(OWNER_PERS[off.owner.pers.to].n)}</b>。今シーズンの副目標は新しい方針で選ばれています。</div>` : ''}` : ''}
@@ -22460,8 +22666,9 @@ function renderRecords(){
       const s = statT(id), t = teamOf(id);
       const seasons = Object.entries(s.seasons).sort((a, b) => b[0] - a[0]);
       detail = `<div class="recDetail"><div class="recTitle">${teamLogo(t, 22)}<b>${esc(t.name)}</b>${close}</div>
+        ${teamEraHtml(t)}
         <div class="recNums">${[['出走', s.starts], ['タイトル', s.titles], ['優勝', s.wins], ['表彰台', s.podiums], ['ポール', s.poles], ['FL', s.fl], ['ポイント', s.points], ['勝率', recPct(recRate(s.wins, s.starts))], ['最高位', posTxt(s.bestPos)]].map(([k, v]) => `<span><small>${k}</small><b>${v}</b></span>`).join('')}</div>
-        ${seasons.length ? `<div class="wrapx"><table class="stand"><tr><th>シーズン</th><th class="n">ポイント</th><th class="n">順位</th><th>ドライバー</th></tr>${seasons.map(([sn, x]) => `<tr><td><button type="button" class="recLink" data-rsn="${sn}">${SY(sn)}年シーズン</button></td><td class="n">${x.pts}</td><td class="n"><span class="rcP ${rcMedal(x.pos)}">${x.pos}</span></td><td class="muted">${(x.drivers || []).join(' / ')}</td></tr>`).join('')}</table></div>` : '<p class="note">シーズンを終えると、ここにシーズンごとの順位が記録されます。</p>'}</div>`;
+        ${seasons.length ? `<div class="wrapx"><table class="stand"><tr><th>シーズン</th>${teamOldNames(t).length ? '<th>チーム名</th>' : ''}<th class="n">ポイント</th><th class="n">順位</th><th>ドライバー</th></tr>${seasons.map(([sn, x]) => `<tr><td><button type="button" class="recLink" data-rsn="${sn}">${SY(sn)}年シーズン</button></td>${teamOldNames(t).length ? (() => { const e = teamAt(id, +sn); return `<td>${teamLogo(e, 16)}${esc(e.name)}</td>`; })() : ''}<td class="n">${x.pts}</td><td class="n"><span class="rcP ${rcMedal(x.pos)}">${x.pos}</span></td><td class="muted">${(x.drivers || []).join(' / ')}</td></tr>`).join('')}</table></div>` : '<p class="note">シーズンを終えると、ここにシーズンごとの順位が記録されます。</p>'}</div>`;
     }
   }
   const hint = { alltime: '年齢は生年月日とレースの開催日から出しています。自チームの選手の記録は水色で示します。名前を押すと通算の戦績を表示します。', season: '名前を押すと通算の戦績、シーズンを押すとその年の順位表に切り替わります。', teams: '見出しを押すと並べ替えます（もう一度押すと逆順）。名前を押すとシーズンごとの成績を表示します。', drivers: '見出しを押すと並べ替えます（もう一度押すと逆順）。名前を押すとシーズンごとの成績を表示します。' }[recView];
@@ -23433,6 +23640,10 @@ function makeNews(){
     if(L.round === Math.round(2*career.calendar.length/6) || L.round === Math.round(4*career.calendar.length/6)){ const nx = Object.entries(career.reg.pol || {}).filter(([, v]) => v === 'next').map(([id]) => teamOf(id)).filter(Boolean); const t = nx[Math.floor(Math.random()*nx.length)];
       if(t) add('噂', '', 58, `${t.name}、来季に照準か`, `${t.name}は今季の開発を抑え、来季の${th.n}規則に向けた研究に力を入れているとの噂がある。`); }
   }
+  if(L.round === 1) (career.takes || []).filter(x => x.season === career.season).forEach(x => { const t = teamOf(x.team); if(!t) return;
+    const cs = order.filter(c => c.m.team === t.id && fin(c)).map(pos), mineT = x.team === me, renamed = t.name !== x.from.name;
+    add('新体制', mineT ? 'mine' : '', mineT ? 92 : 62, renamed ? `新生「${t.name}」がデビュー` : `新オーナーの${t.name}、新体制の初戦`,
+      `${TAKE_TYPE[x.type].n}で${renamed ? `生まれ変わった${t.name}（旧${x.from.name}）` : `${x.co}の傘下に入った${t.name}`}。${cs.length ? `最上位は${Math.min(...cs)}位。` : '2台ともリタイアに終わった。'}`); });
   if(regFirstYear() && L.round === 1) add('規則', 'good', 85, `新規則の初戦、${career.reg.cur.theme ? REG_THEMES[career.reg.cur.theme].n : ''}の新時代が開幕`, `先行研究の差がどこまで出たのか。変わった部分の開発はまだ伸びしろが大きい。`);
   { const TL = L.to || [], nm = id => (teamOf(id) || {}).name || '';
     const mineSw = TL.filter(x => x.team === me && x.kind === 'swap'), mineBad = TL.filter(x => x.team === me && (x.kind === 'refuse' || x.kind === 'ignore'));
@@ -23626,6 +23837,7 @@ function openSaveIO(){
 $('#cname').value = course.name;
 updateTTRange(); syncSliders(); resize(); rebuild(); ecamFitWorld(); updateSizeUI(); renderCourseList(); renderMachines(); updateHint(); updateCamUI(); updateSoundBtn(); updateSetSummary(); updateCtl();
 syncTabs('hq'); renderHQ();
+if(career && career.takeAsk) try{ openTake(); }catch(e){ console.error(e); }   // 自チームの身売り：名前・カラーを選ぶまで出す
 requestAnimationFrame(loop);
 })();
 </script>
